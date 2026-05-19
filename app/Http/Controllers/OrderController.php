@@ -256,7 +256,7 @@ class OrderController extends Controller
             ->latest('updated_at')
             ->get();
 
-        return view('roles.customer.orders.order', compact('order', 'histori'));
+        return view('roles.customer.orders.orders', compact('order', 'histori'));
     }
 
     /**
