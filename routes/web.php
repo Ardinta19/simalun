@@ -20,13 +20,19 @@ Route::middleware('guest')->group(function () {
     Route::get('/', fn() => view('welcome'))->name('welcome');
 
     Route::get('/login', fn() => view('auth.login'))->name('login');
-    Route::post('/login', [LoginController::class, 'authenticate'])->name('login.post');
+    Route::post('/login', [LoginController::class, 'authenticate'])
+        ->middleware('throttle:5,1')
+        ->name('login.post');
 
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'store'])->name('register.post');
+    Route::post('/register', [RegisterController::class, 'store'])
+        ->middleware('throttle:3,1')
+        ->name('register.post');
 
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
-    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendLink'])->name('password.email');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendLink'])
+        ->middleware('throttle:3,1')
+        ->name('password.email');
 
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'update'])->name('password.update.reset');
@@ -58,10 +64,10 @@ Route::middleware('auth')->group(function () {
         ->name('profile.primary-address');
 
     Route::get('/order/create', [OrderController::class, 'create'])
-        ->middleware('role:customer')
+        ->middleware(['role:customer', 'verified'])
         ->name('order.create');
     Route::post('/order/store', [OrderController::class, 'store'])
-        ->middleware(['role:customer', 'throttle:6,1'])
+        ->middleware(['role:customer', 'verified', 'throttle:6,1'])
         ->name('order.store');
     Route::get('/order/{orderCode}', [OrderController::class, 'show'])
         ->name('order.show');
