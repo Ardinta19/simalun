@@ -22,7 +22,7 @@ class ProfileController extends Controller
         }
 
         $view = match ($user->role) {
-            'admin'  => 'roles.admin.profile-edit',
+            'admin'  => 'roles.admin.profile_edit',
             'driver' => 'roles.driver.profile-edit',
             default  => 'roles.customer.profile.edit',
         };
