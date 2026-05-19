@@ -3,187 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Profil – Azka Laundry</title>
+<title>Profil Admin – Azka Laundry</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
-:root {
-  --blue-dark:#002f5c; --blue-mid:#0077b6; --blue-light:#00b4d8;
-  --blue-sky:#e0f4ff; --orange:#FF6B35; --green:#00C48C;
-  --white:#ffffff; --ink:#1a2332; --ink-mid:#3d5066; --ink-lt:#8899aa;
-  --surface:#f4f8fc; --border:#ddeeff; --radius:16px; --nav-h:72px;
-}
+:root{--blue-dark:#002f5c;--blue-mid:#0077b6;--blue-light:#00b4d8;--blue-sky:#e0f4ff;--orange:#f59e0b;--green:#00C48C;--ink:#1a2332;--ink-mid:#3d5066;--ink-lt:#8899aa;--surface:#f4f8fc;--card:#fff;--border:#ddeeff;--radius:18px;--nav-h:72px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:var(--nav-h);}
+body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);}
+.wrap{max-width:520px;margin:0 auto;padding:max(env(safe-area-inset-top,0px),16px) 16px 16px;}
 
-.top-header{background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue-mid) 60%,var(--blue-light) 100%);padding:0;position:relative;overflow:hidden;}
-.top-header::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06);top:-80px;right:-60px;}
-.header-inner{position:relative;z-index:1;padding:max(env(safe-area-inset-top,0px),20px) 20px 20px;max-width:520px;margin:0 auto;}
-.header-top{display:flex;align-items:center;gap:12px;margin-bottom:0;}
-.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.1rem;flex-shrink:0;}
-.header-title{font-family:'Fredoka One',cursive;font-size:1.2rem;color:#fff;flex:1;}
-.header-wave{display:block;width:100%;margin-bottom:-2px;}
+/* Header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 4px;}
+.page-header-left{display:flex;align-items:center;gap:10px;}
+.page-header-left img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border);}
+.page-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--ink);}
+.notif-btn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;position:relative;font-size:1rem;box-shadow:0 2px 6px rgba(0,47,92,.06);}
+.notif-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;background:var(--orange);color:#fff;border-radius:99px;font-size:.55rem;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);padding:0 3px;}
 
-.page-body{max-width:520px;margin:0 auto;padding:16px 16px 8px;}
+/* Profile Card */
+.profile-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;box-shadow:0 4px 16px rgba(0,47,92,.05);}
+.profile-card-inner{display:flex;flex-direction:column;align-items:flex-start;}
+.profile-name{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--ink);line-height:1.2;}
+.profile-desc{font-size:.8rem;font-weight:700;color:var(--ink-lt);margin-top:4px;}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:5px 12px;border-radius:99px;background:#e6fff6;border:1px solid #a7f3d0;font-size:.72rem;font-weight:800;color:#065f46;}
+.profile-badge-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
 
-/* Avatar card */
-.avatar-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 20px;text-align:center;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,47,92,.06);}
-.avatar-wrap{width:80px;height:80px;border-radius:50%;background:var(--blue-sky);border:3px solid var(--border);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;}
-.avatar-wrap img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.profile-name{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--ink);}
-.profile-role{font-size:.75rem;font-weight:800;color:var(--ink-lt);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;}
-.edit-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--blue-mid);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;border:none;border-radius:99px;padding:.5rem 1.2rem;cursor:pointer;text-decoration:none;margin-top:14px;transition:background .2s;}
-.edit-btn:hover{background:var(--blue-dark);}
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 2px 8px rgba(0,47,92,.04);display:flex;align-items:center;gap:12px;}
+.stat-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.stat-ico.blue{background:var(--blue-sky);color:var(--blue-mid);}
+.stat-ico.orange{background:#fff3e0;color:#d97706;}
+.stat-body{}
+.stat-num{font-family:'Fredoka One',cursive;font-size:1.4rem;line-height:1;color:var(--ink);}
+.stat-lbl{font-size:.68rem;font-weight:800;color:var(--ink-lt);margin-top:2px;text-transform:uppercase;letter-spacing:.3px;}
 
-/* Info list */
-.info-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,47,92,.06);}
-.info-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);}
-.info-row:last-child{border-bottom:none;}
-.info-icon{width:36px;height:36px;border-radius:10px;background:var(--blue-sky);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
-.info-body{flex:1;min-width:0;}
-.info-label{font-size:.68rem;font-weight:800;color:var(--ink-lt);text-transform:uppercase;letter-spacing:.3px;}
-.info-value{font-size:.92rem;font-weight:700;color:var(--ink);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Menu section */
+.section-label{font-size:.72rem;font-weight:900;color:var(--ink-lt);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;padding-left:4px;}
+.menu-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,47,92,.04);}
+.menu-item{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--ink);transition:background .15s;}
+.menu-item:last-child{border-bottom:none;}
+.menu-item:active{background:var(--blue-sky);}
+.menu-ico{width:38px;height:38px;border-radius:12px;background:var(--blue-sky);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.menu-body{flex:1;}
+.menu-label{font-weight:800;font-size:.88rem;color:var(--ink);}
+.menu-sub{font-size:.7rem;font-weight:700;color:var(--ink-lt);margin-top:2px;}
+.menu-arrow{color:var(--ink-lt);font-size:1rem;}
 
-/* Danger zone */
-.danger-card{background:#fff;border:1.5px solid #fee2e2;border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;}
-.danger-title{font-size:.82rem;font-weight:800;color:#ef4444;margin-bottom:10px;}
-.btn-logout{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.65rem;border-radius:99px;border:1.5px solid #ef4444;background:transparent;color:#ef4444;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;text-decoration:none;transition:all .2s;}
-.btn-logout:hover{background:#ef4444;color:#fff;}
+/* Banner */
+.ops-banner{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue-mid) 100%);border-radius:var(--radius);padding:20px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,47,92,.15);}
+.ops-banner::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);top:-40px;right:-30px;}
+.ops-banner-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:#fff;line-height:1.2;margin-bottom:4px;}
+.ops-banner-sub{font-size:.75rem;font-weight:700;color:rgba(255,255,255,.7);}
 
-/* Alert */
-.alert-success{background:#e6fff6;border:1.5px solid var(--green);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;font-size:.85rem;font-weight:700;color:var(--green);}
+/* Logout */
+.logout-section{margin-top:8px;}
+.btn-logout{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:99px;border:1.5px solid #fecaca;background:#fff;color:#dc2626;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;transition:all .15s;}
+.btn-logout:active{background:#fef2f2;border-color:#fca5a5;}
+.version{text-align:center;margin-top:12px;font-size:.7rem;font-weight:700;color:var(--ink-lt);letter-spacing:.3px;}
 
-/* Bottom nav */
-.nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-top:1.5px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:520px;height:100%;margin:0 auto;display:flex;align-items:center}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#94a3b8;transition:color 0.2s}
-.nav-item.active{color:var(--blue-mid)}
-.nav-ico{font-size:1.4rem;line-height:1}
-.nav-label{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.3px}
-
-.nav-fab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
-.nav-fab-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,107,53,0.45);margin-top:-25px;transition:transform 0.15s;color:#fff;font-size:2rem;font-family:'Fredoka One',cursive}
-.nav-fab:active .nav-fab-btn{transform:scale(0.95)}
-.nav-fab-lbl{font-size:0.62rem;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+/* Bottom Nav */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-top:1.5px solid var(--border);padding-bottom:env(safe-area-inset-bottom);z-index:100;}
+.nav-in{max-width:520px;margin:0 auto;height:100%;display:flex;align-items:center;}
+.nav-item{flex:1;text-decoration:none;color:#94a3b8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:800;font-size:.65rem;text-transform:uppercase;letter-spacing:.4px;}
+.nav-item.active{color:var(--blue-mid);}
+.nav-item svg{width:22px;height:22px;margin-bottom:1px;}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="top-header">
-  <div class="header-inner">
-    <div class="header-top">
-      @php
-  $role = auth()->user()->role;
-  $dashboardRoute = $role === 'admin' ? 'dashboard.admin' : ($role === 'driver' ? 'dashboard.driver' : 'customer.dashboard');
-@endphp
-<a href="{{ route($dashboardRoute) }}" class="back-btn">‹</a>
-      <div class="header-title">Profil Saya</div>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="page-header-left">
+      <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0077b6&color=fff&size=72" alt="{{ $user->name }}">
+      <span class="page-title">Profil Admin</span>
     </div>
-  </div>
-  <svg class="header-wave" viewBox="0 0 1440 28" preserveAspectRatio="none" style="height:28px;">
-    <path fill="#f4f8fc" d="M0,14 C240,28 480,0 720,14 C960,28 1200,0 1440,14 L1440,28 L0,28Z"/>
-  </svg>
-</div>
-
-<div class="page-body">
+    <a href="{{ route('admin.notifications') }}" class="notif-btn">
+      &#128276;
+      @php $adminUnread = auth()->user()->unreadNotifications->count(); @endphp
+      @if($adminUnread > 0)
+        <span class="notif-badge">{{ $adminUnread }}</span>
+      @endif
+    </a>
+  </header>
 
   @if(session('status') === 'profile-updated')
-  <div class="alert-success">✅ Profil berhasil diperbarui.</div>
+  <div style="background:#e6fff6;border:1.5px solid #a7f3d0;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:.82rem;font-weight:700;color:#065f46;">Profil berhasil diperbarui.</div>
   @endif
 
-  <!-- Avatar Card -->
-  <div class="avatar-card">
-    <div class="avatar-wrap">
-      @if($user->avatar)
-        <img src="{{ asset('storage/'.$user->avatar) }}" alt="Avatar">
-      @else
-        👤
-      @endif
+  <!-- Profile Card -->
+  <div class="profile-card">
+    <div class="profile-card-inner">
+      <div class="profile-name">{{ $user->name }}</div>
+      <div class="profile-desc">Administrator Utama</div>
+      <div class="profile-badge">
+        <span class="profile-badge-dot"></span>
+        Sistem Aktif
+      </div>
     </div>
-    <div class="profile-name">{{ $user->name }}</div>
-    <div class="profile-role">{{ ucfirst($user->role) }}</div>
-    <a href="{{ route('profile.edit') }}" class="edit-btn">
-      ✏️ Edit Profil
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-ico blue">&#128101;</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ \App\Models\User::where('role','driver')->where('is_active',true)->count() }}</div>
+        <div class="stat-lbl">Kurir Aktif</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico orange">&#128230;</div>
+      <div class="stat-body">
+        <div class="stat-num">{{ \App\Models\Order::whereDate('created_at', today())->count() }}</div>
+        <div class="stat-lbl">Pesanan Hari Ini</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pengaturan Operasional -->
+  <div class="section-label">Pengaturan Operasional</div>
+  <div class="menu-card">
+    <a href="{{ route('admin.orders') }}" class="menu-item">
+      <div class="menu-ico">&#9881;</div>
+      <div class="menu-body">
+        <div class="menu-label">Manajemen Layanan</div>
+        <div class="menu-sub">Kelola pesanan dan status order</div>
+      </div>
+      <span class="menu-arrow">&#8250;</span>
+    </a>
+    <a href="{{ route('admin.orders') }}" class="menu-item">
+      <div class="menu-ico">&#128101;</div>
+      <div class="menu-body">
+        <div class="menu-label">Daftar Kurir</div>
+        <div class="menu-sub">Lihat dan kelola kurir aktif</div>
+      </div>
+      <span class="menu-arrow">&#8250;</span>
+    </a>
+    <a href="{{ route('admin.finance.index') }}" class="menu-item">
+      <div class="menu-ico">&#128200;</div>
+      <div class="menu-body">
+        <div class="menu-label">Laporan Keuangan</div>
+        <div class="menu-sub">Rekap pemasukan dan pengeluaran</div>
+      </div>
+      <span class="menu-arrow">&#8250;</span>
     </a>
   </div>
 
-  <!-- Info -->
-  <div class="info-card">
-    <div class="info-row">
-      <div class="info-icon">📧</div>
-      <div class="info-body">
-        <div class="info-label">Email</div>
-        <div class="info-value">{{ $user->email }}</div>
-      </div>
-    </div>
-    <div class="info-row">
-      <div class="info-icon">📱</div>
-      <div class="info-body">
-        <div class="info-label">Nomor HP</div>
-        <div class="info-value">{{ $user->phone ?? '-' }}</div>
-      </div>
-    </div>
-    <div class="info-row">
-      <div class="info-icon">📅</div>
-      <div class="info-body">
-        <div class="info-label">Bergabung Sejak</div>
-        <div class="info-value">{{ $user->created_at->format('d M Y') }}</div>
-      </div>
-    </div>
+  <!-- Banner -->
+  <div class="ops-banner">
+    <div class="ops-banner-title">Optimalkan Operasi</div>
+    <div class="ops-banner-sub">Cek performa outlet hari ini</div>
   </div>
 
-  <!-- Danger -->
-  <div class="danger-card">
-    <div class="danger-title">⚠️ Akun</div>
+  <!-- Logout -->
+  <div class="logout-section">
     <form method="POST" action="{{ route('logout') }}">
       @csrf
       <button type="submit" class="btn-logout">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
-        Keluar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
       </button>
     </form>
   </div>
+  <div class="version">Azka Laundry v2.4.0 &bull; Admin Panel</div>
 
 </div>
 
-<nav class="nav">
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
   <div class="nav-in">
-    @php
-      $role = auth()->user()->role;
-      $beranda = $role === 'admin' ? 'dashboard.admin' : ($role === 'driver' ? 'driver.dashboard' : 'customer.dashboard');
-      $orders  = $role === 'admin' ? 'admin.orders' : ($role === 'driver' ? 'driver.orders' : 'customer.orders');
-      $notif   = $role === 'admin' ? 'admin.notifications' : ($role === 'driver' ? 'driver.notifications' : 'customer.notifications');
-      $profile = $role === 'admin' ? 'admin.profile' : ($role === 'driver' ? 'profile.edit' : 'customer.profile');
-    @endphp
-    <a href="{{ route($beranda) }}" class="nav-item">
-      <span class="nav-ico">🏠</span><span class="nav-label">Beranda</span>
+    <a href="{{ route('dashboard.admin') }}" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Beranda</span>
     </a>
-    <a href="{{ route($orders) }}" class="nav-item">
-      <span class="nav-ico">📋</span><span class="nav-label">Pesanan</span>
+    <a href="{{ route('admin.orders') }}" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+      <span>Pesanan</span>
     </a>
-    @if($role === 'admin')
-      <a href="{{ route('admin.walkin.form') }}" class="nav-fab">
-        <div class="nav-fab-btn"><span>+</span></div>
-        <span class="nav-fab-lbl">Walk-in</span>
-      </a>
-    @elseif($role === 'driver')
-      <a href="{{ route('driver.tracking') }}" class="nav-fab">
-        <div class="nav-fab-btn"><span>📍</span></div>
-        <span class="nav-fab-lbl">Lacak</span>
-      </a>
-    @else
-      <a href="{{ route('order.create') }}" class="nav-fab">
-        <div class="nav-fab-btn"><span>+</span></div>
-        <span class="nav-fab-lbl">Pesan</span>
-      </a>
-    @endif
-    <a href="{{ route($notif) }}" class="nav-item">
-      <span class="nav-ico">🔔</span><span class="nav-label">Notif</span>
-    </a>
-    <a href="{{ route($profile) }}" class="nav-item active">
-      <span class="nav-ico">👤</span><span class="nav-label">Profil</span>
+    <a href="{{ route('admin.profile') }}" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profil</span>
     </a>
   </div>
 </nav>

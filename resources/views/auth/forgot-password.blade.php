@@ -296,7 +296,7 @@ html, body {
         <div class="alert alert-error">⚠️ {{ $errors->first() }}</div>
       @endif
 
-      <form method="POST" action="{{ route('password.update') }}" id="reset-form" novalidate>
+      <form method="POST" action="{{ route('password.update.reset') }}" id="reset-form" novalidate>
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
 

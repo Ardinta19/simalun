@@ -117,6 +117,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'adminIndex'])->name('notifications');
 
         Route::get('/profile', [ProfileController::class, 'adminShow'])->name('profile');
+
+        Route::get('/help', fn() => view('roles.admin.help'))->name('help');
     });
 
     Route::middleware('role:driver')->prefix('driver')->name('driver.')->group(function () {
@@ -131,6 +133,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'driverIndex'])->name('notifications');
 
         Route::get('/help', fn() => view('roles.driver.help'))->name('help');
+
+        Route::get('/profile', fn() => view('roles.driver.profile'))->name('profile');
     });
 
     Route::get('/dashboard/admin',  [DashboardController::class, 'admin'])->name('dashboard.admin');

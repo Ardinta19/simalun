@@ -222,7 +222,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
             </span>
             <span class="driver-nav__label">Notif</span>
         </a>
-        <a href="{{ route('profile.edit') }}" class="driver-nav__item">
+        <a href="{{ route('driver.profile') }}" class="driver-nav__item">
             <span class="driver-nav__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
