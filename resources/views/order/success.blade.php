@@ -43,6 +43,20 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
 .btn-home:active{transform:scale(.97);}
 .btn-secondary{display:block;width:100%;padding:12px;margin-top:10px;background:none;color:var(--blue-mid);font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;transition:background .2s;}
 .btn-secondary:hover{background:var(--surface);}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (min-width: 768px) {
+  .card { max-width: 480px; padding: 40px 32px; border-radius: 20px; }
+  h1 { font-size: 1.7rem; }
+  .success-ring { width: 90px; height: 90px; }
+}
+@media (min-width: 1024px) {
+  .card { max-width: 520px; padding: 48px 40px; border-radius: 24px; }
+  body { padding: 40px 24px; }
+}
+@media (min-width: 1280px) {
+  .card { max-width: 560px; }
+}
 </style>
 </head>
 <body>
@@ -117,8 +131,49 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
   </div>
 
   <a href="{{ route('customer.dashboard') }}" class="btn-home">Kembali ke Beranda</a>
-  <a href="{{ route('order.show', $order->order_code) }}" class="btn-secondary">Lacak Pesanan →</a>
+  <a href="{{ route('customer.order.detail', $order->id) }}" class="btn-secondary">Lacak Pesanan →</a>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const card = document.querySelector('.card');
+  const ring = document.querySelector('.success-ring');
+  const details = document.querySelector('.detail-list');
+  const buttons = document.querySelectorAll('.btn-home, .btn-secondary');
+
+  gsap.from(card, { opacity: 0, y: 40, duration: 0.6, ease: 'power3.out' });
+  gsap.from(ring, { scale: 0, rotation: -180, duration: 0.7, delay: 0.2, ease: 'back.out(1.7)' });
+  gsap.from('h1, .subtitle', { opacity: 0, y: 20, duration: 0.5, stagger: 0.1, delay: 0.4, ease: 'power2.out' });
+  gsap.from('.order-code', { opacity: 0, scale: 0.9, duration: 0.5, delay: 0.6, ease: 'back.out(1.5)' });
+  gsap.from('.status-badge', { opacity: 0, x: -20, duration: 0.4, delay: 0.7, ease: 'power2.out' });
+
+  if (details) {
+    gsap.from(details.querySelectorAll('.detail-row'), {
+      opacity: 0, x: -15, duration: 0.4, stagger: 0.06, delay: 0.8, ease: 'power2.out'
+    });
+  }
+
+  gsap.from(buttons, { opacity: 0, y: 15, duration: 0.4, stagger: 0.1, delay: 1.0, ease: 'power2.out' });
+
+  // Confetti-like particles
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    const colors = ['#FF6B35', '#0077b6', '#00C48C', '#48cae4', '#FFD700'];
+    p.style.cssText = `position:fixed;width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};pointer-events:none;z-index:1000;top:-10px;left:${Math.random()*100}%;`;
+    document.body.appendChild(p);
+    gsap.to(p, {
+      y: window.innerHeight + 50,
+      x: `+=${(Math.random()-0.5)*200}`,
+      rotation: Math.random()*720,
+      duration: 2 + Math.random()*2,
+      delay: Math.random()*0.5,
+      ease: 'power1.in',
+      onComplete: () => p.remove()
+    });
+  }
+});
+</script>
 
 </body>
 </html>

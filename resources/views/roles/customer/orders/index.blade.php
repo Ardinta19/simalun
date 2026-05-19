@@ -422,6 +422,27 @@ body {
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 }
+
+/* ═══════ RESPONSIVE ═══════ */
+@media(min-width:768px){
+  .page-header .header-row{max-width:680px;}
+  .filter-inner{max-width:680px;}
+  .page-body{max-width:680px;padding:20px 32px;}
+  .order-card{border-radius:22px;}
+  .active-banner{border-radius:22px;}
+}
+@media(min-width:1024px){
+  .page-header .header-row{max-width:720px;}
+  .filter-inner{max-width:720px;}
+  .page-body{max-width:720px;padding:24px 40px;}
+  .order-card{border-radius:24px;}
+  .active-banner{border-radius:24px;padding:20px;}
+}
+@media(min-width:1280px){
+  .page-header .header-row{max-width:800px;}
+  .filter-inner{max-width:800px;}
+  .page-body{max-width:800px;}
+}
 </style>
 </head>
 <body>

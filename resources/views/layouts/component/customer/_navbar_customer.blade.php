@@ -6,13 +6,14 @@
 
 @php $navActive = $active ?? 'beranda'; @endphp
 
-<nav class="customer-nav" id="customer-nav">
+<nav class="customer-nav" id="customer-nav" aria-label="Navigasi utama">
     <div class="customer-nav__inner">
 
         {{-- Beranda --}}
         <a href="{{ route('customer.dashboard') }}"
            class="customer-nav__item {{ $navActive === 'beranda' ? 'is-active' : '' }}"
-           aria-label="Beranda">
+           aria-label="Beranda"
+           @if($navActive === 'beranda') aria-current="page" @endif>
             <span class="customer-nav__icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
@@ -20,19 +21,21 @@
                 </svg>
             </span>
             <span class="customer-nav__label">Beranda</span>
+            @if($navActive === 'beranda')<span class="customer-nav__dot"></span>@endif
         </a>
 
         {{-- Pesanan --}}
         <a href="{{ route('customer.orders') }}"
            class="customer-nav__item {{ $navActive === 'pesanan' ? 'is-active' : '' }}"
-           aria-label="Pesanan">
+           aria-label="Pesanan"
+           @if($navActive === 'pesanan') aria-current="page" @endif>
             <span class="customer-nav__icon">
                 @php
-                    $unreadOrders = 0;
-                    try { $unreadOrders = auth()->user()?->customerOrders()->whereIn('status', ['siap', 'dikirim', 'selesai'])->where('updated_at', '>=', now()->subHours(24))->count() ?? 0; } catch (\Exception $e) {}
+                    $navUnreadOrders = 0;
+                    try { $navUnreadOrders = auth()->user()?->customerOrders()->whereIn('status', ['siap', 'dikirim'])->where('updated_at', '>=', now()->subHours(24))->count() ?? 0; } catch (\Exception $e) {}
                 @endphp
-                @if($unreadOrders > 0)
-                    <span class="customer-nav__badge">{{ $unreadOrders > 9 ? '9+' : $unreadOrders }}</span>
+                @if($navUnreadOrders > 0)
+                    <span class="customer-nav__badge">{{ $navUnreadOrders > 9 ? '9+' : $navUnreadOrders }}</span>
                 @endif
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
@@ -42,6 +45,7 @@
                 </svg>
             </span>
             <span class="customer-nav__label">Pesanan</span>
+            @if($navActive === 'pesanan')<span class="customer-nav__dot"></span>@endif
         </a>
 
         {{-- FAB: Pesan Baru --}}
@@ -60,14 +64,15 @@
         {{-- Notifikasi --}}
         <a href="{{ route('customer.notifications') }}"
            class="customer-nav__item {{ $navActive === 'notif' ? 'is-active' : '' }}"
-           aria-label="Notifikasi">
+           aria-label="Notifikasi"
+           @if($navActive === 'notif') aria-current="page" @endif>
             <span class="customer-nav__icon" style="position:relative">
                 @php
-                    $unreadNotif = 0;
-                    try { $unreadNotif = auth()->user()?->unreadNotifications?->count() ?? 0; } catch (\Exception $e) {}
+                    $navUnreadNotif = 0;
+                    try { $navUnreadNotif = auth()->user()?->unreadNotifications?->count() ?? 0; } catch (\Exception $e) {}
                 @endphp
-                @if($unreadNotif > 0)
-                    <span class="customer-nav__badge">{{ $unreadNotif > 9 ? '9+' : $unreadNotif }}</span>
+                @if($navUnreadNotif > 0)
+                    <span class="customer-nav__badge">{{ $navUnreadNotif > 9 ? '9+' : $navUnreadNotif }}</span>
                 @endif
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -75,12 +80,14 @@
                 </svg>
             </span>
             <span class="customer-nav__label">Notif</span>
+            @if($navActive === 'notif')<span class="customer-nav__dot"></span>@endif
         </a>
 
         {{-- Profil --}}
         <a href="{{ route('customer.profile') }}"
            class="customer-nav__item {{ $navActive === 'profil' ? 'is-active' : '' }}"
-           aria-label="Profil">
+           aria-label="Profil"
+           @if($navActive === 'profil') aria-current="page" @endif>
             <span class="customer-nav__icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
@@ -88,16 +95,17 @@
                 </svg>
             </span>
             <span class="customer-nav__label">Profil</span>
+            @if($navActive === 'profil')<span class="customer-nav__dot"></span>@endif
         </a>
 
     </div>
 </nav>
 
 <style>
-/* ═══════════════════════════════════════════════
-   CUSTOMER BOTTOM NAVBAR — Global Component
-   Tambahkan ke file CSS utama atau inline di layout
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   CUSTOMER BOTTOM NAVBAR — Single Source of Truth
+   Responsive: Mobile → Tablet → Laptop → Desktop
+═══════════════════════════════════════════════════════════════════ */
 .customer-nav {
     position: fixed;
     bottom: 0;
@@ -170,6 +178,14 @@
     letter-spacing: 0.4px;
     font-family: 'Nunito', sans-serif;
 }
+.customer-nav__dot {
+    width: 4px;
+    height: 4px;
+    background: #0077b6;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+}
 /* FAB Button */
 .customer-nav__fab {
     flex: 1;
@@ -206,18 +222,51 @@
     font-family: 'Nunito', sans-serif;
     margin-top: 2px;
 }
-/* Active indicator dot */
-.customer-nav__item.is-active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    width: 4px;
-    height: 4px;
-    background: #0077b6;
-    border-radius: 50%;
+
+/* ═══════ RESPONSIVE ═══════ */
+/* Tablet (768px+) */
+@media (min-width: 768px) {
+    .customer-nav__inner {
+        max-width: 680px;
+        height: 70px;
+    }
+    .customer-nav__label {
+        font-size: 0.65rem;
+    }
+    .customer-nav__fab-btn {
+        width: 56px;
+        height: 56px;
+    }
 }
+
+/* Laptop (1024px+) */
+@media (min-width: 1024px) {
+    .customer-nav__inner {
+        max-width: 720px;
+        height: 72px;
+    }
+    .customer-nav__item {
+        gap: 4px;
+    }
+    .customer-nav__label {
+        font-size: 0.68rem;
+    }
+}
+
+/* Desktop (1280px+) */
+@media (min-width: 1280px) {
+    .customer-nav__inner {
+        max-width: 800px;
+    }
+}
+
 /* Body padding so content isn't hidden behind nav */
 body {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (min-width: 768px) {
+    body {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+    }
 }
 </style>

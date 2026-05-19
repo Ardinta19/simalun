@@ -14,7 +14,13 @@ class ProfileController extends Controller
     /** GET /profile/edit — Form edit profil (semua role) */
     public function edit()
     {
-        return view('profile.edit', ['user' => Auth::user()]);
+        $user = Auth::user();
+        $viewName = match ($user->role) {
+            'admin'  => 'roles.admin.profile_edit',
+            default  => 'roles.customer.profile.edit',
+        };
+
+        return view($viewName, ['user' => $user]);
     }
 
     /** PATCH /profile — Update nama, email, phone, avatar */
@@ -26,7 +32,7 @@ class ProfileController extends Controller
             'name'   => ['required', 'string', 'max:255'],
             'email'  => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
             'phone'  => ['nullable', 'string', 'max:20'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
         ]);
 
         // Upload avatar
@@ -42,7 +48,7 @@ class ProfileController extends Controller
 
         $user->fill($validated)->save();
 
-        return back()->with('status', 'profile-updated');
+        return redirect()->route('customer.profile')->with('status', 'profile-updated');
     }
 
     /** DELETE /profile — Hapus akun (customer only) */

@@ -821,10 +821,37 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — Mobile, Tablet, Laptop, Desktop
 ═══════════════════════════════════════════════ */
 @media (min-width: 560px) {
   .page-body { padding: 0 24px; }
+}
+
+@media (min-width: 768px) {
+  .page-body { max-width: 680px; padding: 0 32px; }
+  .hd-inner { max-width: 680px; }
+  .hd-name { font-size: 2.2rem; }
+  .stats-row { gap: 14px; }
+  .stat-card { padding: 18px 20px; }
+  .stat-num { font-size: 2.2rem; }
+  .quick-grid { gap: 12px; }
+  .quick-item { padding: 16px 6px; border-radius: 18px; }
+  .quick-ico { width: 46px; height: 46px; }
+}
+
+@media (min-width: 1024px) {
+  .page-body { max-width: 720px; padding: 0 40px; margin-top: -44px; }
+  .hd-inner { max-width: 720px; }
+  .quick-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .active-hero { border-radius: 24px; }
+  .cta-jemput { border-radius: 24px; padding: 20px 22px; }
+  .promo-banner { border-radius: 24px; padding: 22px 24px; }
+  .history-card { border-radius: 24px; }
+}
+
+@media (min-width: 1280px) {
+  .page-body { max-width: 800px; }
+  .hd-inner { max-width: 800px; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1127,63 +1154,9 @@ body {
 </main>
 
 {{-- ══════════════════════════════════════
-     BOTTOM NAVIGATION
+     BOTTOM NAVIGATION — SHARED COMPONENT
 ══════════════════════════════════════ --}}
-<nav class="bot-nav" aria-label="Navigasi utama">
-  <div class="bn-inner">
-
-    <a href="{{ route('customer.dashboard') }}" class="bn-item" aria-label="Beranda" aria-current="page">
-      <div class="bn-icon on" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      </div>
-      <span class="bn-label on">Beranda</span>
-      <div class="bn-dot" aria-hidden="true"></div>
-    </a>
-
-    <a href="{{ route('customer.orders') }}" class="bn-item" aria-label="Daftar pesanan">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
-        </svg>
-      </div>
-      <span class="bn-label">Pesanan</span>
-    </a>
-
-    {{-- FAB Pesan — pusat nav --}}
-    <a href="{{ route('order.create') }}" class="bn-fab" aria-label="Pesan jemput sekarang">
-      <div class="bn-fab-btn" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </div>
-      <span class="bn-fab-lbl">Pesan</span>
-    </a>
-
-    <a href="{{ route('customer.notifications') }}" class="bn-item" aria-label="Notifikasi">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-        </svg>
-      </div>
-      <span class="bn-label">Notif</span>
-      @if(isset($unreadNotif) && $unreadNotif > 0)
-        <span class="notif-badge" aria-label="{{ $unreadNotif }} notifikasi">{{ $unreadNotif }}</span>
-      @endif
-    </a>
-
-    <a href="{{ route('customer.profile') }}" class="bn-item" aria-label="Profil saya">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-      <span class="bn-label">Profil</span>
-    </a>
-
-  </div>
-</nav>
+@include('layouts.component.customer._navbar_customer', ['active' => 'beranda'])
 
 {{-- ══════════════════════════════════════
      JAVASCRIPT — GSAP entrance (echo splash)

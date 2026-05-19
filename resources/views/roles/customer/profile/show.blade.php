@@ -53,18 +53,28 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 /* Alert */
 .alert-success{background:#e6fff6;border:1.5px solid var(--green);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;font-size:.85rem;font-weight:700;color:var(--green);}
 
-/* Bottom nav */
-.nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-top:1.5px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:520px;height:100%;margin:0 auto;display:flex;align-items:center}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#94a3b8;transition:color 0.2s}
-.nav-item.active{color:var(--blue-mid)}
-.nav-ico{font-size:1.4rem;line-height:1}
-.nav-label{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.3px}
-
-.nav-fab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
-.nav-fab-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,107,53,0.45);margin-top:-25px;transition:transform 0.15s;color:#fff;font-size:2rem;font-family:'Fredoka One',cursive}
-.nav-fab:active .nav-fab-btn{transform:scale(0.95)}
-.nav-fab-lbl{font-size:0.62rem;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+/* Responsive */
+@media(min-width:768px){
+  .header-inner{max-width:680px;}
+  .page-body{max-width:680px;padding:20px 32px;}
+  .avatar-card{border-radius:20px;padding:28px 24px;}
+  .avatar-wrap{width:90px;height:90px;}
+  .profile-name{font-size:1.5rem;}
+  .info-card{border-radius:20px;}
+  .danger-card{border-radius:20px;}
+}
+@media(min-width:1024px){
+  .header-inner{max-width:720px;}
+  .page-body{max-width:720px;padding:24px 40px;}
+  .avatar-card{border-radius:24px;padding:32px 28px;}
+  .avatar-wrap{width:100px;height:100px;}
+  .info-card{border-radius:24px;}
+  .info-row{padding:16px 20px;}
+}
+@media(min-width:1280px){
+  .header-inner{max-width:800px;}
+  .page-body{max-width:800px;}
+}
 </style>
 </head>
 <body>
@@ -148,26 +158,39 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 </div>
 
-<nav class="nav">
-  <div class="nav-in">
-    <a href="{{ route('customer.dashboard') }}" class="nav-item">
-      <span class="nav-ico">🏠</span><span class="nav-label">Beranda</span>
-    </a>
-    <a href="{{ route('customer.orders') }}" class="nav-item">
-      <span class="nav-ico">📋</span><span class="nav-label">Pesanan</span>
-    </a>
-    <a href="{{ route('order.create') }}" class="nav-fab">
-      <div class="nav-fab-btn"><span>+</span></div>
-      <span class="nav-fab-lbl">Pesan</span>
-    </a>
-    <a href="{{ route('customer.notifications') }}" class="nav-item">
-      <span class="nav-ico">🔔</span><span class="nav-label">Notif</span>
-    </a>
-    <a href="{{ route('customer.profile') }}" class="nav-item active">
-      <span class="nav-ico">👤</span><span class="nav-label">Profil</span>
-    </a>
-  </div>
-</nav>
+@include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Header entrance
+  gsap.from('.top-header', { opacity:0, y:-20, duration:0.4, ease:'power2.out' });
+
+  // Avatar card
+  gsap.from('.avatar-card', { opacity:0, y:25, scale:0.97, duration:0.5, delay:0.15, ease:'back.out(1.5)' });
+
+  // Info card
+  gsap.from('.info-card', { opacity:0, y:20, duration:0.4, delay:0.3, ease:'power2.out' });
+
+  // Info rows stagger
+  gsap.from('.info-row', { opacity:0, x:-15, duration:0.35, stagger:0.08, delay:0.4, ease:'power2.out' });
+
+  // Danger card
+  gsap.from('.danger-card', { opacity:0, y:15, duration:0.4, delay:0.55, ease:'power2.out' });
+
+  // Success alert animation
+  const alert = document.querySelector('.alert-success');
+  if (alert) {
+    gsap.from(alert, { opacity:0, y:-10, scale:0.95, duration:0.4, ease:'back.out(1.5)' });
+  }
+
+  // Nav touch feedback
+  document.querySelectorAll('.customer-nav__item, .customer-nav__fab').forEach(el => {
+    el.addEventListener('touchstart', function() { gsap.to(this, {scale:.92, duration:.09, ease:'power2.out'}); }, {passive:true});
+    el.addEventListener('touchend', function() { gsap.to(this, {scale:1, duration:.22, ease:'back.out(2.5)'}); }, {passive:true});
+  });
+});
+</script>
 
 </body>
 </html>

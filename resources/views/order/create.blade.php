@@ -395,6 +395,28 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 @media(min-width:560px){
   .page-body { padding:24px 24px 120px; }
 }
+@media(min-width:768px){
+  .page-body { max-width:680px; padding:24px 32px 120px; }
+  .header-inner { max-width:680px; }
+  .section-card { border-radius:20px; }
+  .zone-grid { gap:12px; }
+  .service-card { padding:14px 18px; }
+  .time-grid { gap:12px; }
+  .cta-inner { max-width:680px; }
+}
+@media(min-width:1024px){
+  .page-body { max-width:720px; padding:28px 40px 130px; }
+  .header-inner { max-width:720px; }
+  .section-card { border-radius:24px; }
+  .field-input { font-size:1rem; padding:14px 16px; }
+  .btn-order { padding:17px; font-size:1.05rem; border-radius:14px; }
+  .cta-inner { max-width:720px; }
+}
+@media(min-width:1280px){
+  .page-body { max-width:800px; }
+  .header-inner { max-width:800px; }
+  .cta-inner { max-width:800px; }
+}
 </style>
 </head>
 <body>
