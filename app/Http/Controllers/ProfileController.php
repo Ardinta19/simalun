@@ -11,10 +11,22 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    /** GET /profile/edit — Form edit profil (semua role) */
+    /** GET /profile/edit — Form edit profil, dipisah per role */
     public function edit()
     {
-        return view('profile.edit', ['user' => Auth::user()]);
+        $user = Auth::user();
+        $view = match ($user->role) {
+            'admin'  => 'roles.admin.profile_edit',
+            'driver' => 'roles.driver.profile_edit',
+            default  => 'roles.customer.profile.edit',
+        };
+
+        // Fallback ke view generik bila view role-specific belum ada
+        if (! view()->exists($view)) {
+            $view = 'roles.customer.profile.edit';
+        }
+
+        return view($view, ['user' => $user]);
     }
 
     /** PATCH /profile — Update nama, email, phone, avatar */
