@@ -43,7 +43,7 @@ body {
     padding: max(env(safe-area-inset-top,0px), 16px) 20px 24px;
     position: sticky; top: 0; z-index: 100;
 }
-.header-row { display:flex; align-items:center; gap:12px; max-width:520px; margin:0 auto; }
+.header-row { display:flex; align-items:center; gap:12px; max-width:680px; margin:0 auto; }
 .btn-back {
     width:38px; height:38px; border-radius:50%;
     background:rgba(255,255,255,.15); border:1.5px solid rgba(255,255,255,.25);
@@ -55,7 +55,7 @@ body {
 .header-sub { font-size:.68rem; font-weight:800; color:rgba(255,255,255,.65); margin-top:2px; letter-spacing:.5px; }
 
 /* ── BODY ────────────────────────────── */
-.page-body { max-width:520px; margin:0 auto; padding:16px; }
+.page-body { max-width:680px; margin:0 auto; padding:16px; }
 
 /* ── SECTION CARD ────────────────────── */
 .section-card {
@@ -169,7 +169,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
     border-top:1.5px solid var(--border);
     z-index:50;
 }
-.cta-inner { max-width:520px; margin:0 auto; }
+.cta-inner { max-width:680px; margin:0 auto; }
 .btn-submit {
     width:100%; padding:14px;
     background:linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-light) 100%);

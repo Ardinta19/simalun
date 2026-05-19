@@ -96,7 +96,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    CUSTOMER BOTTOM NAVBAR — Global Component
-   Tambahkan ke file CSS utama atau inline di layout
+   Single source of truth for all customer pages
 ═══════════════════════════════════════════════ */
 .customer-nav {
     position: fixed;
@@ -112,7 +112,7 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .customer-nav__inner {
-    max-width: 520px;
+    max-width: 680px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -161,14 +161,14 @@
     justify-content: center;
     padding: 0 3px;
     border: 2px solid white;
-    font-family: 'Nunito', sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 .customer-nav__label {
     font-size: 0.6rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-family: 'Nunito', sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 /* FAB Button */
 .customer-nav__fab {
@@ -203,7 +203,7 @@
     color: #FF6B35;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-family: 'Nunito', sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
     margin-top: 2px;
 }
 /* Active indicator dot */
@@ -216,8 +216,17 @@
     background: #0077b6;
     border-radius: 50%;
 }
-/* Body padding so content isn't hidden behind nav */
-body {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+
+/* Responsive: tablet+ gets taller nav with bigger touch targets */
+@media (min-width: 768px) {
+    .customer-nav__inner { height: 70px; }
+    .customer-nav__label { font-size: 0.65rem; }
+    .customer-nav__fab-btn { width: 56px; height: 56px; margin-top: -24px; }
+}
+
+/* Desktop: optionally hide bottom nav (desktop usually uses top nav)
+   But since this is mobile-first web app, we keep it visible */
+@media (min-width: 1024px) {
+    .customer-nav__inner { max-width: 720px; height: 72px; padding: 0 16px; }
 }
 </style>

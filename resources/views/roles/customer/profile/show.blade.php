@@ -44,7 +44,7 @@ body {
   position: sticky; top: 0; z-index: 50;
 }
 .app-bar__row {
-  max-width: 520px; margin: 0 auto;
+  max-width: 680px; margin: 0 auto;
   display: grid; grid-template-columns: 36px 1fr 36px;
   gap: 12px; align-items: center;
 }
@@ -78,7 +78,7 @@ body {
 
 /* Identity card */
 .identity {
-  max-width: 520px; margin: 0 auto;
+  max-width: 680px; margin: 0 auto;
   padding: 24px 20px 8px;
 }
 .identity__row {
@@ -137,7 +137,7 @@ body {
 
 /* Section */
 .section {
-  max-width: 520px; margin: 0 auto;
+  max-width: 680px; margin: 0 auto;
   padding: 16px 20px;
 }
 .section__title {
@@ -259,7 +259,7 @@ body {
 
 /* Footer */
 .foot {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 24px 20px 8px;
   text-align: center;
@@ -288,7 +288,7 @@ body {
 
 /* Alert */
 .alert {
-  max-width: 520px; margin: 12px auto 0;
+  max-width: 680px; margin: 12px auto 0;
   padding: 0 20px;
 }
 .alert__inner {

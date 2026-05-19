@@ -3,220 +3,424 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Edit Profil – Azka Laundry SIMALUN</title>
+<title>Edit Profil — Azka Laundry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body {
-  width:100%; min-height:100%; font-family:'Nunito',sans-serif;
-  background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
-  overflow-x:hidden;
+:root {
+  --brand-deep:    #002f5c;
+  --brand-primary: #0077b6;
+  --brand-light:   #00b4d8;
+  --brand-accent:  #FF6B35;
+  --ink:           #0d1f33;
+  --ink-2:         #3d5066;
+  --ink-3:         #6b7c8f;
+  --ink-mute:      #8c9bab;
+  --line:          #e3ecf3;
+  --line-2:        #f0f5f9;
+  --bg:            #f7fafd;
+  --card:          #ffffff;
+  --ok:            #16a34a;
+  --danger:        #dc2626;
+  --warn:          #d97706;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0));
+  -webkit-font-smoothing: antialiased;
 }
 
-#ambient { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-#wave-band { position:fixed; bottom:0; left:-5%; right:-5%; height:40%; pointer-events:none; z-index:0; }
-.ws { position:absolute; left:0; width:200%; overflow:visible; }
-.ws.w1 { bottom:38%; }
-.ws.w2 { bottom:34%; opacity:.55; }
-.ws.w3 { bottom:30%; opacity:.28; }
+/* App bar */
+.app-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  padding: max(env(safe-area-inset-top, 0), 14px) 20px 14px;
+  position: sticky; top: 0; z-index: 50;
+}
+.app-bar__row {
+  max-width: 680px; margin: 0 auto;
+  display: grid; grid-template-columns: 36px 1fr 36px;
+  gap: 12px; align-items: center;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  display: grid; place-items: center;
+  color: var(--ink-2);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s;
+}
+.icon-btn:hover { background: var(--line-2); }
+.icon-btn svg { width: 18px; height: 18px; }
+.app-bar__title {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
 
-#page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:2rem 1.2rem max(4rem, env(safe-area-inset-bottom)); }
+/* Page */
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
 
-#header { display:flex; flex-direction:column; align-items:center; gap:.35rem; padding-top:max(2rem, env(safe-area-inset-top)); margin-bottom:1.6rem; opacity:0; }
-#drum-wrap { width:72px; height:72px; position:relative; }
-#drum-wrap::after { content:''; position:absolute; inset:-8px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.14) 40%, transparent 72%); animation:halo 3.5s ease-in-out infinite; }
-@keyframes halo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.09)} }
-#drum-spin-ring { position:absolute; inset:-4px; border-radius:50%; border:2px dashed rgba(255,255,255,.28); animation:ring-spin 6s linear infinite; pointer-events:none; }
-@keyframes ring-spin { to{transform:rotate(360deg);} }
+/* Alerts */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.alert svg { width: 18px; height: 18px; flex-shrink: 0; }
+.alert--ok { background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.25); color: var(--ok); }
+.alert--err { background: rgba(220,38,38,.06); border: 1px solid rgba(220,38,38,.2); color: var(--danger); }
 
-.wm-name { font-family:'Fredoka One',cursive; font-size:1.8rem; color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
-.wm-sub  { font-size:.6rem; font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.2rem; }
+/* Avatar section */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+.avatar-wrap {
+  position: relative;
+  width: 96px; height: 96px;
+  margin-bottom: 12px;
+}
+.avatar-img {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--line-2);
+  border: 3px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+.avatar-img img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-btn {
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  border: 2.5px solid var(--card);
+  display: grid; place-items: center;
+  cursor: pointer;
+  color: #fff;
+  transition: transform .12s;
+}
+.avatar-btn:hover { transform: scale(1.1); }
+.avatar-btn svg { width: 14px; height: 14px; }
+.avatar-hint {
+  font-size: 0.76rem;
+  color: var(--ink-mute);
+  text-align: center;
+}
 
-#card { width:100%; max-width:440px; background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:24px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 16px 48px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.2); padding:1.8rem 1.6rem 1.6rem; opacity:0; transform:translateY(32px); margin-bottom: 20px; }
-.card-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#fff; text-align:center; margin-bottom:.25rem; }
-.card-sub { font-size:.8rem; font-weight:700; color:rgba(255,255,255,.7); text-align:center; margin-bottom:1.3rem; }
+/* Form sections */
+.form-section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.form-section__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.form-section__sub {
+  font-size: 0.78rem;
+  color: var(--ink-3);
+  margin-bottom: 18px;
+}
 
-.form-group { margin-bottom:1.2rem; }
-.form-label { display:block; font-size:.72rem; font-weight:800; color:rgba(255,255,255,.85); letter-spacing:.4px; margin-bottom:.45rem; text-transform:uppercase; padding-left:4px; }
-.input-wrap { position:relative; }
-.input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; opacity:.7; }
-.form-input { width:100%; padding:.82rem .9rem .82rem 2.7rem; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; color:#fff; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:700; outline:none; transition:all .3s; }
-.form-input:focus { border-color:rgba(255,255,255,.6); background:rgba(255,255,255,.18); box-shadow:0 0 0 4px rgba(255,255,255,.1); transform: scale(1.01); }
+/* Form fields */
+.field {
+  margin-bottom: 16px;
+}
+.field:last-child { margin-bottom: 0; }
+.field__label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.field__input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field__input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(0,119,182,.1);
+  background: var(--card);
+}
+.field__input::placeholder {
+  color: var(--ink-mute);
+  font-weight: 400;
+}
+.field__error {
+  font-size: 0.76rem;
+  color: var(--danger);
+  font-weight: 600;
+  margin-top: 4px;
+}
 
-.btn { width:100%; padding:.9rem; border:none; border-radius:99px; font-family:'Nunito',sans-serif; font-weight:900; font-size:1rem; letter-spacing:.4px; cursor:pointer; position:relative; overflow:hidden; transition:all .2s; }
-.btn-pri { background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%); color:#fff; box-shadow:0 8px 24px rgba(255,107,53,0.4); }
-.btn-pri:active { transform:scale(.97); }
-.btn-pri:hover { box-shadow:0 12px 32px rgba(255,107,53,0.55); }
+/* Buttons */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.98); }
+.btn--primary {
+  background: var(--brand-primary);
+  color: #fff;
+}
+.btn--primary:hover { background: var(--brand-deep); }
+.btn--outline {
+  background: var(--card);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+}
+.btn--outline:hover { background: var(--line-2); }
+.btn--danger {
+  background: none;
+  color: var(--danger);
+  border: 1px solid rgba(220,38,38,.25);
+  margin-top: 16px;
+}
+.btn--danger:hover { background: rgba(220,38,38,.04); }
+.btn svg { width: 16px; height: 16px; }
 
-.btn-sec { background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2); color:#fff; margin-top:10px; font-size:0.85rem; }
-
-.alert { border-radius:14px; padding:.8rem 1rem; margin-bottom:1.2rem; font-size:.85rem; font-weight:700; display:flex; align-items:center; gap:8px; }
-.alert-success { background:rgba(0,196,140,.18); border:1px solid rgba(0,196,140,.35); color:#7fffd4; }
-
-#btn-back { position:fixed; top:max(1rem, env(safe-area-inset-top)); left:1rem; z-index:10; width:38px; height:38px; border-radius:50%; border:none; cursor:pointer; background:rgba(255,255,255,.15); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; transition:all .2s; text-decoration:none; }
-#btn-back:hover { background:rgba(255,255,255,.25); transform:translateX(-3px); }
-
-.avatar-edit-wrap { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; position:relative; }
-.avatar-preview { width:90px; height:90px; border-radius:30px; object-fit:cover; border:3px solid #fff; box-shadow:0 8px 20px rgba(0,0,0,0.2); }
-.avatar-label { position:absolute; bottom:-5px; right:calc(50% - 50px); background:var(--orange, #FF6B35); width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; border:2.5px solid #fff; cursor:pointer; font-size:0.9rem; }
+/* Separator */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 20px 0;
+}
 </style>
 </head>
 <body>
 
-<div id="ambient" aria-hidden="true"></div>
-<div id="wave-band" aria-hidden="true">
-  <svg class="ws w1" viewBox="0 0 1440 64" preserveAspectRatio="none"><path fill="rgba(255,255,255,.20)" d="M0,32 C200,64 400,0 600,32 C800,64 1000,0 1200,32 C1320,48 1400,20 1440,32 L1440,64 L0,64Z"/></svg>
-  <svg class="ws w2" viewBox="0 0 1440 64" preserveAspectRatio="none"><path fill="rgba(255,255,255,.14)" d="M0,16 C180,46 360,4 540,24 C720,44 900,8 1080,28 C1260,48 1380,12 1440,22 L1440,64 L0,64Z"/></svg>
-  <svg class="ws w3" viewBox="0 0 1440 64" preserveAspectRatio="none"><path fill="rgba(255,255,255,.08)" d="M0,44 C160,12 320,52 480,36 C640,20 800,50 960,32 C1120,14 1300,46 1440,30 L1440,64 L0,64Z"/></svg>
+<div class="app-bar">
+  <div class="app-bar__row">
+    <a href="{{ route('customer.profile') }}" class="icon-btn" aria-label="Kembali ke profil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </a>
+    <div class="app-bar__title">Edit Profil</div>
+    <span></span>
+  </div>
 </div>
 
-<a href="{{ url()->previous() }}" id="btn-back">&#8592;</a>
-
-<div id="page">
-  <div id="header">
-    <div id="drum-wrap">
-      <div id="drum-spin-ring"></div>
-      <svg width="100%" viewBox="0 0 148 148" fill="none">
-        <circle cx="74" cy="74" r="70" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
-        <rect x="16" y="26" width="116" height="106" rx="18" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.35)" stroke-width="1.8"/>
-        <circle cx="36" cy="41" r="7" fill="#FF6B35"/><circle cx="56" cy="41" r="7" fill="#00C48C"/>
-        <circle cx="74" cy="90" r="38" fill="rgba(0,100,160,.55)" stroke="rgba(255,255,255,.45)" stroke-width="2.5"/>
-      </svg>
-    </div>
-    <div class="wm-name">SIMALUN</div>
-    <div class="wm-sub">PENGATURAN PROFIL</div>
-  </div>
+<main class="page">
 
   @if(session('status') === 'profile-updated')
-    <div class="alert alert-success js-in">✅ Profil berhasil diperbarui!</div>
+  <div class="alert alert--ok" data-reveal>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    Profil berhasil diperbarui
+  </div>
   @endif
 
-  <div id="card">
-    <div class="card-title">Informasi Akun 👤</div>
-    <div class="card-sub">Perbarui data diri & foto profil</div>
-
-    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
-      @csrf
-      @method('patch')
-
-      <div class="avatar-edit-wrap">
-        <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=fff&color=0077b6' }}" class="avatar-preview" id="preview">
-        <label for="avatar-input" class="avatar-label">📸</label>
-        <input type="file" id="avatar-input" name="avatar" style="display:none" onchange="previewImage(this)">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Nama Lengkap</label>
-        <div class="input-wrap">
-          <span class="input-icon">👤</span>
-          <input type="text" name="name" class="form-input" value="{{ old('name', $user->name) }}" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Alamat Email</label>
-        <div class="input-wrap">
-          <span class="input-icon">📧</span>
-          <input type="email" name="email" class="form-input" value="{{ old('email', $user->email) }}" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Nomor WhatsApp</label>
-        <div class="input-wrap">
-          <span class="input-icon">📱</span>
-          <input type="text" name="phone" class="form-input" value="{{ old('phone', $user->phone) }}" placeholder="08xxxxxxxxxx">
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-pri">Simpan Perubahan</button>
-    </form>
+  @if(session('status') === 'password-updated')
+  <div class="alert alert--ok" data-reveal>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    Password berhasil diperbarui
   </div>
+  @endif
 
-  <div id="card">
-    <div class="card-title">Keamanan Akun 🔒</div>
-    <div class="card-sub">Ganti password secara berkala</div>
-
-    <form method="POST" action="{{ route('password.update') }}">
-      @csrf
-      @method('put')
-
-      <div class="form-group">
-        <label class="form-label">Password Saat Ini</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔑</span>
-          <input type="password" name="current_password" class="form-input" placeholder="••••••••">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Password Baru</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔐</span>
-          <input type="password" name="password" class="form-input" placeholder="Min. 8 karakter">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Konfirmasi Password Baru</label>
-        <div class="input-wrap">
-          <span class="input-icon">🛡️</span>
-          <input type="password" name="password_confirmation" class="form-input" placeholder="Ulangi password">
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-pri" style="background:linear-gradient(135deg, #002f5c, #0077b6)">Perbarui Password</button>
-    </form>
+  @if($errors->any())
+  <div class="alert alert--err" data-reveal>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {{ $errors->first() }}
   </div>
+  @endif
+
+  {{-- Profile Info Form --}}
+  <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" data-reveal>
+    @csrf
+    @method('PATCH')
+
+    {{-- Avatar --}}
+    <div class="avatar-section">
+      <div class="avatar-wrap">
+        <div class="avatar-img">
+          @if($user->avatar)
+            <img src="{{ asset('storage/'.$user->avatar) }}" alt="{{ $user->name }}" id="avatar-preview">
+          @else
+            <span id="avatar-initial">{{ strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+            <img src="" alt="" id="avatar-preview" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover;">
+          @endif
+        </div>
+        <label for="avatar-file" class="avatar-btn" title="Ubah foto profil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </label>
+        <input type="file" id="avatar-file" name="avatar" accept="image/jpeg,image/png,image/webp" style="display:none">
+      </div>
+      <div class="avatar-hint">Ketuk ikon kamera untuk mengganti foto</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__title">Informasi Pribadi</div>
+      <div class="form-section__sub">Nama dan kontak yang digunakan untuk pesanan</div>
+
+      <div class="field">
+        <label class="field__label" for="name">Nama Lengkap</label>
+        <input type="text" id="name" name="name" class="field__input" value="{{ old('name', $user->name) }}" required autocomplete="name">
+        @error('name') <div class="field__error">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="email">Alamat Email</label>
+        <input type="email" id="email" name="email" class="field__input" value="{{ old('email', $user->email) }}" required autocomplete="email">
+        @error('email') <div class="field__error">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="phone">Nomor WhatsApp</label>
+        <input type="tel" id="phone" name="phone" class="field__input" value="{{ old('phone', $user->phone) }}" placeholder="08xxxxxxxxxx" autocomplete="tel">
+        @error('phone') <div class="field__error">{{ $message }}</div> @enderror
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn--primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Simpan Perubahan
+    </button>
+  </form>
+
+  <div class="divider"></div>
+
+  {{-- Password Form --}}
+  <form method="POST" action="{{ route('password.update') }}" data-reveal>
+    @csrf
+    @method('PUT')
+
+    <div class="form-section">
+      <div class="form-section__title">Ubah Password</div>
+      <div class="form-section__sub">Gunakan kombinasi minimal 8 karakter</div>
+
+      <div class="field">
+        <label class="field__label" for="current_password">Password Saat Ini</label>
+        <input type="password" id="current_password" name="current_password" class="field__input" placeholder="Masukkan password lama" autocomplete="current-password">
+        @error('current_password', 'updatePassword') <div class="field__error">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="password">Password Baru</label>
+        <input type="password" id="password" name="password" class="field__input" placeholder="Minimal 8 karakter" autocomplete="new-password">
+        @error('password', 'updatePassword') <div class="field__error">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="password_confirmation">Konfirmasi Password Baru</label>
+        <input type="password" id="password_confirmation" name="password_confirmation" class="field__input" placeholder="Ketik ulang password baru" autocomplete="new-password">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn--outline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Perbarui Password
+    </button>
+  </form>
 
   @if($user->role !== 'admin')
-  <button type="button" class="btn btn-sec" onclick="confirm('Hapus akun permanen?') && document.getElementById('del-form').submit()" style="color:#ff6b6b; border-color:rgba(255,107,107,0.3)">⚠️ Hapus Akun</button>
-  <form id="del-form" method="POST" action="{{ route('profile.destroy') }}" style="display:none">@csrf @method('delete')</form>
+  <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.')">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="password" value="">
+    <button type="submit" class="btn btn--danger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Hapus Akun Permanen
+    </button>
+  </form>
   @endif
 
-  <div style="margin-top:20px; opacity:0.4; font-size:0.7rem; font-weight:800; color:#fff; letter-spacing:1px">SIMALUN v1.0</div>
-</div>
+</main>
+
+@include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
 
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-  // Waves
-  document.querySelectorAll('.ws').forEach((w,i)=>{
-    gsap.fromTo(w,{x:'0%'},{x:'-50%',duration:14+i*4,ease:'none',repeat:-1});
-    gsap.to(w,{y:i%2?5:-5,duration:3+i*1.5,ease:'sine.inOut',yoyo:true,repeat:-1});
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  // Avatar preview
+  const fileInput = document.getElementById('avatar-file');
+  const preview = document.getElementById('avatar-preview');
+  const initial = document.getElementById('avatar-initial');
 
-  // Bubbles
-  (function(){
-    const amb = document.getElementById('ambient'), VH = window.innerHeight;
-    for(let i=0; i<15; i++){
-      const sz = 8+Math.random()*10, el = document.createElement('div');
-      el.style.cssText=['position:absolute',`width:${sz}px`,`height:${sz}px`,'border-radius:50%','background:rgba(255,255,255,0.15)','border:1px solid rgba(255,255,255,0.2)',`left:${Math.random()*100}%`,`top:${VH+20}px`,'pointer-events:none'].join(';');
-      amb.appendChild(el);
-      gsap.fromTo(el,{y:0},{y:-(VH*1.5), duration:10+Math.random()*10, ease:'none', repeat:-1, delay:Math.random()*5});
-    }
-  })();
-
-  // Intro
-  const tl = gsap.timeline();
-  tl.to('#header', {opacity:1, y:0, duration:0.8, ease:'back.out(1.7)'}, 0.2)
-    .to('#card', {opacity:1, y:0, duration:0.6, stagger:0.15, ease:'power2.out'}, 0.4);
-});
-
-function previewImage(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('preview').src = e.target.result;
-      gsap.from('#preview', {scale:0.8, opacity:0.5, duration:0.4, ease:'back.out(2)'});
-    }
-    reader.readAsDataURL(input.files[0]);
+  if (fileInput) {
+    fileInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          if (initial) initial.style.display = 'none';
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
   }
-}
-</script>
 
+  // GSAP entrance
+  if (typeof gsap !== 'undefined') {
+    gsap.from('[data-reveal]', {
+      y: 12,
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+      stagger: 0.06
+    });
+  }
+});
+</script>
 </body>
 </html>

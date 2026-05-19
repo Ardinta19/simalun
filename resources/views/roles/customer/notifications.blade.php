@@ -42,7 +42,7 @@ body {
   position: sticky; top: 0; z-index: 50;
 }
 .app-bar__row {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 36px 1fr 36px;
@@ -70,7 +70,7 @@ body {
 }
 
 .page {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 20px 16px;
 }

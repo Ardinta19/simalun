@@ -19,13 +19,13 @@
 body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));overflow-x:hidden;}
 
 .page-header{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue-mid) 100%);padding:max(env(safe-area-inset-top,0px),16px) 20px 24px;position:sticky;top:0;z-index:100;}
-.header-row{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto;}
+.header-row{display:flex;align-items:center;gap:12px;max-width:680px;margin:0 auto;}
 .btn-back{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;flex-shrink:0;}
 .btn-back svg{width:18px;height:18px;}
 .header-title{flex:1;font-family:'Fredoka One',cursive;font-size:1.3rem;color:white;}
 .header-sub{font-size:.68rem;font-weight:800;color:rgba(255,255,255,.65);margin-top:2px;letter-spacing:.5px;}
 
-.page-body{max-width:520px;margin:0 auto;padding:16px;}
+.page-body{max-width:680px;margin:0 auto;padding:16px;}
 
 .section-card{background:white;border-radius:var(--radius);border:1.5px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,47,92,.05);opacity:0;transform:translateY(18px);}
 .section-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1.5px solid var(--border);background:linear-gradient(90deg,rgba(0,119,182,.04) 0%,transparent 100%);}
@@ -63,7 +63,7 @@ textarea.field-input{resize:none;min-height:80px;line-height:1.5;}
 .toggle-switch.on::after{transform:translateX(22px);}
 
 .bottom-cta{position:fixed;bottom:0;left:0;right:0;padding:12px 16px max(env(safe-area-inset-bottom,0px),16px);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1.5px solid var(--border);z-index:50;}
-.cta-inner{max-width:520px;margin:0 auto;}
+.cta-inner{max-width:680px;margin:0 auto;}
 .btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue-mid) 0%,var(--blue-light) 100%);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(0,119,182,.35);transition:transform .15s;}
 .btn-submit:active{transform:scale(.97);}
 .btn-submit svg{width:18px;height:18px;}

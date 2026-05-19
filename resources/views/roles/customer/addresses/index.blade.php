@@ -42,7 +42,7 @@ body {
   position: sticky; top: 0; z-index: 50;
 }
 .app-bar__row {
-  max-width: 520px; margin: 0 auto;
+  max-width: 680px; margin: 0 auto;
   display: grid; grid-template-columns: 36px 1fr auto;
   gap: 12px; align-items: center;
 }
@@ -82,7 +82,7 @@ body {
 .btn-add svg { width: 14px; height: 14px; }
 
 .page {
-  max-width: 520px; margin: 0 auto;
+  max-width: 680px; margin: 0 auto;
   padding: 20px 16px;
 }
 

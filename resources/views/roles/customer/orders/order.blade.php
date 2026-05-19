@@ -59,7 +59,7 @@ body {
     background: rgba(255,255,255,0.04);
     bottom: -30px; left: 20px;
 }
-.hero-inner { position: relative; z-index: 2; max-width: 520px; margin: 0 auto; }
+.hero-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
 .hero-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 .btn-back {
     width: 38px; height: 38px; border-radius: 50%;
@@ -104,7 +104,7 @@ body {
 
 /* ── CONTENT ─────────────────────────── */
 .content {
-    max-width: 520px;
+    max-width: 680px;
     margin: -20px auto 0;
     padding: 0 16px;
     position: relative;

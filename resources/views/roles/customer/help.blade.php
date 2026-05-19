@@ -47,7 +47,7 @@ body {
   z-index: 50;
 }
 .app-bar__row {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 36px 1fr 36px;
@@ -77,7 +77,7 @@ body {
 
 /* Hero block */
 .hero {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 28px 20px 8px;
 }
@@ -106,7 +106,7 @@ body {
 
 /* Sections */
 .section {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 16px 20px;
 }
@@ -318,7 +318,7 @@ body {
 
 /* Footer note */
 .foot {
-  max-width: 520px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 24px 20px 8px;
   text-align: center;

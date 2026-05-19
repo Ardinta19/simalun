@@ -117,7 +117,7 @@ body {
 }
 .panel-inner {
     padding: 0 16px;
-    max-width: 520px;
+    max-width: 680px;
     margin: 0 auto;
 }
 

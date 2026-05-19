@@ -41,7 +41,7 @@ body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--i
 .header-inner {
   display:flex; align-items:center; gap:.75rem;
   padding:clamp(14px,4vw,20px) clamp(16px,5vw,24px);
-  max-width:520px; margin:0 auto;
+  max-width:680px; margin:0 auto;
 }
 .btn-back {
   width:38px; height:38px; border-radius:50%;
@@ -76,7 +76,7 @@ body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--i
 .step-chip.active { background:#fff; width:36px; }
 
 /* ── SCROLL BODY ── */
-.page-body { max-width:520px; margin:0 auto; padding:20px 16px 120px; }
+.page-body { max-width:680px; margin:0 auto; padding:20px 16px 120px; }
 
 /* ── SECTION CARD ── */
 .section-card {
@@ -361,7 +361,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
   border-top:1.5px solid var(--border);
   z-index:50;
 }
-.cta-inner { max-width:520px; margin:0 auto; }
+.cta-inner { max-width:680px; margin:0 auto; }
 .btn-order {
   width:100%; padding:15px;
   background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);

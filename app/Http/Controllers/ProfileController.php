@@ -38,21 +38,27 @@ class ProfileController extends Controller
             'name'   => ['required', 'string', 'max:255'],
             'email'  => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
             'phone'  => ['nullable', 'string', 'max:20'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         // Upload avatar
         if ($request->hasFile('avatar')) {
-            if ($user->avatar) Storage::disk('public')->delete($user->avatar);
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path;
         }
 
         // Reset email_verified_at jika email berubah
         if ($user->email !== $validated['email']) {
-            $validated['email_verified_at'] = null;
+            $user->email_verified_at = null;
         }
 
-        $user->fill($validated)->save();
+        $user->name  = $validated['name'];
+        $user->email = $validated['email'];
+        $user->phone = $validated['phone'];
+        $user->save();
 
         return back()->with('status', 'profile-updated');
     }

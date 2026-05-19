@@ -116,8 +116,8 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
     </div>
   </div>
 
-  <a href="{{ route('customer.dashboard') }}" class="btn-home">Kembali ke Beranda</a>
-  <a href="{{ route('order.show', $order->order_code) }}" class="btn-secondary">Lacak Pesanan →</a>
+  <a href="{{ route('customer.order.detail', $order->id) }}" class="btn-home">Lacak Pesanan</a>
+  <a href="{{ route('customer.dashboard') }}" class="btn-secondary">Kembali ke Beranda</a>
 </div>
 
 </body>

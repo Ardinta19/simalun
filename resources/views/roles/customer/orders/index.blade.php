@@ -58,7 +58,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    max-width: 520px;
+    max-width: 680px;
     margin: 0 auto;
 }
 .btn-back {
@@ -98,7 +98,7 @@ body {
     z-index: 90;
 }
 .filter-inner {
-    max-width: 520px;
+    max-width: 680px;
     margin: 0 auto;
     display: flex;
     overflow-x: auto;
@@ -131,7 +131,7 @@ body {
 
 /* ── PAGE BODY ───────────────────────── */
 .page-body {
-    max-width: 520px;
+    max-width: 680px;
     margin: 0 auto;
     padding: 16px;
 }
