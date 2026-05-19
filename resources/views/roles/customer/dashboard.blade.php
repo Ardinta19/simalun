@@ -926,27 +926,27 @@ body {
   </a>
 
   {{-- ── PESANAN AKTIF ── --}}
-  @if(isset($activeOrder) && $activeOrder)
+  @if(isset($pesananAktif) && $pesananAktif)
   @php
     $statusCfg = [
-      'pending'      => ['class'=>'sp-pickup',  'label'=>'Menunggu Konfirmasi', 'dot'=>true],
-      'picked_up'    => ['class'=>'sp-pickup',  'label'=>'Kurir Menjemput',     'dot'=>true],
-      'received'     => ['class'=>'sp-washing', 'label'=>'Diterima Laundry',    'dot'=>true],
-      'washing'      => ['class'=>'sp-washing', 'label'=>'Sedang Dicuci',       'dot'=>true],
-      'ready'        => ['class'=>'sp-ready',   'label'=>'Siap Diantar',        'dot'=>true],
-      'delivering'   => ['class'=>'sp-ready',   'label'=>'Kurir Mengantar',     'dot'=>true],
-      'done'         => ['class'=>'sp-done',    'label'=>'Selesai',             'dot'=>false],
+      'menunggu'   => ['class'=>'sp-pickup',  'label'=>'Menunggu Kurir',    'dot'=>true],
+      'dijemput'   => ['class'=>'sp-pickup',  'label'=>'Kurir Menjemput',   'dot'=>true],
+      'dicuci'     => ['class'=>'sp-washing', 'label'=>'Sedang Dicuci',     'dot'=>true],
+      'disetrika'  => ['class'=>'sp-washing', 'label'=>'Sedang Disetrika',  'dot'=>true],
+      'siap'       => ['class'=>'sp-ready',   'label'=>'Siap Diantar',      'dot'=>true],
+      'dikirim'    => ['class'=>'sp-ready',   'label'=>'Kurir Mengantar',   'dot'=>true],
+      'selesai'    => ['class'=>'sp-done',    'label'=>'Selesai',           'dot'=>false],
     ];
-    $st    = $statusCfg[$activeOrder->status] ?? ['class'=>'sp-washing','label'=>$activeOrder->status,'dot'=>true];
+    $st    = $statusCfg[$pesananAktif->status] ?? ['class'=>'sp-washing','label'=>ucfirst($pesananAktif->status),'dot'=>true];
     $steps = [
-      ['key'=>'picked_up',  'icon'=>'📦', 'label'=>"Dijemput"],
-      ['key'=>'washing',    'icon'=>'🫧', 'label'=>"Dicuci"],
-      ['key'=>'ready',      'icon'=>'✅', 'label'=>"Siap"],
-      ['key'=>'delivering', 'icon'=>'🛵', 'label'=>"Diantar"],
-      ['key'=>'done',       'icon'=>'🎉', 'label'=>"Selesai"],
+      ['key'=>'dijemput',   'icon'=>'📦', 'label'=>"Dijemput"],
+      ['key'=>'dicuci',     'icon'=>'🫧', 'label'=>"Dicuci"],
+      ['key'=>'siap',       'icon'=>'✅', 'label'=>"Siap"],
+      ['key'=>'dikirim',    'icon'=>'🛵', 'label'=>"Diantar"],
+      ['key'=>'selesai',    'icon'=>'🎉', 'label'=>"Selesai"],
     ];
-    $statusOrder = ['pending','picked_up','received','washing','ready','delivering','done'];
-    $curIdx = array_search($activeOrder->status, $statusOrder) ?: 0;
+    $statusOrder = ['menunggu','dijemput','dicuci','disetrika','siap','dikirim','selesai'];
+    $curIdx = array_search($pesananAktif->status, $statusOrder) ?: 0;
   @endphp
 
   <div class="js-reveal">
@@ -958,10 +958,10 @@ body {
     <div class="active-hero" role="region" aria-label="Status pesanan aktif">
       <div class="ah-top">
         <div>
-          <div class="ah-order-id">#{{ strtoupper($activeOrder->order_code) }}</div>
+          <div class="ah-order-id">#{{ strtoupper($pesananAktif->order_code) }}</div>
           <div class="ah-service">
-            {{ $activeOrder->service->name ?? 'Cuci Kiloan' }}
-            · {{ $activeOrder->weight_estimate ?? '-' }} kg
+            {{ $pesananAktif->service->name ?? 'Cuci Kiloan' }}
+            · {{ $pesananAktif->weight_estimate ?? '-' }} kg
           </div>
         </div>
         <span class="status-pill {{ $st['class'] }}" role="status">
@@ -1002,18 +1002,16 @@ body {
         <div class="ah-meta">
           <div class="ah-meta-item">
             <div class="ah-meta-lbl">Total</div>
-            <div class="ah-meta-val">Rp {{ number_format($activeOrder->total_price ?? 0, 0, ',', '.') }}</div>
+            <div class="ah-meta-val">Rp {{ number_format($pesananAktif->total_cost ?? 0, 0, ',', '.') }}</div>
           </div>
           <div class="ah-meta-item">
-            <div class="ah-meta-lbl">Estimasi</div>
+            <div class="ah-meta-lbl">Layanan</div>
             <div class="ah-meta-val">
-              {{ $activeOrder->estimated_done
-                ? \Carbon\Carbon::parse($activeOrder->estimated_done)->isoFormat('D MMM, HH:mm')
-                : 'Segera' }}
+              {{ $pesananAktif->service->name ?? 'Reguler' }}
             </div>
           </div>
         </div>
-        <a href="{{ route('customer.order.detail', $activeOrder->id) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $activeOrder->order_code }}">
+        <a href="{{ route('customer.order.detail', $pesananAktif->id) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
           Lacak
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1045,12 +1043,12 @@ body {
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-ico" aria-hidden="true">📦</span>
-        <div class="stat-num">{{ $totalOrders ?? 0 }}</div>
+        <div class="stat-num">{{ $totalPesanan ?? 0 }}</div>
         <div class="stat-lbl">Total Pesanan</div>
       </div>
       <div class="stat-card">
         <span class="stat-ico" aria-hidden="true">✅</span>
-        <div class="stat-num">{{ $completedOrders ?? 0 }}</div>
+        <div class="stat-num">{{ $totalSelesai ?? 0 }}</div>
         <div class="stat-lbl">Selesai</div>
       </div>
     </div>
@@ -1098,7 +1096,7 @@ body {
       <a href="{{ route('customer.orders') }}" class="sec-link">Semua →</a>
     </div>
     <div class="history-card">
-      @forelse(($recentOrders ?? collect()) as $order)
+      @forelse(($riwayat ?? collect()) as $order)
       @php
         $svcSlug  = $order->service->slug ?? 'reguler';
         $icons    = ['reguler'=>'🧺','express'=>'⚡','prioritas'=>'💎'];
@@ -1114,7 +1112,7 @@ body {
           <span class="hist-done-badge">✓ Selesai</span>
         </div>
         <div class="hist-right">
-          <div class="hist-price">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</div>
+          <div class="hist-price">Rp {{ number_format($order->total_cost ?? 0, 0, ',', '.') }}</div>
           <div class="hist-date">{{ \Carbon\Carbon::parse($order->created_at)->isoFormat('D MMM YY') }}</div>
         </div>
       </a>

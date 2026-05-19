@@ -393,11 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
     @php
         $customerLat = -1.603137;  // Default: Jambi
         $customerLng = 103.606789;
-        // If order has address coordinates
-        if(isset($order->customerAddress) && $order->customerAddress) {
-            $customerLat = (float) $order->customerAddress->latitude ?? $customerLat;
-            $customerLng = (float) $order->customerAddress->longitude ?? $customerLng;
-        }
     @endphp
 
     const customerLat = {{ $customerLat }};

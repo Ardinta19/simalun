@@ -136,14 +136,6 @@ class OrderController extends Controller
                 OrderItem::create(array_merge($line, ['order_id' => $order->id]));
             }
 
-            // Catat history status
-            OrderStatusHistory::create([
-                'order_id'    => $order->id,
-                'status_code' => 'menunggu',
-                'status_note' => 'Pesanan berhasil dibuat oleh customer.',
-                'updated_by'  => Auth::id(),
-            ]);
-
             // Update last_used_at pada alamat jika dipakai
             if ($request->customer_address_id) {
                 CustomerAddress::where('id', $request->customer_address_id)
@@ -173,8 +165,6 @@ class OrderController extends Controller
                     "Pesanan #{$order->order_code} dari {$order->customer->name} menunggu penugasan kurir."
                 ));
             }
-
-            return redirect()->route('order.show', $order->order_code);
         });
 
         // Ambil order yang baru dibuat untuk redirect

@@ -62,6 +62,39 @@ class FinanceController extends Controller
         return back()->with('success', 'Pengeluaran berhasil dicatat.');
     }
 
+    /**
+     * Catat pemasukan otomatis saat order selesai.
+     * Dipanggil oleh OrderObserver ketika status berubah ke 'selesai'.
+     * Cek apakah sudah ada entry untuk order ini, jika sudah update amount-nya.
+     */
+    public static function recordIncomeFromOrder(Order $order): void
+    {
+        $existing = FinanceEntry::where('order_id', $order->id)
+            ->where('entry_type', 'income')
+            ->where('source_type', 'order')
+            ->first();
+
+        if ($existing) {
+            // Update amount jika berat aktual berubah
+            $existing->update([
+                'amount' => $order->total_cost,
+                'notes'  => "Order {$order->order_code} (selesai)",
+            ]);
+        } else {
+            FinanceEntry::create([
+                'entry_date'  => today(),
+                'period_key'  => now()->format('Y-m'),
+                'entry_type'  => 'income',
+                'amount'      => $order->total_cost,
+                'source_type' => 'order',
+                'source_id'   => $order->id,
+                'order_id'    => $order->id,
+                'notes'       => "Order {$order->order_code} (selesai)",
+                'created_by'  => $order->customer_id,
+            ]);
+        }
+    }
+
     /** GET /admin/finance/export — Export ke CSV */
     public function export(Request $request)
     {
