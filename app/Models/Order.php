@@ -121,6 +121,25 @@ class Order extends Model
         return $prefix . '-' . str_pad($last + 1, 3, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * Alias: view dashboard pakai $order->total_price
+     */
+    public function getTotalPriceAttribute(): int
+    {
+        return (int) $this->total_cost;
+    }
+
+    /**
+     * Estimasi selesai — hitung dari pickup_date + durasi layanan
+     */
+    public function getEstimatedDoneAttribute(): ?string
+    {
+        if (!$this->pickup_date) return null;
+
+        $hours = $this->service?->estimated_duration_hours ?? 48;
+        return $this->pickup_date->copy()->addHours($hours)->toDateTimeString();
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match($this->status) {

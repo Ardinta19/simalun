@@ -276,10 +276,15 @@ body {
         </svg>
     </a>
 
+    {{-- Order code chip --}}
+    <div style="position:absolute;top:max(env(safe-area-inset-top,0px),16px);right:16px;z-index:500;background:white;border-radius:99px;padding:6px 12px;box-shadow:0 4px 16px rgba(0,0,0,.12);border:1.5px solid var(--border);">
+        <span style="font-family:'Fredoka One',cursive;font-size:.75rem;color:var(--blue-mid);">#{{ strtoupper($order->order_code) }}</span>
+    </div>
+
     {{-- Status chip --}}
     <div class="map-status-chip">
         <span class="map-status-dot"></span>
-        <span class="map-status-label">Kurir Menuju Lokasi</span>
+        <span class="map-status-label">{{ $order->status_label }}</span>
     </div>
 
     {{-- Map --}}
@@ -300,11 +305,23 @@ body {
         <div class="eta-card">
             <div class="eta-icon">🛵</div>
             <div class="eta-info">
-                <div class="eta-label">Estimasi Tiba</div>
-                <div class="eta-value">15 Mnt</div>
-                <div class="eta-sub">Kurir sedang dalam perjalanan</div>
+                <div class="eta-label">Status Sekarang</div>
+                <div class="eta-value">{{ $order->status_label }}</div>
+                <div class="eta-sub">
+                    @if($order->estimated_done)
+                        Estimasi selesai: {{ \Carbon\Carbon::parse($order->estimated_done)->translatedFormat('d M, H:i') }}
+                    @else
+                        Kurir sedang dalam perjalanan
+                    @endif
+                </div>
             </div>
+            @if(in_array($order->status, ['dijemput', 'dikirim']))
             <div class="eta-badge">Aktif</div>
+            @elseif($order->status === 'selesai')
+            <div class="eta-badge" style="background:var(--green)">Selesai</div>
+            @else
+            <div class="eta-badge" style="background:var(--blue-mid)">Proses</div>
+            @endif
         </div>
 
         {{-- Driver Info --}}
@@ -340,43 +357,57 @@ body {
             <div class="activity-title">📋 Aktivitas Pesanan</div>
 
             @php
-                $activities = [
-                    [
-                        'title'   => 'Kurir sedang dalam perjalanan ke lokasi',
-                        'time'    => 'Sedang berlangsung',
-                        'state'   => 'current',
-                    ],
-                    [
-                        'title'   => 'Pesanan diterima & kurir ditugaskan',
-                        'time'    => $order->updated_at?->translatedFormat('H:i') ?? '-',
-                        'state'   => 'done',
-                    ],
-                    [
-                        'title'   => 'Pesanan berhasil dibuat',
-                        'time'    => $order->created_at?->translatedFormat('H:i, d M') ?? '-',
-                        'state'   => 'done',
-                    ],
-                    [
-                        'title'   => 'Cucian akan diproses',
-                        'time'    => 'Menunggu',
-                        'state'   => 'pending',
-                    ],
-                    [
-                        'title'   => 'Diantar kembali ke rumah',
-                        'time'    => 'Menunggu',
-                        'state'   => 'pending',
-                    ],
+                $allSteps = [
+                    'menunggu'  => ['label' => 'Pesanan Diterima',   'desc' => 'Admin sedang memverifikasi pesananmu'],
+                    'dijemput'  => ['label' => 'Kurir Menjemput',    'desc' => 'Kurir sedang dalam perjalanan ke lokasimu'],
+                    'dicuci'    => ['label' => 'Sedang Dicuci',      'desc' => 'Pakaian akan dicuci dengan standar higienis'],
+                    'disetrika' => ['label' => 'Disetrika',          'desc' => 'Pakaian sedang disetrika rapi'],
+                    'siap'      => ['label' => 'Selesai Dicuci',     'desc' => 'Pakaian sudah rapi, bersih, dan harum'],
+                    'dikirim'   => ['label' => 'Kurir Mengantar',    'desc' => 'Pesanan dalam perjalanan kembali kepadamu'],
+                    'selesai'   => ['label' => 'Selesai',            'desc' => 'Pesanan selesai. Terima kasih!'],
                 ];
+
+                $statusOrder = array_keys($allSteps);
+                $currentIdx  = array_search($order->status, $statusOrder);
+                if ($currentIdx === false) $currentIdx = 0;
+
+                // Get timestamps from history
+                $historyMap = [];
+                if ($order->relationLoaded('statusHistories')) {
+                    foreach ($order->statusHistories as $h) {
+                        $historyMap[$h->status_code] = $h->updated_at;
+                    }
+                }
             @endphp
 
-            @foreach($activities as $act)
-            <div class="activity-item">
-                <div class="activity-dot {{ $act['state'] }}"></div>
-                <div class="activity-text">
-                    <div class="at-title {{ $act['state'] === 'pending' ? 'muted' : '' }}">{{ $act['title'] }}</div>
-                    <div class="at-time {{ $act['state'] === 'current' ? 'current' : '' }}">{{ $act['time'] }}</div>
+            @foreach($allSteps as $statusKey => $step)
+                @php
+                    $stepIdx = array_search($statusKey, $statusOrder);
+                    if ($stepIdx < $currentIdx) {
+                        $state = 'done';
+                    } elseif ($stepIdx == $currentIdx) {
+                        $state = 'current';
+                    } else {
+                        $state = 'pending';
+                    }
+
+                    $time = '';
+                    if ($state === 'done' && isset($historyMap[$statusKey])) {
+                        $time = \Carbon\Carbon::parse($historyMap[$statusKey])->translatedFormat('H:i');
+                    } elseif ($state === 'current') {
+                        $time = 'SEDANG BERLANGSUNG';
+                    } else {
+                        $time = 'Menunggu';
+                    }
+                @endphp
+                <div class="activity-item">
+                    <div class="activity-dot {{ $state }}"></div>
+                    <div class="activity-text">
+                        <div class="at-title {{ $state === 'pending' ? 'muted' : '' }}">{{ $step['label'] }}</div>
+                        <div class="at-desc" style="font-size:.72rem;font-weight:700;color:var(--ink-lt);margin-top:1px;">{{ $step['desc'] }}</div>
+                        <div class="at-time {{ $state === 'current' ? 'current' : '' }}">{{ $time }}</div>
+                    </div>
                 </div>
-            </div>
             @endforeach
         </div>
 

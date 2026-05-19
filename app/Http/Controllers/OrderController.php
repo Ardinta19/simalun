@@ -266,7 +266,7 @@ class OrderController extends Controller
     public function tracking()
     {
         $order = Auth::user()->customerOrders()
-            ->with('driver')
+            ->with(['driver', 'customerAddress', 'service', 'statusHistories'])
             ->whereIn('status', ['dijemput', 'dikirim', 'siap'])
             ->latest()
             ->first();
@@ -274,7 +274,7 @@ class OrderController extends Controller
         // Jika tidak ada order aktif, ambil order terbaru
         if (!$order) {
             $order = Auth::user()->customerOrders()
-                ->with('driver')
+                ->with(['driver', 'customerAddress', 'service', 'statusHistories'])
                 ->latest()
                 ->first();
         }

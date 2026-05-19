@@ -33,27 +33,26 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Pesanan aktif (yang sedang berjalan)
-        $pesananAktif = $user->customerOrders()
+        // Pesanan aktif (yang sedang berjalan) — view pakai $activeOrder
+        $activeOrder = $user->customerOrders()
             ->with(['service', 'driver'])
             ->whereIn('status', Order::STATUS_AKTIF)
             ->latest()
             ->first();
 
-        // Riwayat pesanan (5 terbaru selesai)
-        $riwayat = $user->customerOrders()
+        // Riwayat pesanan (5 terbaru selesai) — view pakai $recentOrders
+        $recentOrders = $user->customerOrders()
             ->with('service')
             ->whereIn('status', Order::statusSelesaiSemua())
             ->latest()
             ->take(5)
             ->get();
 
-        // Stats
-        $totalPesanan  = $user->customerOrders()->count();
-        $totalSelesai  = $user->customerOrders()->where('status', 'selesai')->count();
-        $totalKg       = $user->customerOrders()
-            ->where('status', 'selesai')
-            ->sum('weight_actual');
+        // Stats — view pakai $totalOrders & $completedOrders
+        $totalOrders     = $user->customerOrders()->count();
+        $completedOrders = $user->customerOrders()
+            ->whereIn('status', Order::statusSelesaiSemua())
+            ->count();
 
         // Alamat utama
         $alamatUtama = $user->customerAddresses()
@@ -65,11 +64,10 @@ class DashboardController extends Controller
 
         return view('roles.customer.dashboard', compact(
             'user',
-            'pesananAktif',
-            'riwayat',
-            'totalPesanan',
-            'totalSelesai',
-            'totalKg',
+            'activeOrder',
+            'recentOrders',
+            'totalOrders',
+            'completedOrders',
             'alamatUtama',
             'unreadNotif'
         ));

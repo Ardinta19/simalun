@@ -36,6 +36,14 @@ class Service extends Model
     }
 
     /**
+     * Alias: ERD uses estimated_duration_hours, DB uses estimated_hours
+     */
+    public function getEstimatedDurationHoursAttribute(): ?int
+    {
+        return $this->estimated_hours;
+    }
+
+    /**
      * Format harga ke Rupiah singkat: 8000 → "8k"
      */
     public function getPriceFormattedAttribute(): string
