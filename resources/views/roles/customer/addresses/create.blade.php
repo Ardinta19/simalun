@@ -412,22 +412,41 @@ document.getElementById('distance-input')?.addEventListener('input', function() 
 function togglePrimary() {
     const btn = document.getElementById('toggle-primary');
     const inp = document.getElementById('is-primary-val');
+    if (!btn || !inp) return;
+
     const isOn = btn.classList.contains('on');
     btn.classList.toggle('on', !isOn);
     inp.value = isOn ? '0' : '1';
-    gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+
+    if (typeof gsap !== 'undefined') {
+        gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+    }
 }
 
 /* ── ANIMATIONS ──────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
     initMap();
 
+    if (typeof gsap === 'undefined') return;
+
+    const animate = (selector, options, useFromTo = false) => {
+        const els = document.querySelectorAll(selector);
+        if (els.length === 0) return;
+
+        if (useFromTo) {
+            gsap.to(els, options);
+        } else {
+            gsap.from(els, options);
+        }
+    };
+
     gsap.to('.js-card', {
         opacity: 1, y: 0, duration: 0.45,
-        stagger: 0.1, ease: 'power2.out', delay: 0.1
+        stagger: 0.1, ease: 'power2.out', delay: 0.1,
     });
-    gsap.from('.page-header', { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
-    gsap.from('.bottom-cta', { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+
+    animate('.page-header', { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
+    animate('.bottom-cta', { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
 });
 </script>
 </body>

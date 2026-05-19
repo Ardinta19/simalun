@@ -926,27 +926,27 @@ body {
   </a>
 
   {{-- ── PESANAN AKTIF ── --}}
-  @if(isset($activeOrder) && $activeOrder)
+  @if(isset($pesananAktif) && $pesananAktif)
   @php
     $statusCfg = [
-      'pending'      => ['class'=>'sp-pickup',  'label'=>'Menunggu Konfirmasi', 'dot'=>true],
-      'picked_up'    => ['class'=>'sp-pickup',  'label'=>'Kurir Menjemput',     'dot'=>true],
-      'received'     => ['class'=>'sp-washing', 'label'=>'Diterima Laundry',    'dot'=>true],
-      'washing'      => ['class'=>'sp-washing', 'label'=>'Sedang Dicuci',       'dot'=>true],
-      'ready'        => ['class'=>'sp-ready',   'label'=>'Siap Diantar',        'dot'=>true],
-      'delivering'   => ['class'=>'sp-ready',   'label'=>'Kurir Mengantar',     'dot'=>true],
-      'done'         => ['class'=>'sp-done',    'label'=>'Selesai',             'dot'=>false],
+      'menunggu'   => ['class'=>'sp-pickup',  'label'=>'Menunggu Kurir',    'dot'=>true],
+      'dijemput'   => ['class'=>'sp-pickup',  'label'=>'Kurir Menjemput',   'dot'=>true],
+      'dicuci'     => ['class'=>'sp-washing', 'label'=>'Sedang Dicuci',     'dot'=>true],
+      'disetrika'  => ['class'=>'sp-washing', 'label'=>'Sedang Disetrika',  'dot'=>true],
+      'siap'       => ['class'=>'sp-ready',   'label'=>'Siap Diantar',      'dot'=>true],
+      'dikirim'    => ['class'=>'sp-ready',   'label'=>'Kurir Mengantar',   'dot'=>true],
+      'selesai'    => ['class'=>'sp-done',    'label'=>'Selesai',           'dot'=>false],
     ];
-    $st    = $statusCfg[$activeOrder->status] ?? ['class'=>'sp-washing','label'=>$activeOrder->status,'dot'=>true];
+    $st    = $statusCfg[$pesananAktif->status] ?? ['class'=>'sp-washing','label'=>ucfirst($pesananAktif->status),'dot'=>true];
     $steps = [
-      ['key'=>'picked_up',  'icon'=>'📦', 'label'=>"Dijemput"],
-      ['key'=>'washing',    'icon'=>'🫧', 'label'=>"Dicuci"],
-      ['key'=>'ready',      'icon'=>'✅', 'label'=>"Siap"],
-      ['key'=>'delivering', 'icon'=>'🛵', 'label'=>"Diantar"],
-      ['key'=>'done',       'icon'=>'🎉', 'label'=>"Selesai"],
+      ['key'=>'dijemput',   'icon'=>'📦', 'label'=>"Dijemput"],
+      ['key'=>'dicuci',     'icon'=>'🫧', 'label'=>"Dicuci"],
+      ['key'=>'siap',       'icon'=>'✅', 'label'=>"Siap"],
+      ['key'=>'dikirim',    'icon'=>'🛵', 'label'=>"Diantar"],
+      ['key'=>'selesai',    'icon'=>'🎉', 'label'=>"Selesai"],
     ];
-    $statusOrder = ['pending','picked_up','received','washing','ready','delivering','done'];
-    $curIdx = array_search($activeOrder->status, $statusOrder) ?: 0;
+    $statusOrder = ['menunggu','dijemput','dicuci','disetrika','siap','dikirim','selesai'];
+    $curIdx = array_search($pesananAktif->status, $statusOrder) ?: 0;
   @endphp
 
   <div class="js-reveal">
@@ -958,10 +958,10 @@ body {
     <div class="active-hero" role="region" aria-label="Status pesanan aktif">
       <div class="ah-top">
         <div>
-          <div class="ah-order-id">#{{ strtoupper($activeOrder->order_code) }}</div>
+          <div class="ah-order-id">#{{ strtoupper($pesananAktif->order_code) }}</div>
           <div class="ah-service">
-            {{ $activeOrder->service->name ?? 'Cuci Kiloan' }}
-            · {{ $activeOrder->weight_estimate ?? '-' }} kg
+            {{ $pesananAktif->service->name ?? 'Cuci Kiloan' }}
+            · {{ $pesananAktif->weight_estimate ?? '-' }} kg
           </div>
         </div>
         <span class="status-pill {{ $st['class'] }}" role="status">
@@ -1002,18 +1002,16 @@ body {
         <div class="ah-meta">
           <div class="ah-meta-item">
             <div class="ah-meta-lbl">Total</div>
-            <div class="ah-meta-val">Rp {{ number_format($activeOrder->total_price ?? 0, 0, ',', '.') }}</div>
+            <div class="ah-meta-val">Rp {{ number_format($pesananAktif->total_cost ?? 0, 0, ',', '.') }}</div>
           </div>
           <div class="ah-meta-item">
-            <div class="ah-meta-lbl">Estimasi</div>
+            <div class="ah-meta-lbl">Layanan</div>
             <div class="ah-meta-val">
-              {{ $activeOrder->estimated_done
-                ? \Carbon\Carbon::parse($activeOrder->estimated_done)->isoFormat('D MMM, HH:mm')
-                : 'Segera' }}
+              {{ $pesananAktif->service->name ?? 'Reguler' }}
             </div>
           </div>
         </div>
-        <a href="{{ route('customer.order.detail', $activeOrder->id) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $activeOrder->order_code }}">
+        <a href="{{ route('customer.order.detail', $pesananAktif->id) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
           Lacak
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1045,12 +1043,12 @@ body {
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-ico" aria-hidden="true">📦</span>
-        <div class="stat-num">{{ $totalOrders ?? 0 }}</div>
+        <div class="stat-num">{{ $totalPesanan ?? 0 }}</div>
         <div class="stat-lbl">Total Pesanan</div>
       </div>
       <div class="stat-card">
         <span class="stat-ico" aria-hidden="true">✅</span>
-        <div class="stat-num">{{ $completedOrders ?? 0 }}</div>
+        <div class="stat-num">{{ $totalSelesai ?? 0 }}</div>
         <div class="stat-lbl">Selesai</div>
       </div>
     </div>
@@ -1098,7 +1096,7 @@ body {
       <a href="{{ route('customer.orders') }}" class="sec-link">Semua →</a>
     </div>
     <div class="history-card">
-      @forelse(($recentOrders ?? collect()) as $order)
+      @forelse(($riwayat ?? collect()) as $order)
       @php
         $svcSlug  = $order->service->slug ?? 'reguler';
         $icons    = ['reguler'=>'🧺','express'=>'⚡','prioritas'=>'💎'];
@@ -1114,7 +1112,7 @@ body {
           <span class="hist-done-badge">✓ Selesai</span>
         </div>
         <div class="hist-right">
-          <div class="hist-price">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</div>
+          <div class="hist-price">Rp {{ number_format($order->total_cost ?? 0, 0, ',', '.') }}</div>
           <div class="hist-date">{{ \Carbon\Carbon::parse($order->created_at)->isoFormat('D MMM YY') }}</div>
         </div>
       </a>
@@ -1190,110 +1188,108 @@ body {
 ══════════════════════════════════════ --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    if (typeof gsap === 'undefined') return;
 
-  /* ── 1. STAGGERED ENTRANCE — mirip dengan splash intro timeline ── */
-  const reveals = document.querySelectorAll('.js-reveal');
-
-  gsap.fromTo(reveals,
-    { opacity: 0, y: 28 },
-    {
-      opacity: 1, y: 0,
-      duration: .55,
-      stagger: .1,
-      ease: 'power3.out',
-      delay: .1,
+    const reveals = document.querySelectorAll('.js-reveal');
+    if (reveals.length > 0) {
+        gsap.fromTo(reveals,
+            { opacity: 0, y: 28 },
+            {
+                opacity: 1, y: 0,
+                duration: .55,
+                stagger: .1,
+                ease: 'power3.out',
+                delay: .1,
+            }
+        );
     }
-  );
 
-  /* ── 2. HEADER BUBBLES — persis seperti ambient splash ── */
-  (function spawnHeaderBubbles() {
-    const header = document.querySelector('.hd');
-    const deco   = [
-      { w: 18, h: 18, top: '20%', right: '18%', delay: .6 },
-      { w: 10, h: 10, top: '55%', right: '35%', delay: 1.1 },
-      { w: 14, h: 14, top: '30%', left: '12%',  delay: .85 },
-    ];
-    deco.forEach(cfg => {
-      const b = document.createElement('div');
-      b.style.cssText = [
-        'position:absolute','border-radius:50%','pointer-events:none',
-        `width:${cfg.w}px`, `height:${cfg.h}px`,
-        'background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7),rgba(255,255,255,.06))',
-        'border:1px solid rgba(255,255,255,.3)',
-        cfg.top   ? `top:${cfg.top}`   : '',
-        cfg.right ? `right:${cfg.right}` : '',
-        cfg.left  ? `left:${cfg.left}`  : '',
-        'opacity:0',
-      ].join(';');
-      header.appendChild(b);
-      gsap.to(b, {
-        opacity: .7, y: -12,
-        duration: 2.5 + Math.random(),
-        ease: 'sine.inOut',
-        yoyo: true, repeat: -1,
-        delay: cfg.delay,
-      });
-      gsap.fromTo(b, { opacity: 0 }, { opacity: .7, duration: .5, delay: cfg.delay });
+    (function spawnHeaderBubbles() {
+        const header = document.querySelector('.hd');
+        if (!header) return;
+
+        const deco = [
+            { w: 18, h: 18, top: '20%', right: '18%', delay: .6 },
+            { w: 10, h: 10, top: '55%', right: '35%', delay: 1.1 },
+            { w: 14, h: 14, top: '30%', left: '12%',  delay: .85 },
+        ];
+        deco.forEach(cfg => {
+            const b = document.createElement('div');
+            b.style.cssText = [
+                'position:absolute','border-radius:50%','pointer-events:none',
+                `width:${cfg.w}px`, `height:${cfg.h}px`,
+                'background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7),rgba(255,255,255,.06))',
+                'border:1px solid rgba(255,255,255,.3)',
+                cfg.top   ? `top:${cfg.top}`   : '',
+                cfg.right ? `right:${cfg.right}` : '',
+                cfg.left  ? `left:${cfg.left}`  : '',
+                'opacity:0',
+            ].join(';');
+            header.appendChild(b);
+            gsap.to(b, {
+                opacity: .7, y: -12,
+                duration: 2.5 + Math.random(),
+                ease: 'sine.inOut',
+                yoyo: true, repeat: -1,
+                delay: cfg.delay,
+            });
+            gsap.fromTo(b, { opacity: 0 }, { opacity: .7, duration: .5, delay: cfg.delay });
+        });
+    })();
+
+    const drumSvg = document.querySelector('.hd-logo svg');
+    if (drumSvg) {
+        gsap.to(drumSvg, {
+            rotation: 360,
+            duration: 24,
+            ease: 'none',
+            repeat: -1,
+            transformOrigin: '50% 50%',
+        });
+    }
+
+    const activeHero = document.querySelector('.active-hero');
+    if (activeHero) {
+        gsap.to(activeHero, {
+            boxShadow: '0 12px 36px rgba(0,119,182,.15), 0 2px 6px rgba(0,47,92,.06)',
+            duration: 2,
+            yoyo: true,
+            repeat: -1,
+            ease: 'sine.inOut',
+        });
+    }
+
+    const ctaBtn = document.querySelector('.cta-jemput');
+    if (ctaBtn) {
+        const ctaDrum = ctaBtn.querySelector('svg');
+        if (ctaDrum) {
+            ctaBtn.addEventListener('touchstart', function () {
+                gsap.to(ctaDrum, { rotation: '+=45', duration: .25, ease: 'power2.out' });
+            }, { passive: true });
+        }
+    }
+
+    document.querySelectorAll('.bn-item, .bn-fab').forEach(el => {
+        el.addEventListener('touchstart', function () {
+            gsap.to(this, { scale: .91, duration: .09, ease: 'power2.out' });
+        }, { passive: true });
+        el.addEventListener('touchend', function () {
+            gsap.to(this, { scale: 1, duration: .22, ease: 'back.out(2.5)' });
+        }, { passive: true });
     });
-  })();
 
-  /* ── 3. DRUM LOGO — slow rotation, echo dari splash ── */
-  const drumSvg = document.querySelector('.hd-logo svg');
-  if (drumSvg) {
-    gsap.to(drumSvg, {
-      rotation: 360,
-      duration: 24,
-      ease: 'none',
-      repeat: -1,
-      transformOrigin: '50% 50%',
-    });
-  }
-
-  /* ── 4. ACTIVE ORDER CARD — subtle pulse pada border ── */
-  const activeHero = document.querySelector('.active-hero');
-  if (activeHero) {
-    gsap.to(activeHero, {
-      boxShadow: '0 12px 36px rgba(0,119,182,.15), 0 2px 6px rgba(0,47,92,.06)',
-      duration: 2,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
-    });
-  }
-
-  /* ── 5. CTA BUTTON — drum spin saat di-tap ── */
-  const ctaBtn = document.querySelector('.cta-jemput');
-  if (ctaBtn) {
-    const ctaDrum = ctaBtn.querySelector('svg');
-    ctaBtn.addEventListener('touchstart', function () {
-      gsap.to(ctaDrum, { rotation: '+=45', duration: .25, ease: 'power2.out' });
-    }, { passive: true });
-  }
-
-  /* ── 6. BOTTOM NAV touch feedback ── */
-  document.querySelectorAll('.bn-item, .bn-fab').forEach(el => {
-    el.addEventListener('touchstart', function () {
-      gsap.to(this, { scale: .91, duration: .09, ease: 'power2.out' });
-    }, { passive: true });
-    el.addEventListener('touchend', function () {
-      gsap.to(this, { scale: 1, duration: .22, ease: 'back.out(2.5)' });
-    }, { passive: true });
-  });
-
-  /* ── 7. WAVE ANIMATION ── */
-  const wave = document.querySelector('.hd-wave path');
-  if (wave) {
-    gsap.to(wave, {
-      attr: {
-        d: 'M0,20 C80,48 160,4 240,26 C300,42 360,8 414,22 L414,52 L0,52Z'
-      },
-      duration: 3.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
-  }
-
+    const wave = document.querySelector('.hd-wave path');
+    if (wave) {
+        gsap.to(wave, {
+            attr: {
+                d: 'M0,20 C80,48 160,4 240,26 C300,42 360,8 414,22 L414,52 L0,52Z'
+            },
+            duration: 3.5,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+        });
+    }
 });
 </script>
 

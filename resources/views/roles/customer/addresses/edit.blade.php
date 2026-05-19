@@ -141,8 +141,8 @@ textarea.field-input{resize:none;min-height:80px;line-height:1.5;}
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         Tap atau geser pin untuk memperbarui titik
                     </div>
-                    <input type="hidden" name="latitude" id="map-lat" value="{{ $address->latitude ?? '' }}">
-                    <input type="hidden" name="longitude" id="map-lng" value="{{ $address->longitude ?? '' }}">
+                    <input type="hidden" name="latitude" id="map-lat" value="">
+                    <input type="hidden" name="longitude" id="map-lng" value="">
                 </div>
                 <div>
                     <div class="field-label">Alamat Lengkap <span class="required">*</span></div>
@@ -221,8 +221,8 @@ textarea.field-input{resize:none;min-height:80px;line-height:1.5;}
 <script>
 // MAP
 @php
-    $lat = $address->latitude ?? -1.6101;
-    $lng = $address->longitude ?? 103.6131;
+    $lat = -1.6101;
+    $lng = 103.6131;
 @endphp
 const initLat = {{ $lat }};
 const initLng = {{ $lng }};
@@ -249,9 +249,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Animate
-    gsap.to('.js-card', { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'power2.out', delay: 0.1 });
-    gsap.from('.page-header', { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
-    gsap.from('.bottom-cta', { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+    if (typeof gsap !== 'undefined') {
+        gsap.to('.js-card', { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'power2.out', delay: 0.1 });
+
+        const header = document.querySelector('.page-header');
+        if (header) gsap.from(header, { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
+
+        const cta = document.querySelector('.bottom-cta');
+        if (cta) gsap.from(cta, { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+    }
 });
 
 // Zone auto-detect
@@ -265,10 +271,15 @@ document.getElementById('distance-input')?.addEventListener('input', function() 
 function togglePrimary() {
     const btn = document.getElementById('toggle-primary');
     const inp = document.getElementById('is-primary-val');
+    if (!btn || !inp) return;
+
     const isOn = btn.classList.contains('on');
     btn.classList.toggle('on', !isOn);
     inp.value = isOn ? '0' : '1';
-    gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+
+    if (typeof gsap !== 'undefined') {
+        gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+    }
 }
 </script>
 </body>

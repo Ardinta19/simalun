@@ -1,7 +1,5 @@
 <?php
-/* ══════════════════════════════════════════════════════════════
-   FILE: app/Http/Controllers/FinanceController.php
-══════════════════════════════════════════════════════════════ */
+
 namespace App\Http\Controllers;
 
 use App\Models\FinanceEntry;
@@ -11,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class FinanceController extends Controller
 {
-    /** GET /admin/finance */
     public function index(Request $request)
     {
         $range = $request->get('range', 'bulanan');
@@ -21,27 +18,24 @@ class FinanceController extends Controller
         if ($range === 'harian') {
             $query->whereDate('entry_date', today());
         } else {
-            // Bulanan: bulan ini
             $query->where('period_key', now()->format('Y-m'));
         }
 
         $transaksi = $query->paginate(20);
 
-        // Kalkulasi summary
-        $allEntries = FinanceEntry::when(
+        $base = FinanceEntry::when(
             $range === 'harian',
             fn($q) => $q->whereDate('entry_date', today()),
             fn($q) => $q->where('period_key', now()->format('Y-m'))
         );
 
-        $masuk  = (clone $allEntries)->where('entry_type', 'income')->sum('amount');
-        $keluar = (clone $allEntries)->where('entry_type', 'expense')->sum('amount');
+        $masuk  = (clone $base)->where('entry_type', 'income')->sum('amount');
+        $keluar = (clone $base)->where('entry_type', 'expense')->sum('amount');
         $saldo  = $masuk - $keluar;
 
         return view('roles.admin.finance', compact('transaksi', 'masuk', 'keluar', 'saldo', 'range'));
     }
 
-    /** POST /admin/finance — Catat pengeluaran */
     public function store(Request $request)
     {
         $request->validate([
@@ -62,7 +56,34 @@ class FinanceController extends Controller
         return back()->with('success', 'Pengeluaran berhasil dicatat.');
     }
 
-    /** GET /admin/finance/export — Export ke CSV */
+    public static function recordIncomeFromOrder(Order $order): void
+    {
+        $entry = FinanceEntry::where('order_id', $order->id)
+            ->where('entry_type', 'income')
+            ->where('source_type', 'order')
+            ->first();
+
+        $payload = [
+            'amount' => $order->total_cost,
+            'notes'  => "Order {$order->order_code} (selesai)",
+        ];
+
+        if ($entry) {
+            $entry->update($payload);
+            return;
+        }
+
+        FinanceEntry::create(array_merge($payload, [
+            'entry_date'  => today(),
+            'period_key'  => now()->format('Y-m'),
+            'entry_type'  => 'income',
+            'source_type' => 'order',
+            'source_id'   => $order->id,
+            'order_id'    => $order->id,
+            'created_by'  => $order->customer_id,
+        ]));
+    }
+
     public function export(Request $request)
     {
         $range = $request->get('range', 'bulanan');
@@ -85,7 +106,6 @@ class FinanceController extends Controller
 
         $callback = function () use ($entries) {
             $handle = fopen('php://output', 'w');
-            // BOM untuk Excel
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($handle, ['Tanggal', 'Keterangan', 'Tipe', 'Jumlah (Rp)', 'Order Code']);

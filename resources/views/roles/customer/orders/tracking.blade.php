@@ -386,118 +386,95 @@ body {
 {{-- BOTTOM NAVBAR --}}
 @include('layouts.component.customer._navbar_customer', ['active' => 'pesanan'])
 
+@php
+    $customerLat = -1.603137;
+    $customerLng = 103.606789;
+@endphp
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const customerLat = {{ $customerLat }};
+        const customerLng = {{ $customerLng }};
+        let driverLat = customerLat + 0.008;
+        let driverLng = customerLng + 0.005;
 
-    // ── MAP SETUP ──────────────────────────────────────
-    @php
-        $customerLat = -1.603137;  // Default: Jambi
-        $customerLng = 103.606789;
-        // If order has address coordinates
-        if(isset($order->customerAddress) && $order->customerAddress) {
-            $customerLat = (float) $order->customerAddress->latitude ?? $customerLat;
-            $customerLng = (float) $order->customerAddress->longitude ?? $customerLng;
-        }
-    @endphp
+        const map = L.map('tracking-map', {
+            zoomControl: false,
+            attributionControl: false,
+        }).setView([customerLat, customerLng], 15);
 
-    const customerLat = {{ $customerLat }};
-    const customerLng = {{ $customerLng }};
-    // Simulate driver slightly offset from customer
-    let driverLat = customerLat + 0.008;
-    let driverLng = customerLng + 0.005;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+        }).addTo(map);
 
-    // Init map
-    const map = L.map('tracking-map', {
-        zoomControl: false,
-        attributionControl: false
-    }).setView([customerLat, customerLng], 15);
+        const customerIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div class="marker-customer">🏠</div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+        });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+        const driverIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div class="marker-driver">🛵</div>',
+            iconSize: [44, 44],
+            iconAnchor: [22, 22],
+        });
 
-    // Customer marker
-    const customerIcon = L.divIcon({
-        className: 'custom-marker',
-        html: '<div class="marker-customer">🏠</div>',
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        L.marker([customerLat, customerLng], { icon: customerIcon })
+            .addTo(map)
+            .bindPopup('Lokasi Kamu');
+
+        const driverMarker = L.marker([driverLat, driverLng], { icon: driverIcon })
+            .addTo(map)
+            .bindPopup('Kurir Azka Laundry');
+
+        const routeLine = L.polyline([[driverLat, driverLng], [customerLat, customerLng]], {
+            color: '#0077b6',
+            weight: 3,
+            opacity: 0.6,
+            dashArray: '8, 6',
+        }).addTo(map);
+
+        map.fitBounds([[customerLat, customerLng], [driverLat, driverLng]], { padding: [40, 40] });
+
+        document.getElementById('btn-recenter')?.addEventListener('click', function () {
+            map.fitBounds(
+                [[customerLat, customerLng], [driverMarker.getLatLng().lat, driverMarker.getLatLng().lng]],
+                { padding: [40, 40] }
+            );
+        });
+
+        let moveCount = 0;
+        const maxMoves = 15;
+        const moveInterval = setInterval(function () {
+            if (moveCount >= maxMoves) {
+                clearInterval(moveInterval);
+                return;
+            }
+
+            driverLat += (customerLat - driverLat) * 0.08 + (Math.random() - 0.5) * 0.0005;
+            driverLng += (customerLng - driverLng) * 0.08 + (Math.random() - 0.5) * 0.0005;
+
+            driverMarker.setLatLng([driverLat, driverLng]);
+            routeLine.setLatLngs([[driverLat, driverLng], [customerLat, customerLng]]);
+
+            moveCount++;
+        }, 3500);
+
+        if (typeof gsap === 'undefined') return;
+
+        const animate = (selector, options) => {
+            const els = document.querySelectorAll(selector);
+            if (els.length > 0) gsap.from(els, options);
+        };
+
+        animate('#js-panel', { y: 60, opacity: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 });
+        animate('.eta-card', { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out', delay: 0.5 });
+        animate('.driver-card', { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out', delay: 0.6 });
+        animate('.activity-card', { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out', delay: 0.7 });
+        animate('.map-status-chip', { opacity: 0, y: -10, duration: 0.4, ease: 'back.out(1.5)', delay: 0.2 });
     });
-
-    // Driver marker
-    const driverIcon = L.divIcon({
-        className: 'custom-marker',
-        html: '<div class="marker-driver">🛵</div>',
-        iconSize: [44, 44],
-        iconAnchor: [22, 22]
-    });
-
-    L.marker([customerLat, customerLng], { icon: customerIcon })
-        .addTo(map)
-        .bindPopup('Lokasi Kamu');
-
-    const driverMarker = L.marker([driverLat, driverLng], { icon: driverIcon })
-        .addTo(map)
-        .bindPopup('Kurir Azka Laundry');
-
-    // Draw route line
-    const routeLine = L.polyline([[driverLat, driverLng], [customerLat, customerLng]], {
-        color: '#0077b6',
-        weight: 3,
-        opacity: 0.6,
-        dashArray: '8, 6'
-    }).addTo(map);
-
-    // Fit bounds
-    map.fitBounds([[customerLat, customerLng], [driverLat, driverLng]], { padding: [40, 40] });
-
-    // Recenter
-    document.getElementById('btn-recenter').addEventListener('click', function () {
-        map.fitBounds([[customerLat, customerLng], [driverMarker.getLatLng().lat, driverMarker.getLatLng().lng]], { padding: [40, 40] });
-    });
-
-    // Simulate driver movement
-    let moveCount = 0;
-    const maxMoves = 15;
-    const moveInterval = setInterval(function () {
-        if (moveCount >= maxMoves) { clearInterval(moveInterval); return; }
-
-        // Move driver toward customer
-        driverLat += (customerLat - driverLat) * 0.08 + (Math.random() - 0.5) * 0.0005;
-        driverLng += (customerLng - driverLng) * 0.08 + (Math.random() - 0.5) * 0.0005;
-
-        driverMarker.setLatLng([driverLat, driverLng]);
-        routeLine.setLatLngs([[driverLat, driverLng], [customerLat, customerLng]]);
-
-        moveCount++;
-    }, 3500);
-
-    // ── GSAP ANIMATIONS ────────────────────────────────
-    gsap.from('#js-panel', {
-        y: 60,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out',
-        delay: 0.3
-    });
-
-    gsap.from('.eta-card, .driver-card, .activity-card', {
-        opacity: 0,
-        y: 20,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.5
-    });
-
-    gsap.from('.map-status-chip', {
-        opacity: 0,
-        y: -10,
-        duration: 0.4,
-        ease: 'back.out(1.5)',
-        delay: 0.2
-    });
-});
 </script>
 
 </body>
