@@ -178,8 +178,8 @@ html, body {
   <svg class="ws w3" viewBox="0 0 1440 64" preserveAspectRatio="none"><path fill="rgba(255,255,255,.08)" d="M0,44 C160,12 320,52 480,36 C640,20 800,50 960,32 C1120,14 1300,46 1440,30 L1440,64 L0,64Z"/></svg>
 </div>
 
-{{-- BACK BUTTON — Fixed route to customer profile --}}
-<a href="{{ route('customer.profile') }}" id="btn-back" aria-label="Kembali ke profil">
+{{-- BACK BUTTON — Smart back (returns to actual previous page) --}}
+<a href="{{ route('customer.profile') }}" id="btn-back" data-smart-back aria-label="Kembali">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M19 12H5M12 5l-7 7 7 7"/>
   </svg>
@@ -310,7 +310,14 @@ html, body {
   {{-- Delete Account --}}
   @if($user->role !== 'admin')
   <div style="max-width:440px;width:100%;">
-    <button type="button" class="btn btn-sec" onclick="confirm('Apakah kamu yakin ingin menghapus akun secara permanen? Tindakan ini tidak bisa dibatalkan.') && document.getElementById('del-form').submit()" style="color:#ff6b6b; border-color:rgba(255,107,107,0.3)">Hapus Akun</button>
+    <button type="button"
+            class="btn btn-sec"
+            data-confirm-action="Akun kamu akan dihapus permanen beserta semua riwayat pesanan. Tindakan ini tidak bisa dibatalkan."
+            data-confirm-title="Hapus Akun Permanen?"
+            data-confirm-ok="Ya, Hapus Akun"
+            data-confirm-danger="true"
+            data-confirm-target="del-form"
+            style="color:#ff6b6b; border-color:rgba(255,107,107,0.3)">Hapus Akun</button>
     <form id="del-form" method="POST" action="{{ route('profile.destroy') }}" style="display:none">@csrf @method('delete')</form>
   </div>
   @endif

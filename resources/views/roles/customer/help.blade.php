@@ -60,7 +60,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 </style>
 </head>
 <body>
-<div class="top-header"><div class="header-inner"><div class="header-top"><a href="{{ route('customer.dashboard') }}" class="back-btn">‹</a><div class="header-title">Bantuan</div></div></div><svg class="header-wave" viewBox="0 0 1440 28" preserveAspectRatio="none" style="height:28px;"><path fill="#f4f8fc" d="M0,14 C240,28 480,0 720,14 C960,28 1200,0 1440,14 L1440,28 L0,28Z"/></svg></div>
+<div class="top-header"><div class="header-inner"><div class="header-top"><a href="{{ route('customer.dashboard') }}" class="back-btn" data-smart-back aria-label="Kembali">‹</a><div class="header-title">Bantuan</div></div></div><svg class="header-wave" viewBox="0 0 1440 28" preserveAspectRatio="none" style="height:28px;"><path fill="#f4f8fc" d="M0,14 C240,28 480,0 720,14 C960,28 1200,0 1440,14 L1440,28 L0,28Z"/></svg></div>
 <div class="page-body">
   <div class="section-title js-reveal">Hubungi Kami</div>
   <div class="contact-card js-reveal">

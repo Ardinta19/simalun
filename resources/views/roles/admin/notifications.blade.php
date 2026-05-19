@@ -23,7 +23,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="top-header" id="top"><div class="header-inner"><div class="header-top"><a href="{{ route('dashboard.admin') }}" class="back-btn">‹</a><div class="header-title">Notifikasi Admin</div></div></div></div>
+<div class="top-header" id="top"><div class="header-inner"><div class="header-top"><a href="{{ route('dashboard.admin') }}" class="back-btn" data-smart-back aria-label="Kembali">‹</a><div class="header-title">Notifikasi Admin</div></div></div></div>
 <div class="page-body">
   <section class="card js-in">
     <div class="card-title">Antrian Operasional Terbaru</div>

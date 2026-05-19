@@ -41,7 +41,7 @@ textarea.input{min-height:72px;resize:vertical}
   $role = auth()->user()->role;
   $dashboardRoute = $role === 'admin' ? 'dashboard.admin' : ($role === 'driver' ? 'dashboard.driver' : 'customer.dashboard');
 @endphp
-<a class="btn" href="{{ route($dashboardRoute) }}">Kembali</a>
+<a class="btn" href="{{ route($dashboardRoute) }}" data-smart-back>← Kembali</a>
   </div>
 
   @if(session('status'))<div class="ok">{{ session('status') }}</div>@endif
@@ -89,7 +89,11 @@ textarea.input{min-height:72px;resize:vertical}
         <button class="btn btn-primary" type="submit">Update</button>
       </div>
     </form>
-    <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" style="margin-top:8px" onsubmit="return confirm('Hapus alamat ini?')">
+    <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" style="margin-top:8px"
+          data-confirm="Alamat ini akan dihapus permanen dan tidak bisa dikembalikan."
+          data-confirm-title="Hapus Alamat?"
+          data-confirm-ok="Ya, Hapus"
+          data-confirm-danger="true">
       @csrf
       @method('DELETE')
       <button class="btn btn-danger" type="submit">Hapus</button>
@@ -100,5 +104,8 @@ textarea.input{min-height:72px;resize:vertical}
   </div>
   @endforeach
 </div>
+
+@include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
+
 </body>
 </html>

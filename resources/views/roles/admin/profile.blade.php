@@ -76,7 +76,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
   $role = auth()->user()->role;
   $dashboardRoute = $role === 'admin' ? 'dashboard.admin' : ($role === 'driver' ? 'dashboard.driver' : 'customer.dashboard');
 @endphp
-<a href="{{ route($dashboardRoute) }}" class="back-btn">‹</a>
+<a href="{{ route($dashboardRoute) }}" class="back-btn" data-smart-back aria-label="Kembali">‹</a>
       <div class="header-title">Profil Saya</div>
     </div>
   </div>

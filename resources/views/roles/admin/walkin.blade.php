@@ -40,7 +40,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 <div class="top-header">
   <div class="header-inner">
     <div class="header-top">
-      <a href="{{ route('dashboard.admin') }}" class="back-btn">‹</a>
+      <a href="{{ route('dashboard.admin') }}" class="back-btn" data-smart-back aria-label="Kembali">‹</a>
       <div style="flex:1">
         <div class="header-title">Tambah Pelanggan</div>
         <div class="header-sub">FORM ORDER WALK-IN</div>

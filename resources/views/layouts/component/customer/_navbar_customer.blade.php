@@ -270,3 +270,323 @@ body {
     }
 }
 </style>
+
+
+
+{{-- ═══════════════════════════════════════════════════════════════════
+     SHARED CONFIRMATION MODAL (replaces browser confirm())
+═══════════════════════════════════════════════════════════════════ --}}
+<div id="app-confirm" class="app-confirm" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="app-confirm-title">
+    <div class="app-confirm__backdrop" data-confirm-cancel></div>
+    <div class="app-confirm__panel" role="document">
+        <div class="app-confirm__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+        </div>
+        <h3 class="app-confirm__title" id="app-confirm-title">Konfirmasi</h3>
+        <p class="app-confirm__message">Apakah kamu yakin?</p>
+        <div class="app-confirm__actions">
+            <button type="button" class="app-confirm__btn app-confirm__btn--cancel" data-confirm-cancel>Batal</button>
+            <button type="button" class="app-confirm__btn app-confirm__btn--ok" data-confirm-ok>Ya</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ═══════════ CONFIRMATION MODAL ═══════════ */
+.app-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    -webkit-tap-highlight-color: transparent;
+}
+.app-confirm.is-open { display: flex; }
+.app-confirm__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: pointer;
+}
+.app-confirm__panel {
+    position: relative;
+    background: #fff;
+    border-radius: 22px;
+    padding: 28px 22px 18px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0, 47, 92, 0.32), 0 8px 24px rgba(0, 47, 92, 0.18);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    transform: scale(0.92) translateY(10px);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), opacity 0.22s ease;
+}
+.app-confirm.is-open .app-confirm__panel {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+.app-confirm__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d97706;
+    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.22);
+}
+.app-confirm__icon svg { width: 32px; height: 32px; }
+.app-confirm.is-danger .app-confirm__icon {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.25);
+}
+.app-confirm.is-danger .app-confirm__icon svg {
+    stroke-width: 2.4;
+}
+.app-confirm__title {
+    font-family: 'Fredoka One', cursive, sans-serif;
+    font-size: 1.2rem;
+    color: #0d2137;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+.app-confirm__message {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #5a6b7e;
+    line-height: 1.5;
+    margin-bottom: 22px;
+    padding: 0 4px;
+}
+.app-confirm__actions {
+    display: flex;
+    gap: 10px;
+}
+.app-confirm__btn {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.app-confirm__btn--cancel {
+    background: #f1f5f9;
+    color: #475569;
+}
+.app-confirm__btn--cancel:hover { background: #e2e8f0; }
+.app-confirm__btn--cancel:active { transform: scale(0.97); }
+.app-confirm__btn--ok {
+    background: linear-gradient(135deg, #0077b6, #00b4d8);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 119, 182, 0.35);
+}
+.app-confirm__btn--ok:hover { box-shadow: 0 8px 22px rgba(0, 119, 182, 0.5); }
+.app-confirm__btn--ok:active { transform: scale(0.97); }
+.app-confirm.is-danger .app-confirm__btn--ok {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+}
+.app-confirm.is-danger .app-confirm__btn--ok:hover {
+    box-shadow: 0 8px 22px rgba(220, 38, 38, 0.55);
+}
+
+/* Tablet+ */
+@media (min-width: 768px) {
+    .app-confirm__panel {
+        max-width: 420px;
+        padding: 32px 26px 20px;
+        border-radius: 24px;
+    }
+    .app-confirm__title { font-size: 1.35rem; }
+    .app-confirm__message { font-size: 0.95rem; }
+}
+</style>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   APP HELPERS — confirmation modal & smart back button
+═══════════════════════════════════════════════════════════════════ */
+(function () {
+    if (window.__appHelpersLoaded) return;
+    window.__appHelpersLoaded = true;
+
+    /* ─── 1) showConfirm() — Promise-based custom confirm modal ─── */
+    const modal = document.getElementById('app-confirm');
+    if (!modal) return;
+
+    const titleEl   = modal.querySelector('.app-confirm__title');
+    const messageEl = modal.querySelector('.app-confirm__message');
+    const okBtn     = modal.querySelector('[data-confirm-ok]');
+    const cancelEls = modal.querySelectorAll('[data-confirm-cancel]');
+
+    let resolver = null;
+
+    function close(result) {
+        modal.classList.remove('is-open', 'is-danger');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (resolver) {
+            const r = resolver;
+            resolver = null;
+            r(result);
+        }
+    }
+
+    function open() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        // focus the cancel button by default for safety
+        setTimeout(() => {
+            const cancelBtn = modal.querySelector('.app-confirm__btn--cancel');
+            if (cancelBtn) cancelBtn.focus();
+        }, 60);
+    }
+
+    okBtn.addEventListener('click', () => close(true));
+    cancelEls.forEach(el => el.addEventListener('click', () => close(false)));
+    modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close(false);
+        if (e.key === 'Enter' && document.activeElement !== okBtn) {
+            // pressing Enter on cancel keeps cancel; only OK confirms via click
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) close(false);
+    });
+
+    window.showConfirm = function ({
+        title = 'Konfirmasi',
+        message = 'Apakah kamu yakin?',
+        confirmText = 'Ya, Lanjutkan',
+        cancelText = 'Batal',
+        danger = false,
+    } = {}) {
+        return new Promise((resolve) => {
+            // close any existing
+            if (resolver) { resolver(false); resolver = null; }
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            okBtn.textContent = confirmText;
+            modal.querySelectorAll('.app-confirm__btn--cancel').forEach(b => b.textContent = cancelText);
+            modal.classList.toggle('is-danger', !!danger);
+
+            resolver = resolve;
+            open();
+        });
+    };
+
+    /* ─── 2) Auto-wire forms with data-confirm attribute ─── */
+    document.addEventListener('submit', async (e) => {
+        const form = e.target.closest('form[data-confirm]');
+        if (!form || form.dataset.confirmed === '1') return;
+
+        e.preventDefault();
+        const ok = await window.showConfirm({
+            title: form.dataset.confirmTitle || 'Konfirmasi',
+            message: form.dataset.confirm,
+            confirmText: form.dataset.confirmOk || 'Ya, Lanjutkan',
+            cancelText: form.dataset.confirmCancel || 'Batal',
+            danger: form.dataset.confirmDanger === 'true' || form.dataset.confirmDanger === '1',
+        });
+        if (ok) {
+            form.dataset.confirmed = '1';
+            form.submit();
+        }
+    }, true);
+
+    /* ─── 3) Auto-wire buttons/links with data-confirm-action ─── */
+    document.addEventListener('click', async (e) => {
+        const trigger = e.target.closest('[data-confirm-action]');
+        if (!trigger) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const ok = await window.showConfirm({
+            title: trigger.dataset.confirmTitle || 'Konfirmasi',
+            message: trigger.dataset.confirmAction,
+            confirmText: trigger.dataset.confirmOk || 'Ya, Lanjutkan',
+            cancelText: trigger.dataset.confirmCancel || 'Batal',
+            danger: trigger.dataset.confirmDanger === 'true' || trigger.dataset.confirmDanger === '1',
+        });
+
+        if (!ok) return;
+
+        // Determine action target
+        const targetForm = trigger.dataset.confirmTarget
+            ? document.getElementById(trigger.dataset.confirmTarget)
+            : null;
+        if (targetForm && targetForm.tagName === 'FORM') {
+            targetForm.dataset.confirmed = '1';
+            targetForm.submit();
+            return;
+        }
+        if (trigger.tagName === 'A' && trigger.href) {
+            window.location.href = trigger.href;
+            return;
+        }
+        if (trigger.tagName === 'BUTTON' && trigger.form) {
+            trigger.form.submit();
+        }
+    }, true);
+
+    /* ─── 4) Smart back button ───
+       Usage:
+         <a href="{{ route('fallback') }}" data-smart-back>...</a>
+         or call window.smartBack('/fallback') directly.
+       Behavior:
+         - If document.referrer is from same origin AND not the current URL,
+           use history.back() (returns to actual previous page).
+         - Otherwise navigate to the fallback URL provided in href.
+    ─── */
+    window.smartBack = function (fallbackUrl) {
+        try {
+            const ref = document.referrer;
+            if (ref) {
+                const refUrl = new URL(ref);
+                if (refUrl.origin === window.location.origin && refUrl.href !== window.location.href) {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                        return;
+                    }
+                }
+            }
+        } catch (_) { /* ignore */ }
+        if (fallbackUrl) {
+            window.location.href = fallbackUrl;
+        } else {
+            // last resort — try history anyway
+            window.history.back();
+        }
+    };
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-smart-back]');
+        if (!btn) return;
+        e.preventDefault();
+        const fallback = btn.getAttribute('href') || btn.dataset.smartBack || '/';
+        window.smartBack(fallback);
+    });
+})();
+</script>
