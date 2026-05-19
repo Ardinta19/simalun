@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Edit Profil</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
@@ -412,8 +413,7 @@
                 <div class="field-hint" style="margin:0;">
                     Akun yang dihapus tidak bisa dipulihkan. Semua data pesanan akan ikut terhapus.
                 </div>
-                <form method="POST" action="{{ route('profile.destroy') }}"
-                      onsubmit="return confirm('Yakin ingin menghapus akun secara permanen?');">
+                <form method="POST" action="{{ route('profile.destroy') }}" id="form-delete-account">
                     @csrf
                     @method('delete')
                     <div>
@@ -421,7 +421,7 @@
                         <input type="password" name="password" class="field-input" required placeholder="Masukkan password Anda">
                         @error('password') <div class="field-error">{{ $message }}</div> @enderror
                     </div>
-                    <button type="submit" class="btn-danger" style="margin-top:12px;">Hapus Akun Permanen</button>
+                    <button type="button" class="btn-danger" style="margin-top:12px;" id="btn-delete-account">Hapus Akun Permanen</button>
                 </form>
             </div>
         </div>
@@ -429,23 +429,58 @@
 
 </div>
 
+@include('layouts.component.customer._confirm_modal')
+
 <script>
-    document.getElementById('avatar-input')?.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
+(function() {
+    var avatarInput = document.getElementById('avatar-input');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(event) {
+            var file = event.target.files[0];
+            if (!file) return;
 
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran foto maksimal 2 MB.');
-            event.target.value = '';
-            return;
-        }
+            if (file.size > 2 * 1024 * 1024) {
+                showConfirmModal({
+                    title: 'File Terlalu Besar',
+                    message: 'Ukuran foto maksimal 2 MB. Silakan pilih foto yang lebih kecil.',
+                    confirmText: 'Mengerti',
+                    cancelText: 'Tutup',
+                    type: 'warning',
+                    onConfirm: function() {}
+                });
+                event.target.value = '';
+                return;
+            }
 
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('avatar-preview').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatar-preview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    var btnDelete = document.getElementById('btn-delete-account');
+    if (btnDelete) {
+        btnDelete.addEventListener('click', function() {
+            var passwordInput = document.querySelector('#form-delete-account input[name="password"]');
+            if (!passwordInput || !passwordInput.value) {
+                passwordInput.focus();
+                return;
+            }
+            showConfirmModal({
+                title: 'Hapus Akun Permanen?',
+                message: 'Semua data kamu termasuk pesanan dan alamat akan dihapus. Tindakan ini tidak bisa dibatalkan.',
+                confirmText: 'Ya, Hapus Akun',
+                cancelText: 'Batal',
+                type: 'danger',
+                onConfirm: function() {
+                    document.getElementById('form-delete-account').submit();
+                }
+            });
+        });
+    }
+})();
 </script>
 
 </body>

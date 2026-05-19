@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Dashboard – Azka Laundry SIMALUN</title>
+@include('layouts.component.customer._head_meta')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1055,7 +1056,7 @@ body {
   </div>
 
   {{-- ── PROMO BANNER ── --}}
-  <a href="#" class="promo-banner js-reveal" aria-label="Promo diskon 20% member baru">
+  <a href="{{ route('customer.orders') }}" class="promo-banner js-reveal" aria-label="Promo diskon 20% member baru">
     <div class="promo-tag" aria-hidden="true">20%</div>
     <div class="promo-texts">
       <div class="promo-title">Diskon Member Baru!</div>
@@ -1188,9 +1189,15 @@ body {
 ══════════════════════════════════════ --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    if (typeof gsap === 'undefined') return;
+    if (typeof gsap === 'undefined') {
+        document.querySelectorAll('.js-reveal').forEach(function(el) {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+        return;
+    }
 
-    const reveals = document.querySelectorAll('.js-reveal');
+    var reveals = document.querySelectorAll('.js-reveal');
     if (reveals.length > 0) {
         gsap.fromTo(reveals,
             { opacity: 0, y: 28 },

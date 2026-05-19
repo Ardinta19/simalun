@@ -89,10 +89,11 @@ textarea.input{min-height:72px;resize:vertical}
         <button class="btn btn-primary" type="submit">Update</button>
       </div>
     </form>
-    <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" style="margin-top:8px" onsubmit="return confirm('Hapus alamat ini?')">
+    <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" id="old-delete-addr-{{ $address->id }}" style="margin-top:8px">
       @csrf
       @method('DELETE')
-      <button class="btn btn-danger" type="submit">Hapus</button>
+      <button class="btn btn-danger" type="button"
+              onclick="showConfirmModal({ title: 'Hapus Alamat?', message: 'Alamat ini akan dihapus permanen.', confirmText: 'Ya, Hapus', cancelText: 'Batal', type: 'danger', onConfirm: function() { document.getElementById('old-delete-addr-{{ $address->id }}').submit(); } })">Hapus</button>
       @if($address->is_primary)
         <span class="badge-muted">Jika dihapus, alamat berikutnya jadi utama otomatis</span>
       @endif
@@ -100,5 +101,6 @@ textarea.input{min-height:72px;resize:vertical}
   </div>
   @endforeach
 </div>
+@include('layouts.component.customer._confirm_modal')
 </body>
 </html>

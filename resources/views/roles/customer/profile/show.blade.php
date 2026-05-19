@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Profil Saya</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
@@ -19,7 +20,7 @@
         background:var(--surface);
         color:var(--ink);
         min-height:100vh;
-        padding-bottom:var(--nav-h);
+        padding-bottom:80px;
     }
 
     .top-header {
@@ -270,73 +271,6 @@
         font-weight:700;
         color:#047857;
     }
-
-    .nav {
-        position:fixed;
-        left:0; right:0; bottom:0;
-        height:var(--nav-h);
-        background:rgba(255,255,255,.95);
-        backdrop-filter:blur(16px);
-        border-top:1.5px solid var(--border);
-        z-index:100;
-        padding-bottom:env(safe-area-inset-bottom, 0px);
-    }
-    .nav-in {
-        max-width:520px;
-        height:100%;
-        margin:0 auto;
-        display:flex;
-        align-items:center;
-    }
-    .nav-item {
-        flex:1;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:3px;
-        text-decoration:none;
-        color:#94a3b8;
-        transition:color .2s;
-    }
-    .nav-item.active { color:var(--blue-mid); }
-    .nav-ico { font-size:1.4rem; line-height:1; }
-    .nav-label {
-        font-size:.65rem;
-        font-weight:800;
-        text-transform:uppercase;
-        letter-spacing:.3px;
-    }
-
-    .nav-fab {
-        flex:1;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        text-decoration:none;
-    }
-    .nav-fab-btn {
-        width:52px; height:52px;
-        border-radius:50%;
-        background:linear-gradient(135deg, var(--orange) 0%, #ff8c5a 100%);
-        display:flex; align-items:center; justify-content:center;
-        box-shadow:0 6px 20px rgba(255,107,53,.45);
-        margin-top:-25px;
-        transition:transform .15s;
-        color:#fff;
-        font-size:2rem;
-        font-family:'Fredoka One', cursive;
-    }
-    .nav-fab:active .nav-fab-btn { transform:scale(.95); }
-    .nav-fab-lbl {
-        font-size:.62rem;
-        font-weight:800;
-        color:var(--orange);
-        text-transform:uppercase;
-        letter-spacing:.3px;
-        margin-top:2px;
-    }
 </style>
 </head>
 <body>
@@ -458,9 +392,9 @@
 
     <div class="danger-card">
         <div class="danger-title">Akun</div>
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" id="form-logout">
             @csrf
-            <button type="submit" class="btn-logout">
+            <button type="button" class="btn-logout" id="btn-logout">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
                 </svg>
@@ -471,26 +405,29 @@
 
 </div>
 
-<nav class="nav">
-    <div class="nav-in">
-        <a href="{{ route('customer.dashboard') }}" class="nav-item">
-            <span class="nav-ico">🏠</span><span class="nav-label">Beranda</span>
-        </a>
-        <a href="{{ route('customer.orders') }}" class="nav-item">
-            <span class="nav-ico">📋</span><span class="nav-label">Pesanan</span>
-        </a>
-        <a href="{{ route('order.create') }}" class="nav-fab">
-            <div class="nav-fab-btn">+</div>
-            <span class="nav-fab-lbl">Pesan</span>
-        </a>
-        <a href="{{ route('customer.notifications') }}" class="nav-item">
-            <span class="nav-ico">🔔</span><span class="nav-label">Notif</span>
-        </a>
-        <a href="{{ route('customer.profile') }}" class="nav-item active">
-            <span class="nav-ico">👤</span><span class="nav-label">Profil</span>
-        </a>
-    </div>
-</nav>
+@include('layouts.component.customer._confirm_modal')
+
+<script>
+(function() {
+    var btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', function() {
+            showConfirmModal({
+                title: 'Keluar dari Akun?',
+                message: 'Kamu akan keluar dari sesi ini. Yakin ingin melanjutkan?',
+                confirmText: 'Ya, Keluar',
+                cancelText: 'Batal',
+                type: 'warning',
+                onConfirm: function() {
+                    document.getElementById('form-logout').submit();
+                }
+            });
+        });
+    }
+})();
+</script>
+
+@include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
 
 </body>
 </html>

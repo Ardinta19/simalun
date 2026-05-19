@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Buat Pesanan – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -525,7 +526,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
           @endphp
           <label class="service-card">
             <input type="radio" name="service_id" value="{{ $svc->id }}"
-              {{ old('service_id', $services->first()->id) == $svc->id ? 'checked' : '' }}
+              {{ old('service_id', $kgServices->first()?->id ?? $services->first()?->id) == $svc->id ? 'checked' : '' }}
               data-price="{{ $svc->effective_unit_price ?? $svc->price_per_kg }}"
               data-pricing-model="{{ $svc->pricing_model ?? 'per_kg' }}">
             <div class="service-icon {{ $iconCls }}">{{ $icon }}</div>
@@ -966,17 +967,7 @@ if (orderForm) {
 
 recalc();
 
-// Animations
-if(typeof gsap !== 'undefined' && document.querySelector('.section-card')){
-  gsap.from('.section-card', {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    stagger: 0.1,
-    ease: 'power3.out',
-    clearProps: 'all'
-  });
-}
+// Section step animation handled by CSS @keyframes slideUp
 </script>
 
 <style>
