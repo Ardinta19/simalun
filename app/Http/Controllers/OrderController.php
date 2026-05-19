@@ -119,7 +119,8 @@ class OrderController extends Controller
 
         $totalCost = $serviceCost + $itemTotal + $pickupCost;
 
-        $newOrder = DB::transaction(function () use (
+        try {
+            $newOrder = DB::transaction(function () use (
             $request, $service, $weight, $zone, $pickupCost,
             $serviceCost, $itemLines, $totalCost
         ) {
@@ -186,6 +187,11 @@ class OrderController extends Controller
 
             return $order;
         });
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withInput()
+                ->withErrors(['service_id' => 'Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.']);
+        }
 
         return redirect()->route('order.show', $newOrder->order_code);
     }

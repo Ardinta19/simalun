@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->alias([
         'role' => \App\Http\Middleware\RoleMiddleware::class,
     ]);
+
+    // Apply input sanitization to all web requests
+    $middleware->web(append: [
+        \App\Http\Middleware\SanitizeInput::class,
+    ]);
 })
         //
     ->withExceptions(function (Exceptions $exceptions): void {
