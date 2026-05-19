@@ -61,7 +61,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:customer')
         ->name('order.create');
     Route::post('/order/store', [OrderController::class, 'store'])
-        ->middleware('role:customer')
+        ->middleware(['role:customer', 'throttle:6,1'])
         ->name('order.store');
     Route::get('/order/{orderCode}', [OrderController::class, 'show'])
         ->name('order.show');

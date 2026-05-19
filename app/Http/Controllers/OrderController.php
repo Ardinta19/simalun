@@ -33,18 +33,58 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'service_id'              => 'required|exists:services,id',
-            'address'                 => 'required|string|min:10',
-            'zone'                    => 'required|in:A,B,C',
-            'pickup_date'             => 'required|date|after_or_equal:today',
-            'pickup_time'             => 'required|in:pagi,siang,sore',
-            'weight_estimate'         => 'required|numeric|min:1|max:100',
-            'notes'                   => 'nullable|string|max:500',
-            'item_lines'              => 'nullable|array',
-            'item_lines.*.service_id' => 'required_with:item_lines|exists:services,id',
-            'item_lines.*.qty'        => 'required_with:item_lines|integer|min:0',
+        $validated = $request->validate([
+            'service_id'              => ['required', 'exists:services,id'],
+            'address'                 => ['required', 'string', 'min:10', 'max:300'],
+            'address_note'            => ['nullable', 'string', 'max:200'],
+            'zone'                    => ['required', 'in:A,B,C'],
+            'pickup_date'             => ['required', 'date', 'after_or_equal:today', 'before_or_equal:' . now()->addDays(14)->toDateString()],
+            'pickup_time'             => ['required', 'in:pagi,siang,sore'],
+            'weight_estimate'         => ['required', 'numeric', 'min:1', 'max:50'],
+            'notes'                   => ['nullable', 'string', 'max:500'],
+            'customer_address_id'     => ['nullable', 'integer', 'exists:customer_addresses,id'],
+            'item_lines'              => ['nullable', 'array', 'max:30'],
+            'item_lines.*.service_id' => ['required_with:item_lines', 'exists:services,id'],
+            'item_lines.*.qty'        => ['required_with:item_lines', 'integer', 'min:0', 'max:200'],
+            'item_lines.*.notes'      => ['nullable', 'string', 'max:200'],
+        ], [
+            'pickup_date.before_or_equal' => 'Tanggal jemput maksimal 14 hari ke depan.',
+            'weight_estimate.max'         => 'Estimasi berat melebihi batas (maks 50 kg).',
+            'item_lines.max'              => 'Item satuan terlalu banyak (maks 30 baris).',
         ]);
+
+        // Ownership check for customer_address_id
+        if (!empty($validated['customer_address_id'])) {
+            $owns = CustomerAddress::where('id', $validated['customer_address_id'])
+                ->where('customer_id', Auth::id())
+                ->exists();
+            abort_if(!$owns, 403, 'Alamat tersimpan tidak ditemukan.');
+        }
+
+        // Duplicate-order prevention: same service+date+time within 30s
+        $recentDuplicate = Order::where('customer_id', Auth::id())
+            ->where('service_id', $validated['service_id'])
+            ->where('pickup_date', $validated['pickup_date'])
+            ->where('pickup_time', $validated['pickup_time'])
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->exists();
+
+        if ($recentDuplicate) {
+            return back()->withInput()
+                ->withErrors(['service_id' => 'Pesanan serupa baru saja kamu buat. Tunggu sebentar sebelum mencoba lagi.']);
+        }
+
+        // Max 3 active orders per customer
+        $activeOrders = Order::where('customer_id', Auth::id())
+            ->whereIn('status', Order::statusAktifSemua())
+            ->count();
+
+        if ($activeOrders >= 3) {
+            return back()->withInput()
+                ->withErrors(['service_id' => 'Kamu masih punya 3 pesanan aktif. Selesaikan dulu salah satunya.']);
+        }
+
+        $request->merge($validated);
 
         $service    = Service::findOrFail($request->service_id);
         $weight     = (float) $request->weight_estimate;
@@ -255,13 +295,24 @@ class OrderController extends Controller
     public function assignDriver(Request $request, Order $order)
     {
         $request->validate([
-            'driver_id'       => 'required|exists:users,id',
-            'assignment_type' => 'required|in:pickup,delivery',
+            'driver_id'       => ['required', 'exists:users,id'],
+            'assignment_type' => ['required', 'in:pickup,delivery'],
         ]);
+
+        // Status flow validation
+        $expectedStatus = $request->assignment_type === 'pickup' ? 'menunggu' : 'siap';
+        if ($order->status !== $expectedStatus) {
+            return back()->with('error', "Tidak bisa menugaskan driver: status pesanan saat ini '{$order->status_label}'.");
+        }
 
         $driver = User::where('id', $request->driver_id)
             ->where('role', 'driver')
-            ->firstOrFail();
+            ->where('is_active', true)
+            ->first();
+
+        if (!$driver) {
+            return back()->with('error', 'Driver tidak ditemukan atau sedang nonaktif.');
+        }
 
         $newStatus = $request->assignment_type === 'pickup' ? 'dijemput' : 'dikirim';
 
@@ -291,8 +342,13 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:dicuci,disetrika,siap,selesai,dibatalkan',
+            'status' => ['required', 'in:dicuci,disetrika,siap,selesai,dibatalkan'],
         ]);
+
+        // Block update on final status
+        if (in_array($order->status, ['selesai', 'dibatalkan'], true)) {
+            return back()->with('error', 'Pesanan sudah final, tidak bisa diubah lagi.');
+        }
 
         $statusLabel = [
             'dicuci'     => 'Sedang Dicuci',
@@ -344,11 +400,15 @@ class OrderController extends Controller
     public function walkinStore(Request $request)
     {
         $request->validate([
-            'customer_name'   => 'required|string|max:120',
-            'customer_phone'  => 'nullable|string|max:20',
-            'service_id'      => 'required|exists:services,id',
-            'weight_estimate' => 'required|numeric|min:0.5',
-            'pickup_time'     => 'required|in:pagi,siang,sore',
+            'customer_name'   => ['required', 'string', 'min:2', 'max:120'],
+            'customer_phone'  => ['nullable', 'string', 'min:8', 'max:20', 'regex:/^[0-9+\-\s]+$/'],
+            'service_id'      => ['required', 'exists:services,id'],
+            'weight_estimate' => ['required', 'numeric', 'min:0.5', 'max:50'],
+            'pickup_time'     => ['required', 'in:pagi,siang,sore'],
+            'notes'           => ['nullable', 'string', 'max:500'],
+            'item_lines'              => ['nullable', 'array', 'max:30'],
+            'item_lines.*.service_id' => ['required_with:item_lines', 'exists:services,id'],
+            'item_lines.*.qty'        => ['required_with:item_lines', 'integer', 'min:0', 'max:200'],
         ]);
 
         $customer = User::firstOrCreate(
@@ -459,9 +519,11 @@ class OrderController extends Controller
     public function driverDetail(Order $order)
     {
         abort_if($order->driver_id !== Auth::id(), 403);
-        $order->load(['customer', 'customerAddress', 'service', 'items.service']);
+        $order->load(['customer', 'customerAddress', 'service', 'items.service', 'statusHistories.updater']);
 
-        return view('roles.driver.orders', compact('order'));
+        $histori = $order->statusHistories()->latest('updated_at')->get();
+
+        return view('roles.driver.order_detail', compact('order', 'histori'));
     }
 
     public function driverAction(Request $request, Order $order)
@@ -469,10 +531,20 @@ class OrderController extends Controller
         abort_if($order->driver_id !== Auth::id(), 403);
 
         $request->validate([
-            'status'        => 'required|in:dicuci,dikirim,selesai',
-            'weight_actual' => 'nullable|numeric|min:0.1',
-            'proof_image'   => 'nullable|image|max:5120',
+            'status'        => ['required', 'in:dicuci,dikirim,selesai'],
+            'weight_actual' => ['nullable', 'numeric', 'min:0.1', 'max:50'],
+            'proof_image'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
+
+        // Block final status
+        if (in_array($order->status, ['selesai', 'dibatalkan'], true)) {
+            return back()->with('error', 'Pesanan sudah final.');
+        }
+
+        // Require proof for selesai
+        if ($request->status === 'selesai' && !$request->hasFile('proof_image')) {
+            return back()->withErrors(['proof_image' => 'Foto bukti wajib di-upload untuk menandai selesai.']);
+        }
 
         $updateData = ['status' => $request->status];
         $note       = '';

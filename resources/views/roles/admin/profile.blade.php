@@ -150,20 +150,39 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 <nav class="nav">
   <div class="nav-in">
-    <a href="{{ route('customer.dashboard') }}" class="nav-item">
+    @php
+      $role = auth()->user()->role;
+      $beranda = $role === 'admin' ? 'dashboard.admin' : ($role === 'driver' ? 'driver.dashboard' : 'customer.dashboard');
+      $orders  = $role === 'admin' ? 'admin.orders' : ($role === 'driver' ? 'driver.orders' : 'customer.orders');
+      $notif   = $role === 'admin' ? 'admin.notifications' : ($role === 'driver' ? 'driver.notifications' : 'customer.notifications');
+      $profile = $role === 'admin' ? 'admin.profile' : ($role === 'driver' ? 'profile.edit' : 'customer.profile');
+    @endphp
+    <a href="{{ route($beranda) }}" class="nav-item">
       <span class="nav-ico">🏠</span><span class="nav-label">Beranda</span>
     </a>
-    <a href="{{ route('customer.orders') }}" class="nav-item">
+    <a href="{{ route($orders) }}" class="nav-item">
       <span class="nav-ico">📋</span><span class="nav-label">Pesanan</span>
     </a>
-    <a href="{{ route('order.create') }}" class="nav-fab">
-      <div class="nav-fab-btn"><span>+</span></div>
-      <span class="nav-fab-lbl">Pesan</span>
-    </a>
-    <a href="{{ route('customer.notifications') }}" class="nav-item">
+    @if($role === 'customer')
+      <a href="{{ route('order.create') }}" class="nav-fab">
+        <div class="nav-fab-btn"><span>+</span></div>
+        <span class="nav-fab-lbl">Pesan</span>
+      </a>
+    @elseif($role === 'admin')
+      <a href="{{ route('admin.walkin.form') }}" class="nav-fab">
+        <div class="nav-fab-btn"><span>+</span></div>
+        <span class="nav-fab-lbl">Walk-in</span>
+      </a>
+    @else
+      <a href="{{ route('driver.tracking') }}" class="nav-fab">
+        <div class="nav-fab-btn"><span>📍</span></div>
+        <span class="nav-fab-lbl">Lacak</span>
+      </a>
+    @endif
+    <a href="{{ route($notif) }}" class="nav-item">
       <span class="nav-ico">🔔</span><span class="nav-label">Notif</span>
     </a>
-    <a href="{{ route('customer.profile') }}" class="nav-item active">
+    <a href="{{ route($profile) }}" class="nav-item active">
       <span class="nav-ico">👤</span><span class="nav-label">Profil</span>
     </a>
   </div>
