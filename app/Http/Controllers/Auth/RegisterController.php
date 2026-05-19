@@ -34,7 +34,5 @@ class RegisterController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('dashboard');
-        // Note: we redirect back to register page to show success state
-        // Alternatively, redirect to login: return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk.');
     }
 }

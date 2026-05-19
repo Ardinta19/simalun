@@ -340,6 +340,14 @@ class OrderController extends Controller
                 'Kurir Ditugaskan',
                 "Kurir {$driver->name} sedang menuju lokasi kamu."
             ));
+
+            // Notifikasi ke driver yang ditugaskan
+            $taskLabel = $request->assignment_type === 'pickup' ? 'penjemputan' : 'pengantaran';
+            $driver->notify(new OrderStatusUpdated(
+                $order,
+                'Tugas Baru',
+                "Anda ditugaskan untuk {$taskLabel} pesanan #{$order->order_code} dari {$order->customer->name}."
+            ));
         });
 
         return back()->with('success', "Driver {$driver->name} berhasil ditugaskan.");
@@ -379,6 +387,15 @@ class OrderController extends Controller
                 "Pesanan {$statusLabel[$request->status]}",
                 "Pesanan #{$order->order_code} kamu sekarang: {$statusLabel[$request->status]}."
             ));
+
+            // Notifikasi ke driver jika status siap (perlu antar)
+            if ($request->status === 'siap' && $order->driver_id) {
+                $order->driver->notify(new OrderStatusUpdated(
+                    $order,
+                    'Cucian Siap Diantar',
+                    "Pesanan #{$order->order_code} sudah siap. Menunggu penugasan pengantaran."
+                ));
+            }
         });
 
         return back()->with('success', 'Status pesanan berhasil diperbarui.');

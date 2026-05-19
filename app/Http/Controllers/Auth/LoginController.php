@@ -9,12 +9,11 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /**
-     * Handle authentication with SECURE role-based redirect
-     * Role diambil dari DATABASE, bukan dari input user
+     * Handle authentication dan role-based redirect
      */
     public function authenticate(Request $request)
     {
-        // Validasi input HANYA identifier & password
+        // Validasi input
         $credentials = $request->validate([
             'identifier' => ['nullable', 'string'],
             'email'      => ['nullable', 'string'],
@@ -35,12 +34,11 @@ class LoginController extends Controller
         // Cek apakah identifier adalah email atau phone
         $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         
-        // Attempt auth TANPA role di array credentials
-        // Role akan dicek otomatis oleh Laravel dari tabel users
+        // Attempt authentication
         if (Auth::attempt([$field => $identifier, 'password' => $password], $request->boolean('remember'))) {
             $request->session()->regenerate();
             
-            // ✅ Ambil role DARI DATABASE (bukan dari input)
+            // Ambil role dari database
             $user = Auth::user();
             
             // Redirect sesuai role yang tersimpan di database
@@ -66,7 +64,7 @@ class LoginController extends Controller
     }
 
     /**
-     * Helper: Redirect berdasarkan role dari database
+     * Redirect berdasarkan role
      */
     private function redirectByRole(string $role)
     {

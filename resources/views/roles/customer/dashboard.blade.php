@@ -12,7 +12,7 @@
 
 <style>
 /* ═══════════════════════════════════════════════
-   TOKENS — SAMA PERSIS DENGAN SPLASH
+   TOKENS
 ═══════════════════════════════════════════════ */
 :root {
   --c-ocean-deep:  #002f5c;
@@ -50,7 +50,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   HEADER — lanjutan visual dari splash
+   HEADER
 ═══════════════════════════════════════════════ */
 .hd {
   background: linear-gradient(168deg,
@@ -65,7 +65,7 @@ body {
   padding-bottom: 48px;
 }
 
-/* gelembung ambient dekoratif — echo dari splash */
+/* gelembung dekoratif */
 .hd-bubble {
   position: absolute;
   border-radius: 50%;
@@ -530,7 +530,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   PROMO BANNER — berkesinambungan dengan splash
+   PROMO BANNER
 ═══════════════════════════════════════════════ */
 .promo-banner {
   background: linear-gradient(135deg,
@@ -840,7 +840,7 @@ body {
 <body>
 
 {{-- ══════════════════════════════════════
-     HEADER — visual DNA dari splash
+     HEADER
 ══════════════════════════════════════ --}}
 <header class="hd" aria-label="Header dashboard">
 
@@ -853,7 +853,7 @@ body {
     {{-- Topbar --}}
     <div class="hd-topbar">
       <div class="hd-logo">
-        {{-- Drum SVG mini — sama persis dengan splash --}}
+        {{-- Drum SVG mini --}}
         <svg width="32" height="32" viewBox="0 0 148 148" fill="none" aria-hidden="true">
           <circle cx="74" cy="74" r="70" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
           <rect x="16" y="26" width="116" height="106" rx="18" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.35)" stroke-width="1.8"/>
@@ -1185,7 +1185,7 @@ body {
 </nav>
 
 {{-- ══════════════════════════════════════
-     JAVASCRIPT — GSAP entrance (echo splash)
+     JAVASCRIPT
 ══════════════════════════════════════ --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
