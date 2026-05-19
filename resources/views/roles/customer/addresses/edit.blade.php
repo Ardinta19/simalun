@@ -249,9 +249,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Animate
-    gsap.to('.js-card', { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'power2.out', delay: 0.1 });
-    gsap.from('.page-header', { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
-    gsap.from('.bottom-cta', { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+    if (typeof gsap !== 'undefined') {
+        gsap.to('.js-card', { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'power2.out', delay: 0.1 });
+
+        const header = document.querySelector('.page-header');
+        if (header) gsap.from(header, { opacity: 0, y: -16, duration: 0.4, ease: 'power2.out' });
+
+        const cta = document.querySelector('.bottom-cta');
+        if (cta) gsap.from(cta, { opacity: 0, y: 20, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+    }
 });
 
 // Zone auto-detect
@@ -265,10 +271,15 @@ document.getElementById('distance-input')?.addEventListener('input', function() 
 function togglePrimary() {
     const btn = document.getElementById('toggle-primary');
     const inp = document.getElementById('is-primary-val');
+    if (!btn || !inp) return;
+
     const isOn = btn.classList.contains('on');
     btn.classList.toggle('on', !isOn);
     inp.value = isOn ? '0' : '1';
-    gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+
+    if (typeof gsap !== 'undefined') {
+        gsap.from(btn, { scale: 0.9, duration: 0.2, ease: 'back.out(2)' });
+    }
 }
 </script>
 </body>

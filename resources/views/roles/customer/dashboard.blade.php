@@ -1188,110 +1188,108 @@ body {
 ══════════════════════════════════════ --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    if (typeof gsap === 'undefined') return;
 
-  /* ── 1. STAGGERED ENTRANCE — mirip dengan splash intro timeline ── */
-  const reveals = document.querySelectorAll('.js-reveal');
-
-  gsap.fromTo(reveals,
-    { opacity: 0, y: 28 },
-    {
-      opacity: 1, y: 0,
-      duration: .55,
-      stagger: .1,
-      ease: 'power3.out',
-      delay: .1,
+    const reveals = document.querySelectorAll('.js-reveal');
+    if (reveals.length > 0) {
+        gsap.fromTo(reveals,
+            { opacity: 0, y: 28 },
+            {
+                opacity: 1, y: 0,
+                duration: .55,
+                stagger: .1,
+                ease: 'power3.out',
+                delay: .1,
+            }
+        );
     }
-  );
 
-  /* ── 2. HEADER BUBBLES — persis seperti ambient splash ── */
-  (function spawnHeaderBubbles() {
-    const header = document.querySelector('.hd');
-    const deco   = [
-      { w: 18, h: 18, top: '20%', right: '18%', delay: .6 },
-      { w: 10, h: 10, top: '55%', right: '35%', delay: 1.1 },
-      { w: 14, h: 14, top: '30%', left: '12%',  delay: .85 },
-    ];
-    deco.forEach(cfg => {
-      const b = document.createElement('div');
-      b.style.cssText = [
-        'position:absolute','border-radius:50%','pointer-events:none',
-        `width:${cfg.w}px`, `height:${cfg.h}px`,
-        'background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7),rgba(255,255,255,.06))',
-        'border:1px solid rgba(255,255,255,.3)',
-        cfg.top   ? `top:${cfg.top}`   : '',
-        cfg.right ? `right:${cfg.right}` : '',
-        cfg.left  ? `left:${cfg.left}`  : '',
-        'opacity:0',
-      ].join(';');
-      header.appendChild(b);
-      gsap.to(b, {
-        opacity: .7, y: -12,
-        duration: 2.5 + Math.random(),
-        ease: 'sine.inOut',
-        yoyo: true, repeat: -1,
-        delay: cfg.delay,
-      });
-      gsap.fromTo(b, { opacity: 0 }, { opacity: .7, duration: .5, delay: cfg.delay });
+    (function spawnHeaderBubbles() {
+        const header = document.querySelector('.hd');
+        if (!header) return;
+
+        const deco = [
+            { w: 18, h: 18, top: '20%', right: '18%', delay: .6 },
+            { w: 10, h: 10, top: '55%', right: '35%', delay: 1.1 },
+            { w: 14, h: 14, top: '30%', left: '12%',  delay: .85 },
+        ];
+        deco.forEach(cfg => {
+            const b = document.createElement('div');
+            b.style.cssText = [
+                'position:absolute','border-radius:50%','pointer-events:none',
+                `width:${cfg.w}px`, `height:${cfg.h}px`,
+                'background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7),rgba(255,255,255,.06))',
+                'border:1px solid rgba(255,255,255,.3)',
+                cfg.top   ? `top:${cfg.top}`   : '',
+                cfg.right ? `right:${cfg.right}` : '',
+                cfg.left  ? `left:${cfg.left}`  : '',
+                'opacity:0',
+            ].join(';');
+            header.appendChild(b);
+            gsap.to(b, {
+                opacity: .7, y: -12,
+                duration: 2.5 + Math.random(),
+                ease: 'sine.inOut',
+                yoyo: true, repeat: -1,
+                delay: cfg.delay,
+            });
+            gsap.fromTo(b, { opacity: 0 }, { opacity: .7, duration: .5, delay: cfg.delay });
+        });
+    })();
+
+    const drumSvg = document.querySelector('.hd-logo svg');
+    if (drumSvg) {
+        gsap.to(drumSvg, {
+            rotation: 360,
+            duration: 24,
+            ease: 'none',
+            repeat: -1,
+            transformOrigin: '50% 50%',
+        });
+    }
+
+    const activeHero = document.querySelector('.active-hero');
+    if (activeHero) {
+        gsap.to(activeHero, {
+            boxShadow: '0 12px 36px rgba(0,119,182,.15), 0 2px 6px rgba(0,47,92,.06)',
+            duration: 2,
+            yoyo: true,
+            repeat: -1,
+            ease: 'sine.inOut',
+        });
+    }
+
+    const ctaBtn = document.querySelector('.cta-jemput');
+    if (ctaBtn) {
+        const ctaDrum = ctaBtn.querySelector('svg');
+        if (ctaDrum) {
+            ctaBtn.addEventListener('touchstart', function () {
+                gsap.to(ctaDrum, { rotation: '+=45', duration: .25, ease: 'power2.out' });
+            }, { passive: true });
+        }
+    }
+
+    document.querySelectorAll('.bn-item, .bn-fab').forEach(el => {
+        el.addEventListener('touchstart', function () {
+            gsap.to(this, { scale: .91, duration: .09, ease: 'power2.out' });
+        }, { passive: true });
+        el.addEventListener('touchend', function () {
+            gsap.to(this, { scale: 1, duration: .22, ease: 'back.out(2.5)' });
+        }, { passive: true });
     });
-  })();
 
-  /* ── 3. DRUM LOGO — slow rotation, echo dari splash ── */
-  const drumSvg = document.querySelector('.hd-logo svg');
-  if (drumSvg) {
-    gsap.to(drumSvg, {
-      rotation: 360,
-      duration: 24,
-      ease: 'none',
-      repeat: -1,
-      transformOrigin: '50% 50%',
-    });
-  }
-
-  /* ── 4. ACTIVE ORDER CARD — subtle pulse pada border ── */
-  const activeHero = document.querySelector('.active-hero');
-  if (activeHero) {
-    gsap.to(activeHero, {
-      boxShadow: '0 12px 36px rgba(0,119,182,.15), 0 2px 6px rgba(0,47,92,.06)',
-      duration: 2,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
-    });
-  }
-
-  /* ── 5. CTA BUTTON — drum spin saat di-tap ── */
-  const ctaBtn = document.querySelector('.cta-jemput');
-  if (ctaBtn) {
-    const ctaDrum = ctaBtn.querySelector('svg');
-    ctaBtn.addEventListener('touchstart', function () {
-      gsap.to(ctaDrum, { rotation: '+=45', duration: .25, ease: 'power2.out' });
-    }, { passive: true });
-  }
-
-  /* ── 6. BOTTOM NAV touch feedback ── */
-  document.querySelectorAll('.bn-item, .bn-fab').forEach(el => {
-    el.addEventListener('touchstart', function () {
-      gsap.to(this, { scale: .91, duration: .09, ease: 'power2.out' });
-    }, { passive: true });
-    el.addEventListener('touchend', function () {
-      gsap.to(this, { scale: 1, duration: .22, ease: 'back.out(2.5)' });
-    }, { passive: true });
-  });
-
-  /* ── 7. WAVE ANIMATION ── */
-  const wave = document.querySelector('.hd-wave path');
-  if (wave) {
-    gsap.to(wave, {
-      attr: {
-        d: 'M0,20 C80,48 160,4 240,26 C300,42 360,8 414,22 L414,52 L0,52Z'
-      },
-      duration: 3.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    });
-  }
-
+    const wave = document.querySelector('.hd-wave path');
+    if (wave) {
+        gsap.to(wave, {
+            attr: {
+                d: 'M0,20 C80,48 160,4 240,26 C300,42 360,8 414,22 L414,52 L0,52Z'
+            },
+            duration: 3.5,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+        });
+    }
 });
 </script>
 

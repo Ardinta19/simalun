@@ -635,52 +635,30 @@ body {
 @include('layouts.component.customer._navbar_customer', ['active' => 'pesanan'])
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof gsap === 'undefined') return;
 
-    // Animate cards in
-    const cards = document.querySelectorAll('.js-card');
-    gsap.to(cards, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        stagger: 0.07,
-        ease: 'power2.out',
-        delay: 0.1
+        const animate = (selector, options) => {
+            const els = document.querySelectorAll(selector);
+            if (els.length > 0) gsap.from(els, options);
+        };
+
+        const cards = document.querySelectorAll('.js-card');
+        if (cards.length > 0) {
+            gsap.to(cards, {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.07,
+                ease: 'power2.out',
+                delay: 0.1,
+            });
+        }
+
+        animate('#active-banner', { opacity: 0, y: -20, duration: 0.5, ease: 'back.out(1.5)' });
+        animate('.page-header', { opacity: 0, y: -20, duration: 0.4, ease: 'power2.out' });
+        animate('.empty-state', { opacity: 0, y: 30, duration: 0.6, ease: 'power2.out' });
     });
-
-    // Active banner
-    const banner = document.getElementById('active-banner');
-    if (banner) {
-        gsap.from(banner, {
-            opacity: 0,
-            y: -20,
-            duration: 0.5,
-            ease: 'back.out(1.5)'
-        });
-    }
-
-    // Filter chips ripple
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            gsap.from(this, { scale: 0.93, duration: 0.2, ease: 'power2.out' });
-        });
-    });
-
-    // Header animation
-    gsap.from('.page-header', {
-        opacity: 0,
-        y: -20,
-        duration: 0.4,
-        ease: 'power2.out'
-    });
-
-    // Empty state animation
-    const empty = document.querySelector('.empty-state');
-    if (empty) {
-        gsap.from(empty, { opacity: 0, y: 30, duration: 0.6, ease: 'power2.out' });
-    }
-});
 </script>
 
 </body>

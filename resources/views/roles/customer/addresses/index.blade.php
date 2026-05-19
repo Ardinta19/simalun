@@ -316,19 +316,26 @@ body {
 @include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const cards = document.querySelectorAll('.js-card');
-    gsap.to(cards, {
-        opacity: 1, y: 0,
-        duration: 0.45, stagger: 0.08,
-        ease: 'power2.out', delay: 0.1
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof gsap === 'undefined') return;
 
-    gsap.from('.page-header', {
-        opacity: 0, y: -16,
-        duration: 0.4, ease: 'power2.out'
+        const cards = document.querySelectorAll('.js-card');
+        if (cards.length > 0) {
+            gsap.to(cards, {
+                opacity: 1, y: 0,
+                duration: 0.45, stagger: 0.08,
+                ease: 'power2.out', delay: 0.1,
+            });
+        }
+
+        const header = document.querySelector('.page-header');
+        if (header) {
+            gsap.from(header, {
+                opacity: 0, y: -16,
+                duration: 0.4, ease: 'power2.out',
+            });
+        }
     });
-});
 </script>
 </body>
 </html>

@@ -8,40 +8,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    public const STATUS_CANONICAL = [
-        'pending',
-        'assigned_pickup',
-        'picked_up',
-        'washing',
-        'ready_to_deliver',
-        'out_for_delivery',
-        'completed',
-        'cancelled',
-    ];
-
     public const STATUS_AKTIF = ['menunggu', 'dijemput', 'dicuci', 'disetrika', 'siap', 'dikirim'];
     public const STATUS_SELESAI = 'selesai';
 
-    public const STATUS_AKTIF_CANONICAL = [
-        'pending',
-        'assigned_pickup',
-        'picked_up',
-        'washing',
-        'ready_to_deliver',
-        'out_for_delivery',
-    ];
-
-    public const STATUS_SELESAI_CANONICAL = 'completed';
-    public const STATUS_BATAL_CANONICAL = 'cancelled';
-
     public static function statusAktifSemua(): array
     {
-        return array_values(array_unique(array_merge(self::STATUS_AKTIF, self::STATUS_AKTIF_CANONICAL)));
+        return self::STATUS_AKTIF;
     }
 
     public static function statusSelesaiSemua(): array
     {
-        return [self::STATUS_SELESAI, self::STATUS_SELESAI_CANONICAL];
+        return [self::STATUS_SELESAI];
     }
 
     protected $fillable = [
@@ -70,14 +47,13 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'pickup_date' => 'date',
-        'paid_at'     => 'datetime',
-        'is_paid'     => 'boolean',
+        'pickup_date'     => 'date',
+        'paid_at'         => 'datetime',
+        'is_paid'         => 'boolean',
         'weight_estimate' => 'decimal:1',
         'weight_actual'   => 'decimal:1',
     ];
 
-    // ── Relationships ──────────────────────────────────────
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'customer_id');
@@ -113,17 +89,17 @@ class Order extends Model
         return $this->hasMany(OrderStatusHistory::class);
     }
 
-    // ── Helpers ────────────────────────────────────────────
     public static function generateCode(): string
     {
         $prefix = 'AL-' . date('Ymd');
         $last   = self::where('order_code', 'like', $prefix . '%')->count();
+
         return $prefix . '-' . str_pad($last + 1, 3, '0', STR_PAD_LEFT);
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'menunggu'   => 'Menunggu',
             'dijemput'   => 'Dijemput',
             'dicuci'     => 'Sedang Dicuci',
@@ -138,7 +114,7 @@ class Order extends Model
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'menunggu'   => '#F59E0B',
             'dijemput'   => '#3B82F6',
             'dicuci'     => '#0EA5E9',
@@ -151,15 +127,12 @@ class Order extends Model
         };
     }
 
-    /**
-     * Zone costs (SCP-03)
-     */
     public static function zoneCost(string $zone): int
     {
-        return match($zone) {
-            'A' => 5000,
-            'B' => 10000,
-            'C' => 15000,
+        return match ($zone) {
+            'A'     => 5000,
+            'B'     => 10000,
+            'C'     => 15000,
             default => 5000,
         };
     }
