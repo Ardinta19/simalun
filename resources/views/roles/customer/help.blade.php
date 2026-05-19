@@ -4,23 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Bantuan – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue-dark:#002f5c;--blue-mid:#0077b6;--blue-light:#00b4d8;--blue-sky:#e0f4ff;--orange:#FF6B35;--green:#00C48C;--ink:#1a2332;--ink-mid:#3d5066;--ink-lt:#8899aa;--surface:#f4f8fc;--border:#ddeeff;--radius:16px;--nav-h:72px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:var(--nav-h);}
-
-.nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-top:1.5px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:520px;height:100%;margin:0 auto;display:flex;align-items:center}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#94a3b8;transition:color 0.2s}
-.nav-item.active{color:var(--blue-mid)}
-.nav-ico{font-size:1.4rem;line-height:1}
-.nav-label{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.3px}
-
-.nav-fab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
-.nav-fab-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,107,53,0.45);margin-top:-25px;transition:transform 0.15s;color:#fff;font-size:2rem;font-family:'Fredoka One',cursive}
-.nav-fab:active .nav-fab-btn{transform:scale(0.95)}
-.nav-fab-lbl{font-size:0.62rem;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:80px;}
 .top-header{background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue-mid) 60%,var(--blue-light) 100%);position:relative;overflow:hidden;}
 .header-inner{position:relative;z-index:1;padding:max(env(safe-area-inset-top,0px),20px) 20px 20px;max-width:520px;margin:0 auto;}
 .header-top{display:flex;align-items:center;gap:12px;}
@@ -66,24 +55,6 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
   </div>
 </div>
 <script>function toggleFaq(el){el.parentElement.classList.toggle('open');}</script>
-<nav class="nav">
-  <div class="nav-in">
-    <a href="{{ route('customer.dashboard') }}" class="nav-item">
-      <span class="nav-ico">🏠</span><span class="nav-label">Beranda</span>
-    </a>
-    <a href="{{ route('customer.orders') }}" class="nav-item">
-      <span class="nav-ico">📋</span><span class="nav-label">Pesanan</span>
-    </a>
-    <a href="{{ route('order.create') }}" class="nav-fab">
-      <div class="nav-fab-btn"><span>+</span></div>
-      <span class="nav-fab-lbl">Pesan</span>
-    </a>
-    <a href="{{ route('customer.notifications') }}" class="nav-item">
-      <span class="nav-ico">🔔</span><span class="nav-label">Notif</span>
-    </a>
-    <a href="{{ route('customer.profile') }}" class="nav-item">
-      <span class="nav-ico">👤</span><span class="nav-label">Profil</span>
-    </a>
-  </div>
-</nav>
+@include('layouts.component.customer._navbar_customer', ['active' => 'beranda'])
+</body>
 </html>

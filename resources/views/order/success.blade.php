@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Pesanan Berhasil – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue-dark:#002f5c;--blue-mid:#0077b6;--orange:#FF6B35;--green:#00C48C;--surface:#f5f9ff;--border:#ddeeff;--radius:16px;}

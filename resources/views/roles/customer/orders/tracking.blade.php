@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Lacak Pesanan – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -270,7 +271,7 @@ body {
 {{-- MAP AREA --}}
 <div id="map-container">
     {{-- Back button --}}
-    <a href="{{ route('customer.orders') }}" class="map-back">
+    <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('customer.orders') }}" class="map-back">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
         </svg>

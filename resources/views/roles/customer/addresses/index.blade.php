@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Alamat Saya – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
@@ -289,10 +290,10 @@ body {
                     </button>
                 </form>
                 @endif
-                <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" style="flex:1;display:flex;"
-                      onsubmit="return confirm('Hapus alamat ini?')">
+                <form method="POST" action="{{ route('customer.addresses.destroy', $address) }}" id="delete-addr-{{ $address->id }}" style="flex:1;display:flex;">
                     @csrf @method('DELETE')
-                    <button type="submit" class="addr-btn delete" style="width:100%;">
+                    <button type="button" class="addr-btn delete" style="width:100%;"
+                            onclick="showConfirmModal({ title: 'Hapus Alamat?', message: 'Alamat {{ $address->label }} akan dihapus permanen dan tidak bisa dikembalikan.', confirmText: 'Ya, Hapus', cancelText: 'Batal', type: 'danger', onConfirm: function() { document.getElementById('delete-addr-{{ $address->id }}').submit(); } })">
                         🗑️ Hapus
                     </button>
                 </form>
@@ -315,11 +316,20 @@ body {
 {{-- BOTTOM NAVBAR --}}
 @include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
 
+{{-- CONFIRM MODAL --}}
+@include('layouts.component.customer._confirm_modal')
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof gsap === 'undefined') return;
+        if (typeof gsap === 'undefined') {
+            document.querySelectorAll('.js-card').forEach(function(el) {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+            return;
+        }
 
-        const cards = document.querySelectorAll('.js-card');
+        var cards = document.querySelectorAll('.js-card');
         if (cards.length > 0) {
             gsap.to(cards, {
                 opacity: 1, y: 0,
@@ -328,7 +338,7 @@ body {
             });
         }
 
-        const header = document.querySelector('.page-header');
+        var header = document.querySelector('.page-header');
         if (header) {
             gsap.from(header, {
                 opacity: 0, y: -16,

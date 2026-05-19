@@ -31,6 +31,19 @@ class NotificationController extends Controller
         return back();
     }
 
+    public function markAndRedirect(string $id)
+    {
+        $notif = Auth::user()->notifications()->findOrFail($id);
+        $notif->markAsRead();
+
+        $orderId = $notif->data['order_id'] ?? null;
+        if ($orderId) {
+            return redirect()->route('customer.order.detail', $orderId);
+        }
+
+        return redirect()->route('customer.notifications');
+    }
+
     public function adminIndex()
     {
         $notifications = Auth::user()

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Daftar Pesanan – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
@@ -594,7 +595,7 @@ body {
 
         {{-- Pagination --}}
         <div class="pagination-wrap">
-            {{ $pesanan->appends(request()->query())->links() }}
+            {{ $pesanan->appends(request()->query())->links('vendor.pagination.customer-simple') }}
         </div>
 
     @else
@@ -636,14 +637,15 @@ body {
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof gsap === 'undefined') return;
+        if (typeof gsap === 'undefined') {
+            document.querySelectorAll('.js-card').forEach(function(el) {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+            return;
+        }
 
-        const animate = (selector, options) => {
-            const els = document.querySelectorAll(selector);
-            if (els.length > 0) gsap.from(els, options);
-        };
-
-        const cards = document.querySelectorAll('.js-card');
+        var cards = document.querySelectorAll('.js-card');
         if (cards.length > 0) {
             gsap.to(cards, {
                 opacity: 1,
@@ -654,6 +656,11 @@ body {
                 delay: 0.1,
             });
         }
+
+        var animate = function(selector, options) {
+            var els = document.querySelectorAll(selector);
+            if (els.length > 0) gsap.from(els, options);
+        };
 
         animate('#active-banner', { opacity: 0, y: -20, duration: 0.5, ease: 'back.out(1.5)' });
         animate('.page-header', { opacity: 0, y: -20, duration: 0.4, ease: 'power2.out' });

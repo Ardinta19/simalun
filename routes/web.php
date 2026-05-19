@@ -81,6 +81,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::get('/notifications/{id}/open', [NotificationController::class, 'markAndRedirect'])->name('notifications.open');
 
         Route::get('/addresses', [CustomerAddressController::class, 'index'])->name('addresses.index');
         Route::get('/addresses/create', [CustomerAddressController::class, 'create'])->name('addresses.create');

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Detail Pesanan #{{ strtoupper($order->order_code ?? 'N/A') }} – Azka Laundry</title>
+@include('layouts.component.customer._head_meta')
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
@@ -384,7 +385,7 @@ body {
 <div class="hero" id="js-hero">
     <div class="hero-inner">
         <div class="hero-nav">
-            <a href="{{ route('customer.orders') }}" class="btn-back">
+            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('customer.orders') }}" class="btn-back">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 5l-7 7 7 7"/>
                 </svg>
