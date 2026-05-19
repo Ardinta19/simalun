@@ -99,11 +99,15 @@ tr:last-child td{border-bottom:none}
         <div class="card js-in">
             <div class="table-h">
                 <h3>Daftar Antrian</h3>
-                <div style="display:flex; gap:10px">
-                    <select style="padding:8px; border-radius:10px; border:1.5px solid var(--line); font-weight:700">
-                        <option>Semua Status</option>
+                <form method="GET" action="{{ route('admin.orders') }}" style="display:flex; gap:10px">
+                    @php $currentStatus = request('status'); @endphp
+                    <select name="status" onchange="this.form.submit()" style="padding:8px; border-radius:10px; border:1.5px solid var(--line); font-weight:700">
+                        <option value="">Semua Status</option>
+                        @foreach(['menunggu'=>'Menunggu','dijemput'=>'Dijemput','dicuci'=>'Sedang Dicuci','disetrika'=>'Sedang Disetrika','siap'=>'Siap Dikirim','dikirim'=>'Dalam Pengiriman','selesai'=>'Selesai','dibatalkan'=>'Dibatalkan'] as $key=>$label)
+                            <option value="{{ $key }}" {{ $currentStatus === $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
                     </select>
-                </div>
+                </form>
             </div>
             <div style="overflow-x:auto">
                 <table>
@@ -149,6 +153,7 @@ tr:last-child td{border-bottom:none}
                                     @if(in_array($o->status, ['dicuci', 'disetrika']))
                                     <form method="POST" action="{{ route('admin.orders.update-status', $o) }}" style="display:flex; gap:5px; background:#fff7ed; padding:8px; border-radius:10px">
                                         @csrf
+                                        @method('PATCH')
                                         @php $nextStatus = $o->status == 'dicuci' ? 'disetrika' : 'siap' @endphp
                                         <input type="hidden" name="status" value="{{ $nextStatus }}">
                                         <div style="font-size:0.7rem; font-weight:800; color:#9a3412; flex:1">Update ke: {{ $nextStatus == 'disetrika' ? 'Setrika' : 'Siap Kirim' }}</div>
@@ -172,7 +177,7 @@ tr:last-child td{border-bottom:none}
                                     @endif
 
                                     <div style="display:flex; gap:8px">
-                                        <a href="{{ route('customer.order.detail', $o->id) }}" class="btn btn-sec" style="flex:1; justify-content:center">Detail</a>
+                                        <a href="{{ route('order.show', $o->order_code) }}" class="btn btn-sec" style="flex:1; justify-content:center">Detail</a>
                                         <a href="{{ route('admin.orders.receipt', $o) }}" target="_blank" class="btn btn-sec" style="flex:1; justify-content:center">Struk 📄</a>
                                     </div>
                                 </div>

@@ -135,15 +135,17 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        // Tugas menunggu (menunggu dijemput)
+        // Tugas menunggu konfirmasi (status menunggu yang sudah di-assign ke driver ini,
+        // atau yang punya assignment "assigned" di tabel driver_assignments).
         $tugasMenunggu = Order::with(['customer', 'customerAddress', 'service'])
-            ->where('driver_id', $driver->id)
-            ->where('status', 'menunggu')
-            ->orWhere(function ($q) use ($driver) {
-                $q->whereHas('assignments', fn($a) =>
+            ->where(function ($q) use ($driver) {
+                $q->where(function ($qq) use ($driver) {
+                    $qq->where('driver_id', $driver->id)
+                       ->where('status', 'menunggu');
+                })->orWhereHas('assignments', function ($a) use ($driver) {
                     $a->where('driver_id', $driver->id)
-                      ->where('assignment_status', 'assigned')
-                );
+                      ->where('assignment_status', 'assigned');
+                });
             })
             ->latest()
             ->get();

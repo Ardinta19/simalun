@@ -107,10 +107,15 @@ td{padding:15px 20px; border-bottom:1px solid #f1f5f9; font-size:0.9rem; font-we
                 <tbody>
                     @forelse($transaksi ?? [] as $t)
                     <tr>
-                        <td>{{ $t->date->format('d/m/Y') }}</td>
-                        <td>{{ $t->description }}</td>
-                        <td><span class="badge {{ $t->type == 'in' ? 'badge-in' : 'badge-out' }}">{{ $t->type == 'in' ? 'Masuk' : 'Keluar' }}</span></td>
-                        <td style="color:{{ $t->type == 'in' ? 'var(--ok)' : '#ef4444' }}">Rp {{ number_format($t->amount, 0, ',', '.') }}</td>
+                        <td>{{ $t->entry_date->format('d/m/Y') }}</td>
+                        <td>
+                            {{ $t->notes ?? '-' }}
+                            @if($t->order)
+                                <div style="font-size:0.7rem; color:var(--muted); font-family:monospace">#{{ strtoupper($t->order->order_code) }}</div>
+                            @endif
+                        </td>
+                        <td><span class="badge {{ $t->entry_type == 'income' ? 'badge-in' : 'badge-out' }}">{{ $t->entry_type == 'income' ? 'Masuk' : 'Keluar' }}</span></td>
+                        <td style="color:{{ $t->entry_type == 'income' ? 'var(--ok)' : '#ef4444' }}">Rp {{ number_format($t->amount, 0, ',', '.') }}</td>
                     </tr>
                     @empty
                     <tr>
@@ -120,6 +125,11 @@ td{padding:15px 20px; border-bottom:1px solid #f1f5f9; font-size:0.9rem; font-we
                 </tbody>
             </table>
         </div>
+        @if(method_exists($transaksi ?? null, 'links'))
+            <div style="margin-top:15px">
+                {{ $transaksi->links() }}
+            </div>
+        @endif
     </div>
 
     <div class="card js-in">

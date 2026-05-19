@@ -30,14 +30,24 @@ class CustomerAddressController extends Controller
     /** POST /customer/addresses */
     public function store(Request $request)
     {
+        // Cegah membuat terlalu banyak alamat per customer.
+        $existing = Auth::user()->customerAddresses()->count();
+        if ($existing >= 10) {
+            return back()
+                ->withInput()
+                ->with('error', 'Maksimum 10 alamat tersimpan. Hapus salah satu sebelum menambahkan baru.');
+        }
+
         $validated = $request->validate([
             'label'          => ['required', 'string', 'max:80'],
-            'recipient_name' => ['required', 'string', 'max:120'],
-            'phone'          => ['nullable', 'string', 'max:30'],
-            'full_address'   => ['required', 'string', 'min:10'],
-            'distance_km'    => ['nullable', 'numeric', 'min:0'],
+            'recipient_name' => ['required', 'string', 'min:2', 'max:120'],
+            'phone'          => ['nullable', 'string', 'min:8', 'max:30', 'regex:/^[0-9+\-\s]+$/'],
+            'full_address'   => ['required', 'string', 'min:10', 'max:500'],
+            'distance_km'    => ['nullable', 'numeric', 'min:0', 'max:50'],
             'zone'           => ['nullable', 'in:A,B,C'],
             'notes'          => ['nullable', 'string', 'max:300'],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh berisi angka, +, -, atau spasi.',
         ]);
 
         $validated['customer_id'] = Auth::id();
@@ -80,12 +90,14 @@ class CustomerAddressController extends Controller
 
         $validated = $request->validate([
             'label'          => ['required', 'string', 'max:80'],
-            'recipient_name' => ['required', 'string', 'max:120'],
-            'phone'          => ['nullable', 'string', 'max:30'],
-            'full_address'   => ['required', 'string', 'min:10'],
-            'distance_km'    => ['nullable', 'numeric', 'min:0'],
+            'recipient_name' => ['required', 'string', 'min:2', 'max:120'],
+            'phone'          => ['nullable', 'string', 'min:8', 'max:30', 'regex:/^[0-9+\-\s]+$/'],
+            'full_address'   => ['required', 'string', 'min:10', 'max:500'],
+            'distance_km'    => ['nullable', 'numeric', 'min:0', 'max:50'],
             'zone'           => ['nullable', 'in:A,B,C'],
             'notes'          => ['nullable', 'string', 'max:300'],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh berisi angka, +, -, atau spasi.',
         ]);
 
         $address->update($validated);
