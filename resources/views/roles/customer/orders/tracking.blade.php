@@ -433,9 +433,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const customerLat = {{ $customerLat }};
     const customerLng = {{ $customerLng }};
-    // Simulate driver slightly offset from customer
+
+    // Driver position (in real implementation, this comes from server/websocket).
+    // Until backend GPS tracking is wired up, we simulate driver near customer.
     let driverLat = customerLat + 0.008;
     let driverLng = customerLng + 0.005;
+
+    // Customer's actual current location (only used if browser allows + customer permits).
+    let userLat = null;
+    let userLng = null;
 
     // Init map
     const map = L.map('tracking-map', {
@@ -484,8 +490,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Recenter
     document.getElementById('btn-recenter').addEventListener('click', function () {
-        map.fitBounds([[customerLat, customerLng], [driverMarker.getLatLng().lat, driverMarker.getLatLng().lng]], { padding: [40, 40] });
+        // If user location available, fit it into the bounds too
+        const points = [[customerLat, customerLng], [driverMarker.getLatLng().lat, driverMarker.getLatLng().lng]];
+        if (userLat !== null && userLng !== null) points.push([userLat, userLng]);
+        map.fitBounds(points, { padding: [40, 40] });
     });
+
+    // ── REALTIME USER LOCATION (browser Geolocation API — no external API key needed) ──
+    let userMarker = null;
+    if ('geolocation' in navigator) {
+        const userIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="width:18px;height:18px;border-radius:50%;background:#0077b6;border:3px solid #fff;box-shadow:0 0 0 4px rgba(0,119,182,.25);"></div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+
+        const onPos = (pos) => {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            if (userMarker) {
+                userMarker.setLatLng([userLat, userLng]);
+            } else {
+                userMarker = L.marker([userLat, userLng], { icon: userIcon })
+                    .addTo(map)
+                    .bindPopup('Posisi kamu sekarang');
+            }
+        };
+        const onErr = () => { /* user denied — silently keep default view */ };
+
+        // One-time initial pos
+        navigator.geolocation.getCurrentPosition(onPos, onErr, { enableHighAccuracy: true, timeout: 8000 });
+        // Continuous updates while page is open
+        navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 5000 });
+    }
 
     // Simulate driver movement
     let moveCount = 0;

@@ -230,3 +230,10 @@
     .customer-nav__inner { max-width: 720px; height: 72px; padding: 0 16px; }
 }
 </style>
+
+<script>
+// Silently skip GSAP calls when target is missing (suppresses "target not found" console noise)
+if (typeof gsap !== 'undefined') {
+    gsap.config({ nullTargetWarn: false, trialWarn: false });
+}
+</script>

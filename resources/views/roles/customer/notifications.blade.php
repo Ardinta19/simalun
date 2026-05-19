@@ -270,9 +270,7 @@ body {
             $iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
           }
 
-          $href = isset($notif->data['order_id'])
-            ? route('customer.order.detail', $notif->data['order_id'])
-            : route('customer.dashboard');
+          $href = route('customer.notifications.click', $notif->id);
         @endphp
 
         <a href="{{ $href }}" class="list-item {{ is_null($notif->read_at) ? 'is-unread' : '' }}">

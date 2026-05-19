@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::patch('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::get('/notifications/{id}/click', [NotificationController::class, 'click'])->name('notifications.click');
 
         // Alamat
         Route::get('/addresses', [CustomerAddressController::class, 'index'])->name('addresses.index');

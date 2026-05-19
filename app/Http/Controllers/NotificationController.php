@@ -35,6 +35,30 @@ class NotificationController extends Controller
         return back();
     }
 
+    /**
+     * GET /customer/notifications/{id}/click
+     * Mark as read AND redirect to associated resource (order detail).
+     * Used for clickable notification rows so user gets one-tap UX.
+     */
+    public function click(string $id)
+    {
+        $notif = Auth::user()->notifications()->find($id);
+        if (!$notif) {
+            return redirect()->route('customer.notifications');
+        }
+
+        if (is_null($notif->read_at)) {
+            $notif->markAsRead();
+        }
+
+        $orderId = $notif->data['order_id'] ?? null;
+        if ($orderId) {
+            return redirect()->route('customer.order.detail', $orderId);
+        }
+
+        return redirect()->route('customer.notifications');
+    }
+
     /** GET /admin/notifications */
     public function adminIndex()
     {

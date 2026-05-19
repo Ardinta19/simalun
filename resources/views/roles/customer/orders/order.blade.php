@@ -680,57 +680,40 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    if (typeof gsap === 'undefined') return;
+
+    // Helper: only run gsap.from if target exists
+    const animate = (target, props) => {
+        const el = typeof target === 'string' ? document.querySelector(target) : target;
+        if (!el || (el.length !== undefined && el.length === 0)) return;
+        gsap.from(el, props);
+    };
 
     // Hero animation
-    gsap.from('#js-hero', {
-        opacity: 0,
-        y: -30,
-        duration: 0.6,
-        ease: 'power2.out'
-    });
+    animate('#js-hero', { opacity: 0, y: -30, duration: 0.6, ease: 'power2.out' });
 
     // Sections animate in
     const sections = document.querySelectorAll('.js-section');
-    gsap.from(sections, {
-        opacity: 0,
-        y: 25,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.2
-    });
+    if (sections.length) {
+        gsap.from(sections, { opacity: 0, y: 25, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2 });
+    }
 
-    // Animate step circles
+    // Step circles
     const circles = document.querySelectorAll('.step-circle');
-    gsap.from(circles, {
-        scale: 0,
-        duration: 0.4,
-        stagger: 0.08,
-        ease: 'back.out(1.5)',
-        delay: 0.4
-    });
+    if (circles.length) {
+        gsap.from(circles, { scale: 0, duration: 0.4, stagger: 0.08, ease: 'back.out(1.5)', delay: 0.4 });
+    }
 
-    // Animate connectors
+    // Connectors
     const connectors = document.querySelectorAll('.step-connector.done');
-    gsap.from(connectors, {
-        scaleX: 0,
-        transformOrigin: 'left center',
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out',
-        delay: 0.6
-    });
+    if (connectors.length) {
+        gsap.from(connectors, { scaleX: 0, transformOrigin: 'left center', duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.6 });
+    }
 
-    // Driver card entrance
+    // Driver card
     const driver = document.querySelector('.driver-card');
     if (driver) {
-        gsap.from(driver, {
-            x: -20,
-            opacity: 0,
-            duration: 0.5,
-            ease: 'power2.out',
-            delay: 0.3
-        });
+        gsap.from(driver, { x: -20, opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.3 });
     }
 });
 </script>
