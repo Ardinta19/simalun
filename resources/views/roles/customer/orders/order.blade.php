@@ -377,6 +377,145 @@ body {
     max-height: 240px;
     border: 1px solid var(--border);
 }
+
+/* ── CANCEL UX ───────────────────────── */
+.cancel-trigger-btn {
+    width: 100%;
+    padding: 13px;
+    background: #fff;
+    border: 1.5px solid #fecaca;
+    border-radius: var(--radius-sm);
+    color: #dc2626;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: .85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all .15s;
+}
+.cancel-trigger-btn:active {
+    transform: scale(0.97);
+    background: #fef2f2;
+}
+.cancel-hint {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-lt);
+    margin-top: 8px;
+}
+.cancel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.cancel-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+.cancel-sheet {
+    background: white;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 24px 24px 0 0;
+    padding: 20px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.cancel-overlay.active .cancel-sheet {
+    transform: translateY(0);
+}
+.cancel-sheet__handle {
+    width: 36px;
+    height: 4px;
+    background: #d1d5db;
+    border-radius: 99px;
+    margin: 0 auto 18px;
+}
+.cancel-sheet__icon {
+    text-align: center;
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+}
+.cancel-sheet__title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+.cancel-sheet__desc {
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-mid);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+.cancel-field {
+    margin-bottom: 20px;
+}
+.cancel-field__label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 8px;
+}
+.cancel-field__input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.cancel-field__input:focus {
+    border-color: var(--blue-mid);
+}
+.cancel-field__input::placeholder {
+    color: var(--ink-lt);
+    font-weight: 600;
+}
+.cancel-sheet__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.cancel-btn {
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.12s;
+}
+.cancel-btn:active { transform: scale(0.96); }
+.cancel-btn--secondary {
+    background: #f3f4f6;
+    color: var(--ink-mid);
+}
+.cancel-btn--danger {
+    background: #dc2626;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
 </style>
 </head>
 <body>
@@ -681,13 +820,33 @@ body {
     {{-- Cancel button — hanya muncul selama status masih menunggu/dijemput --}}
     @if(in_array($order->status, ['menunggu', 'dijemput']))
     <div style="margin-bottom: 14px;">
-        <form method="POST" action="{{ route('customer.order.cancel', $order) }}" id="form-cancel-order">
-            @csrf
-            <button type="button" onclick="confirmCancel()" style="width:100%;padding:13px;background:#fff;border:1.5px solid #fecaca;border-radius:var(--radius-sm);color:#dc2626;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                Batalkan Pesanan
-            </button>
-        </form>
+        <button type="button" onclick="openCancelSheet()" class="cancel-trigger-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Batalkan Pesanan
+        </button>
+        <p class="cancel-hint">Pembatalan hanya bisa dilakukan sebelum cucian dijemput kurir.</p>
+    </div>
+
+    {{-- Cancel Bottom Sheet --}}
+    <div class="cancel-overlay" id="cancelOverlay" onclick="closeCancelSheet(event)">
+        <div class="cancel-sheet" id="cancelSheet">
+            <div class="cancel-sheet__handle"></div>
+            <div class="cancel-sheet__icon">⚠️</div>
+            <h3 class="cancel-sheet__title">Batalkan Pesanan?</h3>
+            <p class="cancel-sheet__desc">Pesanan yang sudah dibatalkan tidak bisa dikembalikan. Yakin ingin melanjutkan?</p>
+
+            <form method="POST" action="{{ route('customer.order.cancel', $order) }}" id="form-cancel-order">
+                @csrf
+                <div class="cancel-field">
+                    <label for="cancel_reason" class="cancel-field__label">Alasan pembatalan <span style="color:var(--ink-lt)">(opsional)</span></label>
+                    <textarea id="cancel_reason" name="cancel_reason" class="cancel-field__input" rows="3" maxlength="300" placeholder="Contoh: Ganti jadwal, salah pilih layanan..."></textarea>
+                </div>
+                <div class="cancel-sheet__actions">
+                    <button type="button" onclick="closeCancelSheet()" class="cancel-btn cancel-btn--secondary">Tidak Jadi</button>
+                    <button type="submit" class="cancel-btn cancel-btn--danger">Ya, Batalkan</button>
+                </div>
+            </form>
+        </div>
     </div>
     @endif
 
@@ -697,10 +856,25 @@ body {
 @include('layouts.component.customer._navbar_customer', ['active' => 'pesanan'])
 
 <script>
-    function confirmCancel() {
-        if (confirm('Yakin ingin membatalkan pesanan ini? Tindakan ini tidak bisa dibatalkan.')) {
-            document.getElementById('form-cancel-order').submit();
-        }
+    // Cancel bottom sheet
+    function openCancelSheet() {
+        const overlay = document.getElementById('cancelOverlay');
+        if (!overlay) return;
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCancelSheet(e) {
+        if (e && e.target !== e.currentTarget) return;
+        const overlay = document.getElementById('cancelOverlay');
+        if (!overlay) return;
+        const sheet = document.getElementById('cancelSheet');
+        sheet.style.transform = 'translateY(100%)';
+        setTimeout(function() {
+            overlay.classList.remove('active');
+            sheet.style.transform = '';
+            document.body.style.overflow = '';
+        }, 250);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
