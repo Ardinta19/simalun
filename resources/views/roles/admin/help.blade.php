@@ -247,5 +247,8 @@ function switchTab(tabName){
   if(target) target.classList.add('active');
 }
 </script>
+
+@include('layouts.component.admin._navbar_admin', ['active' => ''])
+
 </body>
 </html>
