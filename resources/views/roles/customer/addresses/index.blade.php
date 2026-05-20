@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Alamat Saya – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root {
@@ -30,7 +29,7 @@
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     min-height: 100vh;
@@ -57,7 +56,7 @@ body {
 }
 .btn-back svg { width: 18px; height: 18px; }
 .header-title {
-    flex: 1; font-family: 'Fredoka One', cursive;
+    flex: 1; font-weight: 800;
     font-size: 1.3rem; color: white;
 }
 .header-sub {
@@ -69,6 +68,7 @@ body {
     background: var(--orange);
     display: flex; align-items: center; justify-content: center;
     text-decoration: none; flex-shrink: 0;
+    margin-left: auto;
     box-shadow: 0 4px 12px rgba(255,107,53,0.4);
     transition: transform 0.15s;
 }
@@ -121,7 +121,7 @@ body {
 }
 .addr-info { flex: 1; min-width: 0; }
 .addr-label {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.95rem; color: var(--ink);
     display: flex; align-items: center; gap: 6px;
 }
@@ -133,7 +133,7 @@ body {
     padding: 2px 7px;
     border-radius: 99px;
     border: 1px solid rgba(0,196,140,0.2);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     letter-spacing: 0.3px;
 }
 .addr-recipient {
@@ -165,7 +165,7 @@ body {
 .addr-btn {
     flex: 1; padding: 9px;
     border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.75rem; font-weight: 900;
     text-align: center; text-decoration: none;
     cursor: pointer; border: none;
@@ -188,7 +188,7 @@ body {
 }
 .empty-icon { font-size: 3.5rem; margin-bottom: 16px; display: block; opacity: 0.6; }
 .empty-title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.1rem; color: var(--ink-mid); margin-bottom: 8px;
 }
 .empty-sub {
