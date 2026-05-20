@@ -468,7 +468,7 @@ body {
 
     {{-- Pesanan Aktif Banner --}}
     @if(isset($pesananAktif) && $pesananAktif)
-    <a href="{{ route('customer.order.detail', ['order' => $pesananAktif->id, 'from' => 'orders']) }}" class="active-banner" id="active-banner">
+    <a href="{{ route('customer.order.detail', ['order' => $pesananAktif->id, 'back' => route('customer.orders')]) }}" class="active-banner" id="active-banner">
         <div class="active-banner__pulse">🛵</div>
         <div class="active-banner__info">
             <div class="active-banner__label">Pesanan Aktif</div>
@@ -530,7 +530,7 @@ body {
             $curStep  = $statusProgress[$o->status] ?? 0;
             $strip    = $stripColors[$o->status] ?? '#0077b6';
         @endphp
-        <a href="{{ route('customer.order.detail', ['order' => $o->id, 'from' => 'orders']) }}"
+        <a href="{{ route('customer.order.detail', ['order' => $o->id, 'back' => route('customer.orders')]) }}"
            class="order-card js-card"
            style="--strip-color: {{ $strip }}">
             {{-- Status Strip --}}
