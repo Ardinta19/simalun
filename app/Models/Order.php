@@ -94,9 +94,22 @@ class Order extends Model
     public static function generateCode(): string
     {
         $prefix = 'AL-' . date('Ymd');
-        $last   = self::where('order_code', 'like', $prefix . '%')->count();
 
-        return $prefix . '-' . str_pad($last + 1, 3, '0', STR_PAD_LEFT);
+        // Atomic: lock the latest row with this prefix to prevent race condition
+        $lastOrder = self::where('order_code', 'like', $prefix . '%')
+            ->lockForUpdate()
+            ->orderByDesc('order_code')
+            ->first();
+
+        if ($lastOrder) {
+            // Extract the sequence number from the last code (e.g., AL-20260520-007 → 7)
+            $lastSeq = (int) substr($lastOrder->order_code, -3);
+            $nextSeq = $lastSeq + 1;
+        } else {
+            $nextSeq = 1;
+        }
+
+        return $prefix . '-' . str_pad($nextSeq, 3, '0', STR_PAD_LEFT);
     }
 
     public function getStatusLabelAttribute(): string
