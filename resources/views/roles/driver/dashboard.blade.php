@@ -187,52 +187,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 </div>
 
 {{-- DRIVER NAV --}}
-<nav class="driver-nav">
-    <div class="driver-nav__inner">
-        <a href="{{ route('driver.dashboard') }}" class="driver-nav__item is-active">
-            <span class="driver-nav__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-            </span>
-            <span class="driver-nav__label">Beranda</span>
-        </a>
-        <a href="{{ route('driver.orders') }}" class="driver-nav__item">
-            <span class="driver-nav__icon" style="position:relative;">
-                @if($tugasAktif->count() > 0)
-                <span class="driver-nav__badge">{{ $tugasAktif->count() }}</span>
-                @endif
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="2"/>
-                </svg>
-            </span>
-            <span class="driver-nav__label">Tugas</span>
-        </a>
-        <a href="{{ route('driver.notifications') }}" class="driver-nav__item">
-            <span class="driver-nav__icon" style="position:relative;">
-                @if($unreadNotif > 0)
-                <span class="driver-nav__badge">{{ $unreadNotif }}</span>
-                @endif
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 01-3.46 0"/>
-                </svg>
-            </span>
-            <span class="driver-nav__label">Notif</span>
-        </a>
-        <a href="{{ route('driver.profile') }}" class="driver-nav__item">
-            <span class="driver-nav__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-            </span>
-            <span class="driver-nav__label">Profil</span>
-        </a>
-    </div>
-</nav>
+@include('layouts.component.driver._navbar_driver', ['active' => 'beranda'])
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

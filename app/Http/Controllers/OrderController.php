@@ -165,17 +165,8 @@ class OrderController extends Controller
                     ->update(['last_used_at' => now()]);
             }
 
-            FinanceEntry::create([
-                'entry_date'  => today(),
-                'period_key'  => now()->format('Y-m'),
-                'entry_type'  => 'income',
-                'amount'      => $totalCost,
-                'source_type' => 'order',
-                'source_id'   => $order->id,
-                'order_id'    => $order->id,
-                'notes'       => "Order {$order->order_code}",
-                'created_by'  => Auth::id(),
-            ]);
+            // Income TIDAK dicatat di sini — dicatat saat order selesai (COD model).
+            // Lihat FinanceController::recordIncomeFromOrder()
 
             // Auto-assign ke driver aktif (skala rumahan = 1 driver)
             $driver = User::where('role', 'driver')
@@ -358,25 +349,6 @@ class OrderController extends Controller
                 'updated_by'  => Auth::id(),
             ]);
 
-            // Reverse finance entry — income yang tercatat saat order dibuat
-            $existingEntry = FinanceEntry::where('order_id', $order->id)
-                ->where('entry_type', 'income')
-                ->first();
-
-            if ($existingEntry) {
-                FinanceEntry::create([
-                    'entry_date'  => today(),
-                    'period_key'  => now()->format('Y-m'),
-                    'entry_type'  => 'expense',
-                    'amount'      => $existingEntry->amount,
-                    'source_type' => 'cancel',
-                    'source_id'   => $order->id,
-                    'order_id'    => $order->id,
-                    'notes'       => "Pembatalan #{$order->order_code} — reversal income",
-                    'created_by'  => Auth::id(),
-                ]);
-            }
-
             // Notifikasi ke admin
             User::where('role', 'admin')->each(function ($admin) use ($order, $reasonText) {
                 $admin->notify(new OrderStatusUpdated(
@@ -539,6 +511,12 @@ class OrderController extends Controller
                     "Pesanan #{$order->order_code} sudah siap. Menunggu penugasan pengantaran."
                 ));
             }
+
+            // Record income saat order selesai (COD)
+            if ($request->status === 'selesai') {
+                $order->update(['is_paid' => true, 'paid_at' => now()]);
+                FinanceController::recordIncomeFromOrder($order->fresh());
+            }
         });
 
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
@@ -683,17 +661,7 @@ class OrderController extends Controller
                 OrderItem::create(array_merge($line, ['order_id' => $order->id]));
             }
 
-            FinanceEntry::create([
-                'entry_date'  => today(),
-                'period_key'  => now()->format('Y-m'),
-                'entry_type'  => 'income',
-                'amount'      => $totalCost,
-                'source_type' => 'order',
-                'source_id'   => $order->id,
-                'order_id'    => $order->id,
-                'notes'       => "Walk-in {$order->order_code} – {$customer->name}",
-                'created_by'  => Auth::id(),
-            ]);
+            // Income dicatat saat order selesai (COD model)
         });
 
         return back()->with('status', "Pesanan walk-in untuk {$request->customer_name} berhasil dibuat.");
@@ -750,6 +718,10 @@ class OrderController extends Controller
             $updateData['is_paid']     = true;
             $updateData['paid_at']     = now();
             $note = 'Pesanan berhasil diantar. Foto bukti diunggah.';
+        } elseif ($request->status === 'selesai') {
+            $updateData['is_paid'] = true;
+            $updateData['paid_at'] = now();
+            $note = $note ?: 'Pesanan selesai.';
         }
 
         DB::transaction(function () use ($order, $updateData, $note, $request) {
@@ -778,6 +750,11 @@ class OrderController extends Controller
                 $titles[$request->status],
                 $messages[$request->status]
             ));
+
+            // Record income saat order selesai (COD — bayar di tempat)
+            if ($request->status === 'selesai') {
+                FinanceController::recordIncomeFromOrder($order->fresh());
+            }
         });
 
         return back()->with('success', 'Status berhasil diperbarui.');

@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
         Route::post('/finance', [FinanceController::class, 'store'])->name('finance.store');
         Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
+        Route::get('/finance/export-pdf', [FinanceController::class, 'exportPdf'])->name('finance.export-pdf');
 
         Route::get('/notifications', [NotificationController::class, 'adminIndex'])->name('notifications');
 
