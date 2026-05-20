@@ -83,6 +83,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/orders', [OrderController::class, 'customerIndex'])->name('orders');
         Route::get('/orders/{order}', [OrderController::class, 'customerDetail'])->name('order.detail');
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'customerCancel'])->name('order.cancel');
         Route::get('/tracking', [OrderController::class, 'tracking'])->name('tracking');
 
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');

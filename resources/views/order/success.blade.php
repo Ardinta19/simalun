@@ -56,7 +56,13 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
   </div>
 
   <h1>Pesanan Dibuat!</h1>
-  <p class="subtitle">Driver kami akan segera menghubungimu lewat WhatsApp untuk konfirmasi penjemputan.</p>
+  <p class="subtitle">
+    @if($order->driver)
+      Kurir {{ $order->driver->name }} sedang menuju ke lokasi kamu.
+    @else
+      Driver kami akan segera menghubungimu lewat WhatsApp untuk konfirmasi penjemputan.
+    @endif
+  </p>
 
   <div class="order-code">
     <div class="oc-label">Kode Pesanan</div>
@@ -65,7 +71,7 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
 
   <div class="status-badge">
     <span class="status-dot"></span>
-    <span class="status-label">Menunggu Driver</span>
+    <span class="status-label">{{ $order->driver ? 'Kurir Ditugaskan' : 'Menunggu Driver' }}</span>
   </div>
 
   <div class="detail-list">
