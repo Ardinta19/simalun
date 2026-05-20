@@ -152,7 +152,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile', fn() => view('roles.driver.profile'))->name('profile');
     });
 
-    Route::get('/dashboard/admin',  [DashboardController::class, 'admin'])->name('dashboard.admin');
-    Route::get('/dashboard/driver', [DashboardController::class, 'driver'])->name('dashboard.driver');
-    Route::get('/dashboard/customer', [DashboardController::class, 'customer'])->name('dashboard.customer');
+    Route::get('/dashboard/admin',  [DashboardController::class, 'admin'])->middleware('role:admin')->name('dashboard.admin');
+    Route::get('/dashboard/driver', [DashboardController::class, 'driver'])->middleware('role:driver')->name('dashboard.driver');
+    Route::get('/dashboard/customer', [DashboardController::class, 'customer'])->middleware('role:customer')->name('dashboard.customer');
 });

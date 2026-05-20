@@ -120,7 +120,7 @@ class OrderController extends Controller
         $totalCost = $serviceCost + $itemTotal + $pickupCost;
 
         try {
-            $newOrder = DB::transaction(function () use (
+            $result = DB::transaction(function () use (
             $request, $service, $weight, $zone, $pickupCost,
             $serviceCost, $itemLines, $totalCost
         ) {
@@ -188,27 +188,6 @@ class OrderController extends Controller
                     'status_note' => "Kurir {$driver->name} otomatis ditugaskan untuk penjemputan.",
                     'updated_by'  => $order->customer_id,
                 ]);
-
-                $order->customer->notify(new OrderStatusUpdated(
-                    $order,
-                    'Kurir Sedang Menuju',
-                    "Kurir {$driver->name} sedang menuju lokasi kamu untuk jemput cucian."
-                ));
-
-                $driver->notify(new OrderStatusUpdated(
-                    $order,
-                    'Tugas Baru',
-                    "Pesanan #{$order->order_code} dari {$order->customer->name} siap dijemput."
-                ));
-
-                // Notif admin: awareness bahwa driver sudah ditugaskan
-                User::where('role', 'admin')->each(function ($admin) use ($order, $driver) {
-                    $admin->notify(new OrderStatusUpdated(
-                        $order,
-                        'Pesanan Baru Masuk',
-                        "Pesanan #{$order->order_code} dari {$order->customer->name} — kurir {$driver->name} sudah ditugaskan otomatis."
-                    ));
-                });
             } else {
                 // Tidak ada driver aktif — order tetap 'menunggu', notif admin untuk assign manual
                 OrderStatusHistory::create([
@@ -217,22 +196,48 @@ class OrderController extends Controller
                     'status_note' => 'Pesanan masuk. Belum ada kurir aktif — menunggu penugasan manual.',
                     'updated_by'  => $order->customer_id,
                 ]);
-
-                User::where('role', 'admin')->each(function ($admin) use ($order) {
-                    $admin->notify(new OrderStatusUpdated(
-                        $order,
-                        'Perlu Assign Kurir',
-                        "Pesanan #{$order->order_code} dari {$order->customer->name} butuh penugasan manual. Tidak ada kurir aktif saat ini."
-                    ));
-                });
             }
 
-            return $order;
+            return ['order' => $order, 'driver' => $driver];
         });
         } catch (\Throwable $e) {
             report($e);
             return back()->withInput()
                 ->withErrors(['service_id' => 'Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.']);
+        }
+
+        // Notifikasi dikirim SETELAH transaksi commit berhasil
+        $newOrder = $result['order'];
+        $assignedDriver = $result['driver'];
+
+        if ($assignedDriver) {
+            $newOrder->customer->notify(new OrderStatusUpdated(
+                $newOrder,
+                'Kurir Sedang Menuju',
+                "Kurir {$assignedDriver->name} sedang menuju lokasi kamu untuk jemput cucian."
+            ));
+
+            $assignedDriver->notify(new OrderStatusUpdated(
+                $newOrder,
+                'Tugas Baru',
+                "Pesanan #{$newOrder->order_code} dari {$newOrder->customer->name} siap dijemput."
+            ));
+
+            User::where('role', 'admin')->each(function ($admin) use ($newOrder, $assignedDriver) {
+                $admin->notify(new OrderStatusUpdated(
+                    $newOrder,
+                    'Pesanan Baru Masuk',
+                    "Pesanan #{$newOrder->order_code} dari {$newOrder->customer->name} — kurir {$assignedDriver->name} sudah ditugaskan otomatis."
+                ));
+            });
+        } else {
+            User::where('role', 'admin')->each(function ($admin) use ($newOrder) {
+                $admin->notify(new OrderStatusUpdated(
+                    $newOrder,
+                    'Perlu Assign Kurir',
+                    "Pesanan #{$newOrder->order_code} dari {$newOrder->customer->name} butuh penugasan manual. Tidak ada kurir aktif saat ini."
+                ));
+            });
         }
 
         return redirect()->route('order.show', $newOrder->order_code);
@@ -348,25 +353,24 @@ class OrderController extends Controller
                 'status_note' => "Dibatalkan oleh customer. {$reasonText}",
                 'updated_by'  => Auth::id(),
             ]);
-
-            // Notifikasi ke admin
-            User::where('role', 'admin')->each(function ($admin) use ($order, $reasonText) {
-                $admin->notify(new OrderStatusUpdated(
-                    $order,
-                    'Pesanan Dibatalkan',
-                    "Pesanan #{$order->order_code} dibatalkan oleh {$order->customer->name}. {$reasonText}"
-                ));
-            });
-
-            // Notifikasi ke driver (jika sudah ditugaskan)
-            if ($order->driver) {
-                $order->driver->notify(new OrderStatusUpdated(
-                    $order,
-                    'Pesanan Dibatalkan',
-                    "Pesanan #{$order->order_code} dibatalkan oleh customer. Tidak perlu dijemput."
-                ));
-            }
         });
+
+        // Notifikasi dikirim SETELAH transaksi commit
+        User::where('role', 'admin')->each(function ($admin) use ($order, $reasonText) {
+            $admin->notify(new OrderStatusUpdated(
+                $order,
+                'Pesanan Dibatalkan',
+                "Pesanan #{$order->order_code} dibatalkan oleh {$order->customer->name}. {$reasonText}"
+            ));
+        });
+
+        if ($order->driver) {
+            $order->driver->notify(new OrderStatusUpdated(
+                $order,
+                'Pesanan Dibatalkan',
+                "Pesanan #{$order->order_code} dibatalkan oleh customer. Tidak perlu dijemput."
+            ));
+        }
 
         return redirect()->route('customer.orders')
             ->with('success', 'Pesanan berhasil dibatalkan.');
@@ -449,21 +453,21 @@ class OrderController extends Controller
                 'status_note' => "Driver {$driver->name} ditugaskan untuk {$request->assignment_type}.",
                 'updated_by'  => Auth::id(),
             ]);
-
-            $order->customer->notify(new OrderStatusUpdated(
-                $order,
-                'Kurir Ditugaskan',
-                "Kurir {$driver->name} sedang menuju lokasi kamu."
-            ));
-
-            // Notifikasi ke driver yang ditugaskan
-            $taskLabel = $request->assignment_type === 'pickup' ? 'penjemputan' : 'pengantaran';
-            $driver->notify(new OrderStatusUpdated(
-                $order,
-                'Tugas Baru',
-                "Anda ditugaskan untuk {$taskLabel} pesanan #{$order->order_code} dari {$order->customer->name}."
-            ));
         });
+
+        // Notifikasi dikirim SETELAH transaksi commit — agar tidak rollback order jika notif gagal
+        $order->customer->notify(new OrderStatusUpdated(
+            $order,
+            'Kurir Ditugaskan',
+            "Kurir {$driver->name} sedang menuju lokasi kamu."
+        ));
+
+        $taskLabel = $request->assignment_type === 'pickup' ? 'penjemputan' : 'pengantaran';
+        $driver->notify(new OrderStatusUpdated(
+            $order,
+            'Tugas Baru',
+            "Anda ditugaskan untuk {$taskLabel} pesanan #{$order->order_code} dari {$order->customer->name}."
+        ));
 
         return back()->with('success', "Driver {$driver->name} berhasil ditugaskan.");
     }
@@ -497,21 +501,6 @@ class OrderController extends Controller
                 'updated_by'  => Auth::id(),
             ]);
 
-            $order->customer->notify(new OrderStatusUpdated(
-                $order,
-                "Pesanan {$statusLabel[$request->status]}",
-                "Pesanan #{$order->order_code} kamu sekarang: {$statusLabel[$request->status]}."
-            ));
-
-            // Notifikasi ke driver jika status siap (perlu antar)
-            if ($request->status === 'siap' && $order->driver_id) {
-                $order->driver->notify(new OrderStatusUpdated(
-                    $order,
-                    'Cucian Siap Diantar',
-                    "Pesanan #{$order->order_code} sudah siap. Menunggu penugasan pengantaran."
-                ));
-            }
-
             // Record income saat order selesai (COD)
             if ($request->status === 'selesai') {
                 $order->update(['is_paid' => true, 'paid_at' => now()]);
@@ -519,14 +508,35 @@ class OrderController extends Controller
             }
         });
 
+        // Notifikasi dikirim SETELAH transaksi commit
+        $order->refresh();
+        $order->customer->notify(new OrderStatusUpdated(
+            $order,
+            "Pesanan {$statusLabel[$request->status]}",
+            "Pesanan #{$order->order_code} kamu sekarang: {$statusLabel[$request->status]}."
+        ));
+
+        if ($request->status === 'siap' && $order->driver_id) {
+            $order->driver->notify(new OrderStatusUpdated(
+                $order,
+                'Cucian Siap Diantar',
+                "Pesanan #{$order->order_code} sudah siap. Menunggu penugasan pengantaran."
+            ));
+        }
+
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
     public function receipt(Order $order)
     {
-        if (Auth::user()->role === 'customer') {
-            abort_if($order->customer_id !== Auth::id(), 403);
+        $user = Auth::user();
+
+        if ($user->role === 'customer') {
+            abort_if($order->customer_id !== $user->id, 403);
+        } elseif ($user->role === 'driver') {
+            abort_if($order->driver_id !== $user->id, 403);
         }
+        // Admin dapat melihat semua receipt tanpa batasan
 
         $order->load(['customer', 'service', 'items.service', 'driver']);
 
@@ -538,8 +548,12 @@ class OrderController extends Controller
 
     public function receiptPdf(Order $order)
     {
-        if (Auth::user()->role === 'customer') {
-            abort_if($order->customer_id !== Auth::id(), 403);
+        $user = Auth::user();
+
+        if ($user->role === 'customer') {
+            abort_if($order->customer_id !== $user->id, 403);
+        } elseif ($user->role === 'driver') {
+            abort_if($order->driver_id !== $user->id, 403);
         }
 
         $order->load(['customer', 'service', 'items.service', 'driver']);
@@ -734,28 +748,29 @@ class OrderController extends Controller
                 'updated_by'  => Auth::id(),
             ]);
 
-            $titles = [
-                'dicuci'  => 'Cucian Sedang Diproses',
-                'dikirim' => 'Kurir Sedang Mengantar',
-                'selesai' => 'Pesanan Selesai',
-            ];
-            $messages = [
-                'dicuci'  => "Pakaian #{$order->order_code} sudah dijemput dan masuk proses cuci.",
-                'dikirim' => "Kurir sedang mengantar pesanan #{$order->order_code} ke rumah kamu.",
-                'selesai' => "Pesanan #{$order->order_code} sudah sampai. Terima kasih sudah menggunakan Azka Laundry.",
-            ];
-
-            $order->customer->notify(new OrderStatusUpdated(
-                $order,
-                $titles[$request->status],
-                $messages[$request->status]
-            ));
-
             // Record income saat order selesai (COD — bayar di tempat)
             if ($request->status === 'selesai') {
                 FinanceController::recordIncomeFromOrder($order->fresh());
             }
         });
+
+        // Notifikasi dikirim SETELAH transaksi commit
+        $titles = [
+            'dicuci'  => 'Cucian Sedang Diproses',
+            'dikirim' => 'Kurir Sedang Mengantar',
+            'selesai' => 'Pesanan Selesai',
+        ];
+        $messages = [
+            'dicuci'  => "Pakaian #{$order->order_code} sudah dijemput dan masuk proses cuci.",
+            'dikirim' => "Kurir sedang mengantar pesanan #{$order->order_code} ke rumah kamu.",
+            'selesai' => "Pesanan #{$order->order_code} sudah sampai. Terima kasih sudah menggunakan Azka Laundry.",
+        ];
+
+        $order->customer->notify(new OrderStatusUpdated(
+            $order,
+            $titles[$request->status],
+            $messages[$request->status]
+        ));
 
         return back()->with('success', 'Status berhasil diperbarui.');
     }

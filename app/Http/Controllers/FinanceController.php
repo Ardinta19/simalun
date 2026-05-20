@@ -86,6 +86,7 @@ class FinanceController extends Controller
     /**
      * Record income when order reaches 'selesai' status.
      * Idempotent — won't create duplicate entries.
+     * Protected by both PHP-level check AND unique DB constraint.
      */
     public static function recordIncomeFromOrder(Order $order): void
     {
@@ -98,18 +99,26 @@ class FinanceController extends Controller
             return;
         }
 
-        FinanceEntry::create([
-            'entry_date'  => today(),
-            'period_key'  => now()->format('Y-m'),
-            'entry_type'  => 'income',
-            'category'    => 'income',
-            'amount'      => $order->total_cost,
-            'source_type' => 'order',
-            'source_id'   => $order->id,
-            'order_id'    => $order->id,
-            'notes'       => "Pesanan #{$order->order_code} selesai",
-            'created_by'  => $order->customer_id,
-        ]);
+        try {
+            FinanceEntry::create([
+                'entry_date'  => today(),
+                'period_key'  => now()->format('Y-m'),
+                'entry_type'  => 'income',
+                'category'    => 'income',
+                'amount'      => $order->total_cost,
+                'source_type' => 'order',
+                'source_id'   => $order->id,
+                'order_id'    => $order->id,
+                'notes'       => "Pesanan #{$order->order_code} selesai",
+                'created_by'  => $order->customer_id,
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Unique constraint violation (race condition) — safely ignore duplicate
+            if (str_contains($e->getMessage(), 'uniq_finance_order_type_source') || $e->getCode() === '23000') {
+                return;
+            }
+            throw $e;
+        }
     }
 
     /**
