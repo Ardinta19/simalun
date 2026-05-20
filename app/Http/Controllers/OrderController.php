@@ -177,10 +177,13 @@ class OrderController extends Controller
                 'created_by'  => Auth::id(),
             ]);
 
-            // Auto-assign ke satu-satunya driver aktif (skip confirm admin)
-            $driver = User::where('role', 'driver')->where('is_active', true)->first();
+            // Auto-assign ke driver aktif (skala rumahan = 1 driver)
+            $driver = User::where('role', 'driver')
+                ->where('is_active', true)
+                ->first();
+
             if ($driver) {
-                // Pakai withoutEvents supaya observer tidak duplikat notifikasi
+                // Driver tersedia — langsung assign
                 Order::withoutEvents(function () use ($order, $driver) {
                     $order->update([
                         'driver_id' => $driver->id,
@@ -206,16 +209,32 @@ class OrderController extends Controller
                     'Tugas Baru',
                     "Pesanan #{$order->order_code} dari {$order->customer->name} siap dijemput."
                 ));
-            }
 
-            // Notifikasi admin tetap jalan (untuk awareness)
-            User::where('role', 'admin')->each(function ($admin) use ($order) {
-                $admin->notify(new OrderStatusUpdated(
-                    $order,
-                    'Pesanan Baru Masuk',
-                    "Pesanan #{$order->order_code} dari {$order->customer->name} — kurir sudah ditugaskan otomatis."
-                ));
-            });
+                // Notif admin: awareness bahwa driver sudah ditugaskan
+                User::where('role', 'admin')->each(function ($admin) use ($order, $driver) {
+                    $admin->notify(new OrderStatusUpdated(
+                        $order,
+                        'Pesanan Baru Masuk',
+                        "Pesanan #{$order->order_code} dari {$order->customer->name} — kurir {$driver->name} sudah ditugaskan otomatis."
+                    ));
+                });
+            } else {
+                // Tidak ada driver aktif — order tetap 'menunggu', notif admin untuk assign manual
+                OrderStatusHistory::create([
+                    'order_id'    => $order->id,
+                    'status_code' => 'menunggu',
+                    'status_note' => 'Pesanan masuk. Belum ada kurir aktif — menunggu penugasan manual.',
+                    'updated_by'  => $order->customer_id,
+                ]);
+
+                User::where('role', 'admin')->each(function ($admin) use ($order) {
+                    $admin->notify(new OrderStatusUpdated(
+                        $order,
+                        'Perlu Assign Kurir',
+                        "Pesanan #{$order->order_code} dari {$order->customer->name} butuh penugasan manual. Tidak ada kurir aktif saat ini."
+                    ));
+                });
+            }
 
             return $order;
         });
@@ -322,22 +341,48 @@ class OrderController extends Controller
             return back()->with('error', 'Pesanan tidak bisa dibatalkan karena sudah dalam proses pencucian.');
         }
 
-        DB::transaction(function () use ($order) {
+        $request->validate([
+            'cancel_reason' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $reason = $request->input('cancel_reason');
+        $reasonText = $reason ? "Alasan: {$reason}" : 'Tidak menyertakan alasan.';
+
+        DB::transaction(function () use ($order, $reasonText) {
             $order->update(['status' => 'dibatalkan']);
 
             OrderStatusHistory::create([
                 'order_id'    => $order->id,
                 'status_code' => 'dibatalkan',
-                'status_note' => 'Dibatalkan oleh customer.',
+                'status_note' => "Dibatalkan oleh customer. {$reasonText}",
                 'updated_by'  => Auth::id(),
             ]);
 
+            // Reverse finance entry — income yang tercatat saat order dibuat
+            $existingEntry = FinanceEntry::where('order_id', $order->id)
+                ->where('entry_type', 'income')
+                ->first();
+
+            if ($existingEntry) {
+                FinanceEntry::create([
+                    'entry_date'  => today(),
+                    'period_key'  => now()->format('Y-m'),
+                    'entry_type'  => 'expense',
+                    'amount'      => $existingEntry->amount,
+                    'source_type' => 'cancel',
+                    'source_id'   => $order->id,
+                    'order_id'    => $order->id,
+                    'notes'       => "Pembatalan #{$order->order_code} — reversal income",
+                    'created_by'  => Auth::id(),
+                ]);
+            }
+
             // Notifikasi ke admin
-            User::where('role', 'admin')->each(function ($admin) use ($order) {
+            User::where('role', 'admin')->each(function ($admin) use ($order, $reasonText) {
                 $admin->notify(new OrderStatusUpdated(
                     $order,
                     'Pesanan Dibatalkan',
-                    "Pesanan #{$order->order_code} dibatalkan oleh customer."
+                    "Pesanan #{$order->order_code} dibatalkan oleh {$order->customer->name}. {$reasonText}"
                 ));
             });
 
