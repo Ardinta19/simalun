@@ -295,6 +295,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);min-h
     <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Azka%20Laundry%2C%20saya%20kurir%20{{ urlencode(Auth::user()->name ?? '') }}%20perlu%20bantuan" target="_blank" class="contact-btn">
       Hubungi Admin via WhatsApp
     </a>
+    <a href="{{ route('driver.report') }}" class="contact-btn" style="background:#fef2f2;color:#dc2626;border-color:#fecaca;margin-top:10px;">
+      🐛 Lapor Kendala / Bug
+    </a>
     <div style="margin-top:12px;"></div>
     <div class="card">
       <h4>Jam Kerja Admin</h4>

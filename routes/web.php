@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/addresses/{address}', [CustomerAddressController::class, 'destroy'])->name('addresses.destroy');
         Route::patch('/addresses/{address}/primary', [CustomerAddressController::class, 'setPrimary'])->name('addresses.set-primary');
 
+        Route::get('/report', [\App\Http\Controllers\ReportController::class, 'create'])->name('report');
+        Route::post('/report', [\App\Http\Controllers\ReportController::class, 'store'])->name('report.store');
+
         Route::get('/help', fn() => view('roles.customer.help'))->name('help');
     });
 
@@ -118,6 +121,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/finance', [FinanceController::class, 'store'])->name('finance.store');
         Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
         Route::get('/finance/export-pdf', [FinanceController::class, 'exportPdf'])->name('finance.export-pdf');
+
+        Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'adminIndex'])->name('reports');
+        Route::patch('/reports/{report}/status', [\App\Http\Controllers\ReportController::class, 'updateStatus'])->name('reports.update-status');
 
         Route::get('/notifications', [NotificationController::class, 'adminIndex'])->name('notifications');
 
@@ -138,6 +144,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'driverIndex'])->name('notifications');
 
         Route::get('/help', fn() => view('roles.driver.help'))->name('help');
+
+        Route::get('/report', [\App\Http\Controllers\ReportController::class, 'create'])->name('report');
+        Route::post('/report', [\App\Http\Controllers\ReportController::class, 'store'])->name('report.store');
 
         Route::get('/profile', fn() => view('roles.driver.profile'))->name('profile');
     });
