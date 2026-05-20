@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Edit Profil Admin – Azka Laundry SIMALUN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body {
-  width:100%; min-height:100%; font-family:'Nunito',sans-serif;
+  width:100%; min-height:100%; font-family:'Plus Jakarta Sans',sans-serif;
   background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
   overflow-x:hidden;
 }
@@ -33,21 +33,21 @@ html, body {
 #drum-spin-ring { position:absolute; inset:-4px; border-radius:50%; border:2px dashed rgba(255,255,255,.28); animation:ring-spin 6s linear infinite; pointer-events:none; }
 @keyframes ring-spin { to{transform:rotate(360deg);} }
 
-.wm-name { font-family:'Fredoka One',cursive; font-size:1.8rem; color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
+.wm-name { font-weight:800; font-size:1.8rem; color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
 .wm-sub  { font-size:.6rem; font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.2rem; }
 
 #card { width:100%; max-width:440px; background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:24px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 16px 48px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.2); padding:1.8rem 1.6rem 1.6rem; opacity:0; transform:translateY(32px); margin-bottom: 20px; }
-.card-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#fff; text-align:center; margin-bottom:.25rem; }
+.card-title { font-weight:800; font-size:1.4rem; color:#fff; text-align:center; margin-bottom:.25rem; }
 .card-sub { font-size:.8rem; font-weight:700; color:rgba(255,255,255,.7); text-align:center; margin-bottom:1.3rem; }
 
 .form-group { margin-bottom:1.2rem; }
 .form-label { display:block; font-size:.72rem; font-weight:800; color:rgba(255,255,255,.85); letter-spacing:.4px; margin-bottom:.45rem; text-transform:uppercase; padding-left:4px; }
 .input-wrap { position:relative; }
 .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; opacity:.7; }
-.form-input { width:100%; padding:.82rem .9rem .82rem 2.7rem; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; color:#fff; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:700; outline:none; transition:all .3s; }
+.form-input { width:100%; padding:.82rem .9rem .82rem 2.7rem; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:.93rem; font-weight:700; outline:none; transition:all .3s; }
 .form-input:focus { border-color:rgba(255,255,255,.6); background:rgba(255,255,255,.18); box-shadow:0 0 0 4px rgba(255,255,255,.1); transform: scale(1.01); }
 
-.btn { width:100%; padding:.9rem; border:none; border-radius:99px; font-family:'Nunito',sans-serif; font-weight:900; font-size:1rem; letter-spacing:.4px; cursor:pointer; position:relative; overflow:hidden; transition:all .2s; }
+.btn { width:100%; padding:.9rem; border:none; border-radius:99px; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:1rem; letter-spacing:.4px; cursor:pointer; position:relative; overflow:hidden; transition:all .2s; }
 .btn-pri { background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%); color:#fff; box-shadow:0 8px 24px rgba(255,107,53,0.4); }
 .btn-pri:active { transform:scale(.97); }
 .btn-pri:hover { box-shadow:0 12px 32px rgba(255,107,53,0.55); }

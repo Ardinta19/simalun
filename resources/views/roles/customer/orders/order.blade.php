@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Detail Pesanan #{{ strtoupper($order->order_code ?? 'N/A') }} – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root {
@@ -29,7 +28,7 @@
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     min-height: 100vh;
@@ -70,7 +69,7 @@ body {
     color: white; text-decoration: none; flex-shrink: 0;
 }
 .hero-code {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.9rem; color: rgba(255,255,255,0.75);
     letter-spacing: 1px; text-transform: uppercase;
 }
@@ -92,7 +91,7 @@ body {
     50%       { opacity: 0.5; transform: scale(0.8); }
 }
 .hero-price {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 2rem; color: white;
     text-shadow: 0 2px 12px rgba(0,0,0,0.2);
     line-height: 1;
@@ -122,7 +121,7 @@ body {
     box-shadow: 0 4px 16px rgba(0,47,92,0.05);
 }
 .timeline-card__title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.9rem;
     color: var(--blue-dark);
     margin-bottom: 18px;
@@ -248,7 +247,7 @@ body {
     font-size: 0.9rem; flex-shrink: 0;
 }
 .info-card__title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.9rem; color: var(--blue-dark);
 }
 .info-row {
@@ -315,11 +314,11 @@ body {
 .total-value { font-size: 0.85rem; font-weight: 800; color: white; }
 .total-divider { border: none; border-top: 1px dashed rgba(255,255,255,0.2); margin: 10px 0; }
 .total-main-label {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1rem; color: rgba(255,255,255,0.85);
 }
 .total-main-value {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.4rem; color: white;
 }
 .payment-badge {
@@ -339,7 +338,7 @@ body {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     padding: 13px;
     border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 900; font-size: 0.82rem;
     cursor: pointer; border: none;
     text-decoration: none;
@@ -386,7 +385,7 @@ body {
     border: 1.5px solid #fecaca;
     border-radius: var(--radius-sm);
     color: #dc2626;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 900;
     font-size: .85rem;
     cursor: pointer;
@@ -447,7 +446,7 @@ body {
     margin-bottom: 10px;
 }
 .cancel-sheet__title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.2rem;
     text-align: center;
     color: var(--ink);
@@ -476,7 +475,7 @@ body {
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 12px 14px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--ink);
@@ -499,7 +498,7 @@ body {
 .cancel-btn {
     padding: 14px;
     border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 900;
     font-size: 0.85rem;
     cursor: pointer;

@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Bantuan Kurir – Azka Laundry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue-dark:#002f5c;--blue:#0077b6;--sky:#00b4d8;--orange:#FF6B35;--green:#00C48C;--bg:#f4f8fc;--card:#fff;--ink:#1a2332;--ink-mid:#3d5066;--muted:#64748b;--line:#ddeeff;--r:16px;--nav-h:72px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + 24px);}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + 24px);}
 .top{background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue) 60%,var(--sky) 100%);color:#fff;position:relative;overflow:hidden;}
 .top-in{max-width:560px;margin:0 auto;padding:max(env(safe-area-inset-top,0px),20px) 16px 20px;}
 .top-row{display:flex;align-items:center;gap:12px;}
 .back-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.1rem;flex-shrink:0;}
-.tt{font-family:'Fredoka One',cursive;font-size:1.15rem;flex:1;}
+.tt{font-weight:800;font-size:1.15rem;flex:1;}
 .sub{font-size:.76rem;font-weight:700;opacity:.85;margin-top:4px;padding-left:50px;}
 .top-wave{display:block;width:100%;margin-bottom:-2px;}
 .wrap{max-width:560px;margin:0 auto;padding:14px 16px;}
@@ -21,15 +21,15 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);min-h
 /* Tabs */
 .tab-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;scrollbar-width:none;}
 .tab-row::-webkit-scrollbar{display:none;}
-.tab-btn{white-space:nowrap;padding:8px 14px;border-radius:99px;border:1.5px solid var(--line);background:#fff;font-size:.76rem;font-weight:800;color:var(--ink-mid);cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;}
+.tab-btn{white-space:nowrap;padding:8px 14px;border-radius:99px;border:1.5px solid var(--line);background:#fff;font-size:.76rem;font-weight:800;color:var(--ink-mid);cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
 .tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
 
 /* Cards */
-.section-title{font-family:'Fredoka One',cursive;font-size:.92rem;color:var(--ink);margin-bottom:10px;margin-top:14px;}
+.section-title{font-weight:800;font-size:.92rem;color:var(--ink);margin-bottom:10px;margin-top:14px;}
 .section-title:first-child{margin-top:0;}
 .card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,47,92,.05);}
-.card h4{font-family:'Fredoka One',cursive;font-size:.88rem;margin-bottom:6px;color:var(--ink);}
+.card h4{font-weight:800;font-size:.88rem;margin-bottom:6px;color:var(--ink);}
 .card p,.card li{font-size:.8rem;font-weight:700;color:var(--muted);line-height:1.7;}
 .card ul{padding-left:16px;margin-top:4px;}
 .card ul li{margin-bottom:4px;}

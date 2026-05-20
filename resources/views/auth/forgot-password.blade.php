@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Lupa Password – Azka Laundry SIMALUN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body {
-  width:100%; min-height:100%; font-family:'Nunito',sans-serif;
+  width:100%; min-height:100%; font-family:'Plus Jakarta Sans',sans-serif;
   background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
   overflow-x:hidden;
 }
@@ -43,7 +43,7 @@ html, body {
   border:2px dashed rgba(255,255,255,.28); animation:ring-spin 6s linear infinite;
 }
 @keyframes ring-spin{to{transform:rotate(360deg);}}
-.wm-name{font-family:'Fredoka One',cursive;font-size:clamp(1.5rem,5.8vw,2rem);color:#fff;letter-spacing:-.5px;text-shadow:0 3px 18px rgba(0,0,0,.28);line-height:1;}
+.wm-name{font-weight:800;font-size:clamp(1.5rem,5.8vw,2rem);color:#fff;letter-spacing:-.5px;text-shadow:0 3px 18px rgba(0,0,0,.28);line-height:1;}
 .wm-sub{font-size:clamp(.52rem,2vw,.63rem);font-weight:800;color:rgba(144,224,239,.9);letter-spacing:5px;text-transform:uppercase;margin-top:.2rem;}
 .wm-bar{width:65px;height:2.5px;background:#FF6B35;border-radius:99px;margin:.32rem auto 0;opacity:.75;}
 
@@ -71,7 +71,7 @@ html, body {
   box-shadow:0 8px 24px rgba(0,0,0,.15);
 }
 .card-title {
-  font-family:'Fredoka One',cursive; font-size:clamp(1.25rem,5vw,1.5rem);
+  font-weight:800; font-size:clamp(1.25rem,5vw,1.5rem);
   color:#fff; text-align:center; margin-bottom:.25rem; text-shadow:0 2px 12px rgba(0,0,0,.2);
 }
 .card-sub {
@@ -86,7 +86,7 @@ html, body {
 .form-input {
   width:100%; padding:.8rem .9rem .8rem 2.65rem;
   background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22);
-  border-radius:12px; color:#fff; font-family:'Nunito',sans-serif; font-size:.92rem; font-weight:600;
+  border-radius:12px; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:.92rem; font-weight:600;
   outline:none; transition:border-color .2s, background .2s, box-shadow .2s; -webkit-appearance:none;
 }
 .form-input::placeholder { color:rgba(255,255,255,.45); }
@@ -103,7 +103,7 @@ html, body {
 #btn-send {
   width:100%; padding:.88rem; border:none; border-radius:99px;
   background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%);
-  color:#fff; font-family:'Nunito',sans-serif; font-weight:900;
+  color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900;
   font-size:.97rem; letter-spacing:.3px; cursor:pointer; position:relative; overflow:hidden;
   box-shadow:0 8px 24px rgba(255,107,53,.45), inset 0 1px 0 rgba(255,255,255,.2);
   transition:transform .15s, box-shadow .15s;
@@ -134,7 +134,7 @@ html, body {
 #resend-timer { font-weight:900; color:#FF6B35; }
 #btn-resend {
   background:none; border:none; cursor:pointer;
-  font-family:'Nunito',sans-serif; font-weight:900; font-size:.78rem;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:.78rem;
   color:rgba(144,224,239,.9); display:none; padding:.1rem;
   transition:color .2s;
 }
@@ -351,7 +351,7 @@ html, body {
         <div class="card-sub" style="margin-bottom:1.2rem;">
           Password baru kamu sudah aktif. Silakan login dengan password yang baru.
         </div>
-        <a href="{{ route('login') }}" style="display:inline-flex;align-items:center;gap:.4rem;background:linear-gradient(135deg,#00C48C 0%,#00e0a1 100%);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:99px;padding:.82rem 2rem;text-decoration:none;box-shadow:0 8px 24px rgba(0,196,140,.45);transition:transform .15s;">
+        <a href="{{ route('login') }}" style="display:inline-flex;align-items:center;gap:.4rem;background:linear-gradient(135deg,#00C48C 0%,#00e0a1 100%);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:99px;padding:.82rem 2rem;text-decoration:none;box-shadow:0 8px 24px rgba(0,196,140,.45);transition:transform .15s;">
           Masuk Sekarang →
         </a>
       </div>

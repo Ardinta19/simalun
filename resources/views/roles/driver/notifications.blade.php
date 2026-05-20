@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Notifikasi Kurir – Azka Laundry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root{--blue-dark:#002f5c;--blue-mid:#0077b6;--blue-light:#00b4d8;--blue-sky:#e0f4ff;--orange:#FF6B35;--green:#00C48C;--surface:#f4f8fc;--card:#ffffff;--ink:#1a2332;--ink-mid:#3d5066;--ink-lt:#8899aa;--border:#ddeeff;--radius:20px;--radius-sm:12px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));overflow-x:hidden;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));overflow-x:hidden;}
 
 .page-header{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue-mid) 100%);padding:max(env(safe-area-inset-top,0px),16px) 20px 24px;position:sticky;top:0;z-index:100;}
 .header-row{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto;}
 .btn-back{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;flex-shrink:0;}
 .btn-back svg{width:18px;height:18px;}
-.header-title{flex:1;font-family:'Fredoka One',cursive;font-size:1.3rem;color:white;}
+.header-title{flex:1;font-weight:800;font-size:1.3rem;color:white;}
 
 .page-body{max-width:520px;margin:0 auto;padding:16px;}
 
@@ -38,7 +38,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 .empty-state{text-align:center;padding:60px 20px;}
 .empty-icon{font-size:3rem;margin-bottom:14px;display:block;opacity:.5;}
-.empty-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--ink-mid);margin-bottom:6px;}
+.empty-title{font-weight:800;font-size:1.1rem;color:var(--ink-mid);margin-bottom:6px;}
 .empty-sub{font-size:.8rem;font-weight:700;color:var(--ink-lt);line-height:1.5;}
 
 .driver-nav{position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);box-shadow:0 -4px 24px rgba(0,47,92,.08);padding-bottom:env(safe-area-inset-bottom,0px);}
@@ -46,7 +46,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 .driver-nav__item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#94a3b8;padding:6px 0;transition:color .2s;}
 .driver-nav__item.is-active{color:var(--blue-mid);}
 .driver-nav__icon svg{width:22px;height:22px;}
-.driver-nav__label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;font-family:'Nunito',sans-serif;}
+.driver-nav__label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;font-family:'Plus Jakarta Sans',sans-serif;}
 </style>
 </head>
 <body>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Edit Alamat – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -17,26 +16,26 @@
     --ink-lt:#8899aa; --border:#ddeeff; --radius:16px; --radius-sm:10px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));overflow-x:hidden;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px));overflow-x:hidden;}
 
 .page-header{background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue-mid) 100%);padding:max(env(safe-area-inset-top,0px),16px) 20px 24px;position:sticky;top:0;z-index:100;}
 .header-row{display:flex;align-items:center;gap:12px;max-width:520px;margin:0 auto;}
 .btn-back{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;flex-shrink:0;}
 .btn-back svg{width:18px;height:18px;}
-.header-title{flex:1;font-family:'Fredoka One',cursive;font-size:1.3rem;color:white;}
+.header-title{flex:1;font-weight:800;font-size:1.3rem;color:white;}
 .header-sub{font-size:.68rem;font-weight:800;color:rgba(255,255,255,.65);margin-top:2px;letter-spacing:.5px;}
 
 .page-body{max-width:520px;margin:0 auto;padding:16px;}
 
 .section-card{background:white;border-radius:var(--radius);border:1.5px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,47,92,.05);opacity:0;transform:translateY(18px);}
 .section-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1.5px solid var(--border);background:linear-gradient(90deg,rgba(0,119,182,.04) 0%,transparent 100%);}
-.section-num{width:28px;height:28px;border-radius:50%;background:var(--blue-mid);color:white;font-family:'Fredoka One',cursive;font-size:.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.section-title{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--blue-dark);}
+.section-num{width:28px;height:28px;border-radius:50%;background:var(--blue-mid);color:white;font-weight:800;font-size:.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-title{font-weight:800;font-size:.95rem;color:var(--blue-dark);}
 .section-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
 
 .field-label{font-size:.72rem;font-weight:900;color:var(--ink-mid);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
 .field-label .required{color:var(--red);}
-.field-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:600;color:var(--ink);background:white;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;}
+.field-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:.93rem;font-weight:600;color:var(--ink);background:white;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;}
 .field-input:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(0,119,182,.12);}
 .field-input.is-error{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
 .field-input::placeholder{color:var(--ink-lt);font-weight:600;}
@@ -46,7 +45,7 @@ textarea.field-input{resize:none;min-height:80px;line-height:1.5;}
 .zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .zone-pill{border:2px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;cursor:pointer;background:white;position:relative;transition:all .2s;}
 .zone-pill input[type=radio]{position:absolute;opacity:0;}
-.zone-name{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--ink);display:block;}
+.zone-name{font-weight:800;font-size:.95rem;color:var(--ink);display:block;}
 .zone-desc{font-size:.68rem;font-weight:800;color:var(--ink-lt);display:block;margin-top:2px;}
 .zone-price{font-size:.7rem;font-weight:900;color:var(--green);display:block;margin-top:2px;}
 .zone-pill:has(input:checked){border-color:var(--blue-mid);background:rgba(0,119,182,.06);box-shadow:0 0 0 3px rgba(0,119,182,.12);}
@@ -65,7 +64,7 @@ textarea.field-input{resize:none;min-height:80px;line-height:1.5;}
 
 .bottom-cta{position:fixed;bottom:0;left:0;right:0;padding:12px 16px max(env(safe-area-inset-bottom,0px),16px);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1.5px solid var(--border);z-index:50;}
 .cta-inner{max-width:520px;margin:0 auto;}
-.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue-mid) 0%,var(--blue-light) 100%);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(0,119,182,.35);transition:transform .15s;}
+.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue-mid) 0%,var(--blue-light) 100%);color:white;font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(0,119,182,.35);transition:transform .15s;}
 .btn-submit:active{transform:scale(.97);}
 .btn-submit svg{width:18px;height:18px;}
 

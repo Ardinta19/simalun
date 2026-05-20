@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Lacak Pesanan – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -27,7 +26,7 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height: 100%; }
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     overflow-x: hidden;
@@ -140,7 +139,7 @@ body {
 }
 .eta-info { flex: 1; }
 .eta-label { font-size: 0.7rem; font-weight: 800; color: var(--ink-lt); letter-spacing: 0.5px; text-transform: uppercase; }
-.eta-value { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--blue-dark); line-height: 1; margin-top: 2px; }
+.eta-value { font-weight: 800; font-size: 1.4rem; color: var(--blue-dark); line-height: 1; margin-top: 2px; }
 .eta-sub   { font-size: 0.72rem; font-weight: 700; color: var(--ink-lt); margin-top: 3px; }
 .eta-badge {
     background: var(--green);
@@ -200,7 +199,7 @@ body {
     box-shadow: 0 4px 16px rgba(0,47,92,0.05);
 }
 .activity-title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.9rem; color: var(--blue-dark);
     margin-bottom: 16px;
     display: flex; align-items: center; gap: 8px;
@@ -331,7 +330,7 @@ body {
         {{-- No driver assigned yet --}}
         <div class="driver-card" style="justify-content: center; flex-direction: column; text-align: center; gap: 8px;">
             <div style="font-size: 2rem;">⏳</div>
-            <div style="font-family: 'Fredoka One', cursive; color: var(--ink-mid);">Menunggu Penugasan Kurir</div>
+            <div style="font-weight: 800; color: var(--ink-mid);">Menunggu Penugasan Kurir</div>
             <div style="font-size: 0.78rem; color: var(--ink-lt); font-weight: 700;">Admin sedang memproses pesananmu</div>
         </div>
         @endif

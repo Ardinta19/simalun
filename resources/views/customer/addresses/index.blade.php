@@ -4,20 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alamat Saya – Azka Laundry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#0077b6;--blue-dark:#002f5c;--bg:#f4f8fc;--card:#fff;--ink:#1a2332;--muted:#64748b;--line:#ddeeff;--green:#00C48C;--red:#ef4444;--r:16px}
-*{box-sizing:border-box}body{margin:0;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink)}
 .wrap{max-width:860px;margin:0 auto;padding:18px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-.h1{font-family:'Fredoka One',cursive;color:var(--blue-dark);font-size:1.25rem}
+.h1{font-weight:800;color:var(--blue-dark);font-size:1.25rem}
 .btn{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:.55rem .8rem;font-weight:800;text-decoration:none;cursor:pointer;transition:.18s}
 .btn:hover{transform:translateY(-1px)}
 .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,47,92,.05)}
 .card-title{font-weight:900;margin-bottom:10px;color:var(--blue-dark)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .label{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.input{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:.65rem .7rem;font:600 .92rem 'Nunito',sans-serif}
+.input{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:.65rem .7rem;font:600 .92rem 'Plus Jakarta Sans',sans-serif}
 textarea.input{min-height:72px;resize:vertical}
 .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}

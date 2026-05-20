@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Azka Laundry – SIMALUN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
@@ -14,7 +14,7 @@
   margin:0; padding:0; box-sizing:border-box;
   -webkit-tap-highlight-color:transparent; user-select:none;
 }
-html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans-serif; background:#001f3f; }
+html, body { width:100%; height:100%; overflow:hidden; font-family:'Plus Jakarta Sans',sans-serif; background:#001f3f; }
 
 /* ── STAGE ── */
 #stage {
@@ -63,7 +63,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 }
 
 #wordmark { text-align:center; }
-.wm-name { font-family:'Fredoka One',cursive; font-size:clamp(1.7rem,6.5vw,2.3rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
+.wm-name { font-weight:800; font-size:clamp(1.7rem,6.5vw,2.3rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
 .wm-sub  { font-size:clamp(.55rem,2vw,.68rem); font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.25rem; }
 .wm-bar  { width:80px; height:2.5px; background:#FF6B35; border-radius:99px; margin:.4rem auto 0; opacity:.75; }
 
@@ -133,7 +133,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
   position:absolute; top:8px; right:8px;
   width:22px; height:22px; border-radius:50%;
   background:#FF6B35; color:#fff;
-  font-family:'Fredoka One',cursive; font-size:.8rem;
+  font-weight:800; font-size:.8rem;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 2px 8px rgba(255,107,53,.5);
   z-index:2;
@@ -156,7 +156,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
   top:calc(0.5rem - 10px);   /* sejajar top panel + offset */
   right:calc( (100% - min(310px,88vw)) / 2 - 10px );
   background:rgba(255,107,53,.92); color:#fff;
-  font-family:'Fredoka One',cursive; font-size:.65rem;
+  font-weight:800; font-size:.65rem;
   padding:.22rem .6rem; border-radius:6px; letter-spacing:.5px;
   box-shadow:0 3px 10px rgba(255,107,53,.4);
   transform:rotate(3deg);
@@ -164,7 +164,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 }
 
 .panel h2 {
-  font-family:'Fredoka One',cursive; font-size:clamp(1.35rem,5.5vw,1.75rem);
+  font-weight:800; font-size:clamp(1.35rem,5.5vw,1.75rem);
   color:#fff; text-align:center; line-height:1.2;
   text-shadow:0 3px 14px rgba(0,0,0,.22);
   margin-top:.1rem;
@@ -232,7 +232,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 #btn-next {
   display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 2.1rem;
   background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%);
-  color:#fff; font-family:'Nunito',sans-serif; font-weight:800;
+  color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
   font-size:clamp(.88rem,3.4vw,.98rem); border:none; border-radius:99px; cursor:pointer;
   box-shadow:0 8px 22px rgba(255,107,53,.45),0 2px 6px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.2);
   transition:transform .15s, box-shadow .15s; letter-spacing:.3px; position:relative; overflow:hidden;
@@ -250,7 +250,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 
 #btn-skip {
   background:none; border:none; color:rgba(255,255,255,.5);
-  font-family:'Nunito',sans-serif; font-weight:700; font-size:.78rem;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.78rem;
   letter-spacing:.5px; cursor:pointer; padding:.25rem .9rem; transition:color .2s;
 }
 #btn-skip:hover { color:rgba(255,255,255,.88); }
@@ -258,7 +258,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 /* soap word bubbles */
 .soap-bubble {
   position:absolute; display:flex; align-items:center; justify-content:center;
-  border-radius:50%; font-family:'Nunito',sans-serif; font-weight:800;
+  border-radius:50%; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
   text-align:center; pointer-events:none; line-height:1.2;
   border:1.5px solid rgba(255,255,255,.4);
   background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.7),rgba(255,255,255,.08));
@@ -303,7 +303,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
 #exit-text {
   position:absolute; bottom:22%; left:0; right:0;
   text-align:center; opacity:0;
-  font-family:'Fredoka One',cursive; font-size:1.3rem; color:rgba(255,255,255,.9);
+  font-weight:800; font-size:1.3rem; color:rgba(255,255,255,.9);
   letter-spacing:3px;
   text-shadow:0 0 20px rgba(72,202,228,.9),0 2px 8px rgba(0,0,0,.4);
 }

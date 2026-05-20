@@ -5,28 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Bantuan – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue-dark:#002f5c;--blue-mid:#0077b6;--blue-light:#00b4d8;--blue-sky:#e0f4ff;--orange:#FF6B35;--green:#00C48C;--ink:#1a2332;--ink-mid:#3d5066;--ink-lt:#8899aa;--surface:#f4f8fc;--border:#ddeeff;--radius:16px;--nav-h:72px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + 24px);}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + 24px);}
 .top-header{background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue-mid) 60%,var(--blue-light) 100%);position:relative;overflow:hidden;}
 .header-inner{position:relative;z-index:1;padding:max(env(safe-area-inset-top,0px),20px) 20px 20px;max-width:520px;margin:0 auto;}
 .header-top{display:flex;align-items:center;gap:12px;}
 .back-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.1rem;flex-shrink:0;}
-.header-title{font-family:'Fredoka One',cursive;font-size:1.2rem;color:#fff;flex:1;}
+.header-title{font-weight:800;font-size:1.2rem;color:#fff;flex:1;}
 .header-wave{display:block;width:100%;margin-bottom:-2px;}
 .page-body{max-width:520px;margin:0 auto;padding:16px;}
 
 /* Tabs */
 .tab-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{white-space:nowrap;padding:8px 16px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;font-weight:800;color:var(--ink-mid);cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;}
+.tab-btn{white-space:nowrap;padding:8px 16px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;font-weight:800;color:var(--ink-mid);cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;}
 .tab-btn.active{background:var(--blue-mid);color:#fff;border-color:var(--blue-mid);}
 .tab-content{display:none;}.tab-content.active{display:block;}
 
 /* Section */
-.section-title{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--ink);margin-bottom:10px;margin-top:16px;}
+.section-title{font-weight:800;font-size:.95rem;color:var(--ink);margin-bottom:10px;margin-top:16px;}
 .section-title:first-child{margin-top:0;}
 
 /* Contact Card */
@@ -47,7 +46,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 /* Info Box */
 .info-box{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,47,92,.06);}
-.info-box h4{font-family:'Fredoka One',cursive;font-size:.88rem;margin-bottom:6px;color:var(--ink);}
+.info-box h4{font-weight:800;font-size:.88rem;margin-bottom:6px;color:var(--ink);}
 .info-box p,.info-box li{font-size:.8rem;font-weight:700;color:var(--ink-mid);line-height:1.7;}
 .info-box ul{padding-left:16px;margin-top:4px;}
 .info-box ul li{margin-bottom:4px;}

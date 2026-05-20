@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Tambah Alamat – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -30,7 +29,7 @@
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     min-height: 100vh;
@@ -52,7 +51,7 @@ body {
     color:white; text-decoration:none; flex-shrink:0;
 }
 .btn-back svg { width:18px; height:18px; }
-.header-title { flex:1; font-family:'Fredoka One',cursive; font-size:1.3rem; color:white; }
+.header-title { flex:1; font-weight:800; font-size:1.3rem; color:white; }
 .header-sub { font-size:.68rem; font-weight:800; color:rgba(255,255,255,.65); margin-top:2px; letter-spacing:.5px; }
 
 /* ── BODY ────────────────────────────── */
@@ -77,11 +76,11 @@ body {
 .section-num {
     width:28px; height:28px; border-radius:50%;
     background:var(--blue-mid); color:white;
-    font-family:'Fredoka One',cursive; font-size:.88rem;
+    font-weight:800; font-size:.88rem;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
 }
-.section-title { font-family:'Fredoka One',cursive; font-size:.95rem; color:var(--blue-dark); }
+.section-title { font-weight:800; font-size:.95rem; color:var(--blue-dark); }
 .section-body { padding:14px 16px; display:flex; flex-direction:column; gap:12px; }
 
 /* ── FORM ELEMENTS ───────────────────── */
@@ -94,7 +93,7 @@ body {
 .field-input {
     width:100%; padding:12px 14px;
     border:1.5px solid var(--border); border-radius:var(--radius-sm);
-    font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:600;
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:.93rem; font-weight:600;
     color:var(--ink); background:white; outline:none;
     transition:border-color .2s, box-shadow .2s;
     appearance:none;
@@ -116,7 +115,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
     background:white; position:relative; transition:all .2s;
 }
 .zone-pill input[type=radio] { position:absolute; opacity:0; }
-.zone-name { font-family:'Fredoka One',cursive; font-size:.95rem; color:var(--ink); display:block; }
+.zone-name { font-weight:800; font-size:.95rem; color:var(--ink); display:block; }
 .zone-desc { font-size:.68rem; font-weight:800; color:var(--ink-lt); display:block; margin-top:2px; }
 .zone-price { font-size:.7rem; font-weight:900; color:var(--green); display:block; margin-top:2px; }
 .zone-pill:has(input:checked) {
@@ -174,7 +173,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 .btn-submit {
     width:100%; padding:14px;
     background:linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-light) 100%);
-    color:white; font-family:'Nunito',sans-serif; font-weight:900;
+    color:white; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900;
     font-size:.95rem; border:none; border-radius:var(--radius-sm);
     cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
     box-shadow:0 6px 20px rgba(0,119,182,.35);

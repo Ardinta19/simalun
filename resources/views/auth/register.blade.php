@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Daftar – Azka Laundry SIMALUN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body {
-  width:100%; min-height:100%; font-family:'Nunito',sans-serif;
+  width:100%; min-height:100%; font-family:'Plus Jakarta Sans',sans-serif;
   background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
   overflow-x:hidden;
 }
@@ -55,7 +55,7 @@ html, body {
   animation:ring-spin 6s linear infinite; pointer-events:none;
 }
 @keyframes ring-spin { to{transform:rotate(360deg);} }
-.wm-name { font-family:'Fredoka One',cursive; font-size:clamp(1.4rem,5.5vw,1.9rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
+.wm-name { font-weight:800; font-size:clamp(1.4rem,5.5vw,1.9rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
 .wm-sub  { font-size:clamp(.5rem,1.9vw,.62rem); font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.18rem; }
 .wm-bar  { width:60px; height:2.5px; background:#FF6B35; border-radius:99px; margin:.3rem auto 0; opacity:.75; }
 
@@ -68,7 +68,7 @@ html, body {
   padding:1.6rem 1.5rem 1.5rem; opacity:0; transform:translateY(32px);
 }
 .card-title {
-  font-family:'Fredoka One',cursive; font-size:clamp(1.2rem,4.8vw,1.5rem);
+  font-weight:800; font-size:clamp(1.2rem,4.8vw,1.5rem);
   color:#fff; text-align:center; margin-bottom:.2rem; text-shadow:0 2px 12px rgba(0,0,0,.2);
 }
 .card-sub {
@@ -84,7 +84,7 @@ html, body {
 .step-dot {
   width:28px; height:28px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-family:'Fredoka One',cursive; font-size:.75rem;
+  font-weight:800; font-size:.75rem;
   border:2px solid rgba(255,255,255,.3);
   color:rgba(255,255,255,.5);
   transition:all .3s ease;
@@ -122,7 +122,7 @@ html, body {
   width:100%; padding:.78rem .9rem .78rem 2.65rem;
   background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22);
   border-radius:12px; color:#fff;
-  font-family:'Nunito',sans-serif; font-size:.91rem; font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:.91rem; font-weight:600;
   outline:none; transition:border-color .2s, background .2s, box-shadow .2s;
   -webkit-appearance:none;
 }
@@ -214,7 +214,7 @@ html, body {
 .btn-back-step {
   padding:.82rem 1.1rem; background:rgba(255,255,255,.12);
   border:1.5px solid rgba(255,255,255,.22); border-radius:99px;
-  color:rgba(255,255,255,.8); font-family:'Nunito',sans-serif;
+  color:rgba(255,255,255,.8); font-family:'Plus Jakarta Sans',sans-serif;
   font-weight:800; font-size:.88rem; cursor:pointer;
   transition:background .2s; white-space:nowrap;
 }
@@ -223,7 +223,7 @@ html, body {
 .btn-next-step, .btn-submit {
   flex:1; padding:.85rem; border:none; border-radius:99px;
   background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%);
-  color:#fff; font-family:'Nunito',sans-serif; font-weight:900;
+  color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900;
   font-size:.95rem; letter-spacing:.3px; cursor:pointer; position:relative; overflow:hidden;
   box-shadow:0 8px 24px rgba(255,107,53,.45), inset 0 1px 0 rgba(255,255,255,.2);
   transition:transform .15s, box-shadow .15s;
@@ -272,7 +272,7 @@ html, body {
 }
 #success-state .success-icon { font-size:3.5rem; margin-bottom:.8rem; }
 #success-state .success-title {
-  font-family:'Fredoka One',cursive; font-size:1.4rem; color:#fff; margin-bottom:.4rem;
+  font-weight:800; font-size:1.4rem; color:#fff; margin-bottom:.4rem;
 }
 #success-state .success-sub {
   font-size:.82rem; font-weight:700; color:rgba(255,255,255,.75);
@@ -281,7 +281,7 @@ html, body {
 .btn-to-login {
   display:inline-flex; align-items:center; gap:.4rem;
   background:linear-gradient(135deg,#00C48C 0%,#00e0a1 100%);
-  color:#fff; font-family:'Nunito',sans-serif; font-weight:900;
+  color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900;
   font-size:.95rem; border:none; border-radius:99px;
   padding:.82rem 2rem; cursor:pointer; text-decoration:none;
   box-shadow:0 8px 24px rgba(0,196,140,.45);

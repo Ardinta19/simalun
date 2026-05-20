@@ -4,10 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Edit Profil</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Nunito', sans-serif; background:#f4f8fc; color:#1a2332; padding:24px 16px; }
+    body { font-family:'Plus Jakarta Sans', sans-serif; background:#f4f8fc; color:#1a2332; padding:24px 16px; }
     .container { max-width:520px; margin:0 auto; }
     h1 { font-size:1.4rem; margin-bottom:18px; color:#002f5c; }
     .card { background:#fff; border:1.5px solid #ddeeff; border-radius:14px; padding:18px; margin-bottom:14px; }

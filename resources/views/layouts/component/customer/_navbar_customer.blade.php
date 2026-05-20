@@ -161,14 +161,14 @@
     justify-content: center;
     padding: 0 3px;
     border: 2px solid white;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .customer-nav__label {
     font-size: 0.6rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 /* FAB Button */
 .customer-nav__fab {
@@ -203,7 +203,7 @@
     color: #FF6B35;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     margin-top: 2px;
 }
 /* Active indicator dot */
