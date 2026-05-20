@@ -54,5 +54,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:
   </section>
 </div>
 <script>document.addEventListener('DOMContentLoaded',()=>{gsap.from('#top',{y:-16,opacity:0,duration:.45,ease:'power2.out'});gsap.from('.js-in',{y:18,opacity:0,duration:.42,stagger:.08,ease:'power2.out'});});</script>
+
+@include('layouts.component.admin._navbar_admin', ['active' => ''])
+
 </body>
 </html>

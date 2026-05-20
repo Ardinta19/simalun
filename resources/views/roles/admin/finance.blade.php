@@ -363,6 +363,7 @@ body {
 
 {{-- Admin Navbar --}}
 @include('layouts.component.admin._navbar_admin', ['active' => 'beranda'])
+@include('layouts.component._form_loading')
 
 </body>
 </html>

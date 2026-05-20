@@ -363,9 +363,9 @@ body {
             <div class="stat-card__icon stat-card__icon--star">
                 <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <div class="stat-card__num" style="color: var(--warning);">4.9</div>
-            <div class="stat-card__label">Rating</div>
-            <div class="stat-card__sub">Unggul</div>
+            <div class="stat-card__num" style="color: var(--warning);">{{ $antarBulanIni }}</div>
+            <div class="stat-card__label">Bulan Ini</div>
+            <div class="stat-card__sub">Antaran</div>
         </div>
     </div>
 

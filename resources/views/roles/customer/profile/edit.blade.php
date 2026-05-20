@@ -19,7 +19,7 @@
         background:var(--surface);
         color:var(--ink);
         min-height:100vh;
-        padding-bottom:30px;
+        padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px));
         overflow-x:hidden;
     }
 
@@ -509,6 +509,8 @@
     }
 })();
 </script>
+
+@include('layouts.component.customer._navbar_customer', ['active' => 'profil'])
 
 </body>
 </html>
