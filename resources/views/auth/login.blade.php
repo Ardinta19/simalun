@@ -127,7 +127,7 @@ html, body {
 
   <div id="card">
 
-    <div class="card-title">Selamat Datang 👋</div>
+    <div class="card-title">Selamat Datang</div>
     <div class="card-sub">Masuk ke akun SIMALUN kamu</div>
 
     @if(session('error'))

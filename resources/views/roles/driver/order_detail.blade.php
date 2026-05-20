@@ -58,8 +58,18 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 <div class="hero">
     <div class="hero-inner">
+        @php
+            $from = request('from');
+            $backMap = [
+                'notifications' => ['url' => route('driver.notifications'), 'label' => 'Notifikasi'],
+                'dashboard'     => ['url' => route('driver.dashboard'),     'label' => 'Beranda'],
+                'tracking'      => ['url' => route('driver.tracking'),      'label' => 'Tracking'],
+                'orders'        => ['url' => route('driver.orders'),        'label' => 'Daftar Tugas'],
+            ];
+            $back = $backMap[$from] ?? $backMap['orders'];
+        @endphp
         <div class="hero-nav">
-            <a href="{{ route('driver.orders') }}" class="btn-back">
+            <a href="{{ $back['url'] }}" class="btn-back" aria-label="Kembali ke {{ $back['label'] }}" title="Kembali ke {{ $back['label'] }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </a>
             <div class="hero-code">#{{ strtoupper($order->order_code) }}</div>

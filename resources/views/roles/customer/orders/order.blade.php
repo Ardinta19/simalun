@@ -382,10 +382,22 @@ body {
 <body>
 
 {{-- HERO HEADER --}}
+@php
+    // Smart back: ikuti referrer kontekstual lewat query ?from=...
+    $from = request('from');
+    $backMap = [
+        'notifications' => ['url' => route('customer.notifications'), 'label' => 'Notifikasi'],
+        'dashboard'     => ['url' => route('customer.dashboard'),     'label' => 'Beranda'],
+        'tracking'      => ['url' => route('customer.tracking'),      'label' => 'Lacak Pesanan'],
+        'success'       => ['url' => route('customer.dashboard'),     'label' => 'Beranda'],
+        'orders'        => ['url' => route('customer.orders'),        'label' => 'Pesanan'],
+    ];
+    $back = $backMap[$from] ?? $backMap['orders'];
+@endphp
 <div class="hero" id="js-hero">
     <div class="hero-inner">
         <div class="hero-nav">
-            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('customer.orders') }}" class="btn-back">
+            <a href="{{ $back['url'] }}" class="btn-back" aria-label="Kembali ke {{ $back['label'] }}" title="Kembali ke {{ $back['label'] }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 5l-7 7 7 7"/>
                 </svg>

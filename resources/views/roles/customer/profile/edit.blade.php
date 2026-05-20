@@ -283,19 +283,20 @@
                 </div>
 
                 <div>
-                    <div class="field-label">Email <span class="req">*</span></div>
+                    <div class="field-label">Email <span style="font-weight:600;color:var(--ink-lt)">(opsional)</span></div>
                     <input type="email" name="email"
                            class="field-input {{ $errors->has('email') ? 'is-error' : '' }}"
-                           value="{{ old('email', $user->email) }}" required>
+                           value="{{ old('email', $user->email) }}"
+                           placeholder="Boleh dikosongkan">
                     @error('email') <div class="field-error">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <div class="field-label">Nomor HP / WhatsApp</div>
+                    <div class="field-label">Nomor HP / WhatsApp <span class="req">*</span></div>
                     <input type="text" name="phone"
                            class="field-input"
                            value="{{ old('phone', $user->phone) }}"
-                           placeholder="08xxxxxxxxxx">
+                           placeholder="08xxxxxxxxxx" required>
                 </div>
 
                 <button type="submit" class="btn-submit">Simpan Data Pribadi</button>

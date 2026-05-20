@@ -418,7 +418,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Nunito',sans
         <h2>Pantau Status Real-Time</h2>
         <p>Lacak tahapan cucian kapan saja. Driver antar langsung, bayar di tempat — semudah itu.</p>
         <div class="panel-tags">
-          <span class="tag">🔔 Notifikasi Email</span>
+          <span class="tag">💬 Notifikasi WhatsApp</span>
           <span class="tag">💵 Bayar di Tempat</span>
         </div>
       </div>

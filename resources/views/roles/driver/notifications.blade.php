@@ -91,7 +91,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
                 $type    = $notif->data['type'] ?? 'system';
                 $icon    = $notifIcons[$type] ?? ['icon' => '🔔', 'bg' => '#f8fafc'];
                 $orderId = $notif->data['order_id'] ?? null;
-                $href    = $orderId ? route('driver.orders.show', $orderId) : '#';
+                $href    = $orderId ? route('driver.orders.show', ['order' => $orderId, 'from' => 'notifications']) : '#';
                 $isUnread = is_null($notif->read_at);
             @endphp
             <a href="{{ $href }}" class="notif-card {{ $isUnread ? 'unread' : '' }}">

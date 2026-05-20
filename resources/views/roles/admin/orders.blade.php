@@ -173,8 +173,7 @@ tr:last-child td{border-bottom:none}
                                     @endif
 
                                     <div style="display:flex; gap:8px">
-                                        <a href="{{ route('order.show', $o->order_code) }}" class="btn btn-sec" style="flex:1; justify-content:center">Detail</a>
-                                        <a href="{{ route('admin.orders.receipt', $o) }}" target="_blank" class="btn btn-sec" style="flex:1; justify-content:center">Struk 📄</a>
+                                        <a href="{{ route('admin.orders.receipt', $o) }}" target="_blank" class="btn btn-sec" style="flex:1; justify-content:center">Detail / Struk</a>
                                     </div>
                                 </div>
                             </td>

@@ -196,16 +196,35 @@ class OrderController extends Controller
         return redirect()->route('order.show', $newOrder->order_code);
     }
 
+    /**
+     * Halaman pasca-checkout (success). Untuk akses berikutnya
+     * (refresh, share link, admin click "Detail"), kita arahkan
+     * ke halaman detail sesuai role agar tidak terjebak di state
+     * "success" yang sudah tidak relevan.
+     */
     public function show(string $orderCode)
     {
         $order = Order::with(['service', 'items.service'])
             ->where('order_code', $orderCode)
             ->firstOrFail();
 
+        $user = Auth::user();
+
+        // Customer hanya boleh lihat ordernya sendiri.
         abort_if(
-            Auth::user()->role === 'customer' && $order->customer_id !== Auth::id(),
+            $user && $user->role === 'customer' && $order->customer_id !== $user->id,
             403
         );
+
+        // Hanya tampilkan layar success ketika order baru saja dibuat
+        // (status masih "menunggu"). Selebihnya arahkan ke detail real.
+        if ($order->status !== 'menunggu') {
+            return match ($user->role ?? 'customer') {
+                'admin'  => redirect()->route('admin.orders.receipt', $order),
+                'driver' => redirect()->route('driver.orders.show', ['order' => $order->id, 'from' => 'orders']),
+                default  => redirect()->route('customer.order.detail', ['order' => $order->id, 'from' => 'success']),
+            };
+        }
 
         return view('order.success', compact('order'));
     }
