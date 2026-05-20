@@ -490,6 +490,106 @@ body {
 </div>
 
 @include('layouts.component.admin._navbar_admin', ['active' => 'pesanan'])
+@include('layouts.component._confirm_modal')
+@include('layouts.component._bottom_sheet_select')
+@include('layouts.component._form_loading')
+
+<script>
+(function() {
+    // Custom bottom-sheet for driver selection
+    document.querySelectorAll('.order-card__select').forEach(function(select) {
+        var wrapper = select.closest('.order-card__panel-form');
+        if (!wrapper) return;
+
+        // Create custom trigger button
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'order-card__select';
+        trigger.style.textAlign = 'left';
+        trigger.style.cursor = 'pointer';
+        trigger.textContent = 'Pilih kurir';
+        trigger.setAttribute('data-trigger', 'true');
+
+        // Build options from native select
+        var options = [];
+        select.querySelectorAll('option').forEach(function(opt) {
+            if (!opt.value) return;
+            options.push({ value: opt.value, label: opt.textContent, sub: 'Kurir aktif' });
+        });
+
+        // Replace native select with trigger (keep hidden select for form submit)
+        select.style.display = 'none';
+        select.parentNode.insertBefore(trigger, select);
+
+        trigger.addEventListener('click', function() {
+            showBottomSelect({
+                title: 'Pilih Kurir',
+                options: options,
+                onSelect: function(value, label) {
+                    select.value = value;
+                    trigger.textContent = label;
+                    trigger.style.color = '#1a2332';
+                    trigger.style.fontWeight = '700';
+                }
+            });
+        });
+    });
+
+    // Confirm modal for status update buttons
+    document.querySelectorAll('.order-card__panel-btn--accent').forEach(function(btn) {
+        var form = btn.closest('form');
+        if (!form) return;
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            showConfirmModal({
+                title: 'Update Status Pesanan?',
+                message: 'Status pesanan akan diperbarui ke tahap selanjutnya. Lanjutkan?',
+                confirmText: 'Ya, Update',
+                cancelText: 'Batal',
+                type: 'info',
+                onConfirm: function() { form.submit(); }
+            });
+        });
+
+        // Change button to type=button to prevent direct submit
+        btn.type = 'button';
+    });
+
+    // Confirm modal for assign driver buttons
+    document.querySelectorAll('.order-card__panel-btn--primary, .order-card__panel-btn--success').forEach(function(btn) {
+        var form = btn.closest('form');
+        if (!form) return;
+        if (btn.classList.contains('order-card__panel-btn--accent')) return; // skip status update btns
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var select = form.querySelector('select[name="driver_id"]');
+            if (select && !select.value) {
+                showConfirmModal({
+                    title: 'Pilih Kurir',
+                    message: 'Silakan pilih kurir terlebih dahulu sebelum menugaskan.',
+                    confirmText: 'Mengerti',
+                    cancelText: 'Tutup',
+                    type: 'warning',
+                    onConfirm: function() {}
+                });
+                return;
+            }
+            showConfirmModal({
+                title: 'Tugaskan Kurir?',
+                message: 'Kurir akan langsung menerima notifikasi tugas baru. Yakin ingin menugaskan?',
+                confirmText: 'Ya, Tugaskan',
+                cancelText: 'Batal',
+                type: 'success',
+                onConfirm: function() { form.submit(); }
+            });
+        });
+
+        btn.type = 'button';
+    });
+})();
+</script>
 
 </body>
 </html>

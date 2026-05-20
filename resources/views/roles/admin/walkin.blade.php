@@ -336,6 +336,7 @@ body {
 </div>
 
 @include('layouts.component.admin._navbar_admin', ['active' => 'pesanan'])
+@include('layouts.component._form_loading')
 
 <script>
 (function () {

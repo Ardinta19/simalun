@@ -446,7 +446,7 @@ body {
     <div class="action-card">
         <div class="action-card__title">Konfirmasi Penjemputan</div>
         <div class="action-card__hint">Masukkan berat aktual setelah pakaian diterima dari customer.</div>
-        <form method="POST" action="{{ route('driver.orders.action', $order) }}">
+        <form method="POST" action="{{ route('driver.orders.action', $order) }}" id="form-confirm-pickup">
             @csrf
             <input type="hidden" name="status" value="dicuci">
             <div class="action-card__field">
@@ -455,7 +455,7 @@ body {
                        class="action-card__input" placeholder="Contoh: 4.5"
                        value="{{ old('weight_actual', $order->weight_estimate) }}" required>
             </div>
-            <button type="submit" class="action-card__submit action-card__submit--success">
+            <button type="button" class="action-card__submit action-card__submit--success" id="btn-confirm-pickup">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Konfirmasi Jemput
             </button>
@@ -468,7 +468,7 @@ body {
     <div class="action-card">
         <div class="action-card__title">Konfirmasi Pengiriman</div>
         <div class="action-card__hint">Upload foto bukti setelah pakaian diserahkan ke customer.</div>
-        <form method="POST" action="{{ route('driver.orders.action', $order) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('driver.orders.action', $order) }}" enctype="multipart/form-data" id="form-confirm-delivery">
             @csrf
             <input type="hidden" name="status" value="selesai">
             <div class="action-card__field">
@@ -476,7 +476,7 @@ body {
                 <input type="file" name="proof_image" id="proof_image" accept="image/*" capture="environment"
                        class="action-card__input" required>
             </div>
-            <button type="submit" class="action-card__submit action-card__submit--accent">
+            <button type="button" class="action-card__submit action-card__submit--accent" id="btn-confirm-delivery">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 Selesaikan Pesanan
             </button>
@@ -525,6 +525,54 @@ body {
 </div>
 
 @include('layouts.component.driver._navbar_driver', ['active' => 'tugas'])
+@include('layouts.component._confirm_modal')
+@include('layouts.component._form_loading')
+
+<script>
+(function() {
+    var btnPickup = document.getElementById('btn-confirm-pickup');
+    if (btnPickup) {
+        btnPickup.addEventListener('click', function() {
+            var weightInput = document.getElementById('weight_actual');
+            if (!weightInput || !weightInput.value || parseFloat(weightInput.value) < 0.1) {
+                weightInput.focus();
+                return;
+            }
+            showConfirmModal({
+                title: 'Konfirmasi Penjemputan?',
+                message: 'Pakaian akan ditandai sudah dijemput dengan berat ' + weightInput.value + ' kg. Pastikan sudah diterima dari customer.',
+                confirmText: 'Ya, Konfirmasi',
+                cancelText: 'Batal',
+                type: 'success',
+                onConfirm: function() {
+                    document.getElementById('form-confirm-pickup').submit();
+                }
+            });
+        });
+    }
+
+    var btnDelivery = document.getElementById('btn-confirm-delivery');
+    if (btnDelivery) {
+        btnDelivery.addEventListener('click', function() {
+            var fileInput = document.getElementById('proof_image');
+            if (!fileInput || !fileInput.files.length) {
+                fileInput.focus();
+                return;
+            }
+            showConfirmModal({
+                title: 'Selesaikan Pesanan?',
+                message: 'Pesanan akan ditandai selesai dan pembayaran COD dicatat. Pastikan cucian sudah diserahkan ke customer.',
+                confirmText: 'Ya, Selesaikan',
+                cancelText: 'Batal',
+                type: 'warning',
+                onConfirm: function() {
+                    document.getElementById('form-confirm-delivery').submit();
+                }
+            });
+        });
+    }
+})();
+</script>
 
 </body>
 </html>
