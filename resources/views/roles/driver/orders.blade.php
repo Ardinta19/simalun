@@ -371,12 +371,10 @@ body {
         </div>
 
         @if($order->status === 'dijemput')
-        <form method="POST" action="{{ route('driver.orders.action', $order) }}" class="task-card__quick">
-            @csrf
-            <input type="hidden" name="status" value="dicuci">
+        <div class="task-card__quick">
             <span class="task-card__quick-label">Pakaian sudah dijemput?</span>
-            <button type="submit" class="task-card__quick-btn task-card__quick-btn--confirm">Konfirmasi</button>
-        </form>
+            <a href="{{ route('driver.orders.show', $order) }}" class="task-card__quick-btn task-card__quick-btn--confirm">Konfirmasi</a>
+        </div>
         @elseif($order->status === 'dikirim')
         <div class="task-card__quick">
             <span class="task-card__quick-label">Upload bukti di halaman detail</span>
