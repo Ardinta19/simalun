@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::post('/profile/primary-address', [ProfileController::class, 'savePrimaryAddress'])
         ->middleware('role:customer')
         ->name('profile.primary-address');

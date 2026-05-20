@@ -714,112 +714,6 @@ body {
   color: var(--c-ink-soft);
 }
 
-/* ═══════════════════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════════════════ */
-.bot-nav {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  height: var(--nav-h);
-  background: rgba(255,255,255,.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--c-line);
-  z-index: 100;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-.bn-inner {
-  max-width: 520px;
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-.bn-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 4px 0;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-}
-.bn-icon {
-  width: 24px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--c-ink-soft);
-  transition: color .2s;
-}
-.bn-icon.on { color: var(--c-ocean-mid); }
-.bn-label {
-  font-size: .58rem;
-  font-weight: 800;
-  color: var(--c-ink-soft);
-  letter-spacing: .3px;
-  text-transform: uppercase;
-}
-.bn-label.on { color: var(--c-ocean-mid); }
-/* dot indicator di bawah icon aktif */
-.bn-dot {
-  width: 4px; height: 4px;
-  background: var(--c-ocean-mid);
-  border-radius: 50%;
-  margin-top: -1px;
-}
-
-/* badge notif */
-.notif-badge {
-  position: absolute;
-  top: 2px; right: calc(50% - 22px);
-  min-width: 16px; height: 16px;
-  background: var(--c-fire);
-  color: #fff;
-  font-size: .55rem;
-  font-weight: 900;
-  border-radius: 99px;
-  display: flex; align-items: center; justify-content: center;
-  border: 1.5px solid #fff;
-  padding: 0 4px;
-}
-
-/* FAB order — pusat nav */
-.bn-fab {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  text-decoration: none;
-  cursor: pointer;
-}
-.bn-fab-btn {
-  width: 50px; height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--c-fire) 0%, var(--c-fire-soft) 100%);
-  display: flex; align-items: center; justify-content: center;
-  margin-top: -22px;
-  box-shadow:
-    0 6px 20px rgba(255,107,53,.45),
-    0 2px 6px rgba(255,107,53,.2);
-  transition: transform .15s, box-shadow .15s;
-  flex-shrink: 0;
-}
-.bn-fab:active .bn-fab-btn {
-  transform: scale(.92);
-  box-shadow: 0 3px 10px rgba(255,107,53,.3);
-}
-.bn-fab-lbl {
-  font-size: .55rem;
-  font-weight: 900;
-  color: var(--c-fire);
-  text-transform: uppercase;
-  letter-spacing: .4px;
-}
 
 /* ═══════════════════════════════════════════════
    RESPONSIVE
@@ -1125,64 +1019,8 @@ body {
 
 </main>
 
-{{-- ══════════════════════════════════════
-     BOTTOM NAVIGATION
-══════════════════════════════════════ --}}
-<nav class="bot-nav" aria-label="Navigasi utama">
-  <div class="bn-inner">
-
-    <a href="{{ route('customer.dashboard') }}" class="bn-item" aria-label="Beranda" aria-current="page">
-      <div class="bn-icon on" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      </div>
-      <span class="bn-label on">Beranda</span>
-      <div class="bn-dot" aria-hidden="true"></div>
-    </a>
-
-    <a href="{{ route('customer.orders') }}" class="bn-item" aria-label="Daftar pesanan">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
-        </svg>
-      </div>
-      <span class="bn-label">Pesanan</span>
-    </a>
-
-    {{-- FAB Pesan — pusat nav --}}
-    <a href="{{ route('order.create') }}" class="bn-fab" aria-label="Pesan jemput sekarang">
-      <div class="bn-fab-btn" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </div>
-      <span class="bn-fab-lbl">Pesan</span>
-    </a>
-
-    <a href="{{ route('customer.notifications') }}" class="bn-item" aria-label="Notifikasi">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-        </svg>
-      </div>
-      <span class="bn-label">Notif</span>
-      @if(isset($unreadNotif) && $unreadNotif > 0)
-        <span class="notif-badge" aria-label="{{ $unreadNotif }} notifikasi">{{ $unreadNotif }}</span>
-      @endif
-    </a>
-
-    <a href="{{ route('customer.profile') }}" class="bn-item" aria-label="Profil saya">
-      <div class="bn-icon" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-      <span class="bn-label">Profil</span>
-    </a>
-
-  </div>
-</nav>
+{{-- BOTTOM NAVIGATION (shared partial) --}}
+@include('layouts.component.customer._navbar_customer', ['active' => 'beranda'])
 
 {{-- ══════════════════════════════════════
      JAVASCRIPT
@@ -1275,15 +1113,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }, { passive: true });
         }
     }
-
-    document.querySelectorAll('.bn-item, .bn-fab').forEach(el => {
-        el.addEventListener('touchstart', function () {
-            gsap.to(this, { scale: .91, duration: .09, ease: 'power2.out' });
-        }, { passive: true });
-        el.addEventListener('touchend', function () {
-            gsap.to(this, { scale: 1, duration: .22, ease: 'back.out(2.5)' });
-        }, { passive: true });
-    });
 
     const wave = document.querySelector('.hd-wave path');
     if (wave) {
