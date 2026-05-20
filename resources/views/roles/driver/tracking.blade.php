@@ -35,7 +35,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);paddi
     </div>
   </section>
 </main>
-<nav class="nav"><div class="nav-in"><a href="{{ route('dashboard.driver') }}">Beranda</a><a href="{{ route('driver.orders') }}">Tugas</a><a class="active" href="{{ route('driver.tracking') }}">Lacak</a><a href="{{ route('driver.help') }}">Bantuan</a></div></nav>
+<nav class="nav"><div class="nav-in"><a href="{{ route('driver.dashboard') }}">Beranda</a><a href="{{ route('driver.orders') }}">Tugas</a><a class="active" href="{{ route('driver.tracking') }}">Lacak</a><a href="{{ route('driver.help') }}">Bantuan</a></div></nav>
 <script>document.addEventListener('DOMContentLoaded',()=>{gsap.from('#top',{y:-16,opacity:0,duration:.45,ease:'power2.out'});gsap.from('.js-in',{y:18,opacity:0,duration:.42,stagger:.08,ease:'power2.out'});});</script>
 </body>
 </html>
