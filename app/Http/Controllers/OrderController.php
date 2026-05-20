@@ -243,10 +243,9 @@ class OrderController extends Controller
         $user = Auth::user();
 
         // Customer hanya boleh lihat ordernya sendiri.
-        abort_if(
-            $user && $user->role === 'customer' && $order->customer_id !== $user->id,
-            403
-        );
+        if ($user && $user->role === 'customer' && $order->customer_id !== $user->id) {
+            abort(403);
+        }
 
         // Tampilkan layar success hanya saat order baru dibuat (menunggu/dijemput).
         // Kalau sudah masuk proses lebih lanjut, arahkan ke detail.
@@ -254,8 +253,8 @@ class OrderController extends Controller
         if (!$showSuccess) {
             return match ($user->role ?? 'customer') {
                 'admin'  => redirect()->route('admin.orders.receipt', $order),
-                'driver' => redirect()->route('driver.orders.show', ['order' => $order->id, 'from' => 'orders']),
-                default  => redirect()->route('customer.order.detail', ['order' => $order->id, 'from' => 'success']),
+                'driver' => redirect()->route('driver.orders.show', ['order' => $order->id]),
+                default  => redirect()->route('customer.order.detail', ['order' => $order->id]),
             };
         }
 

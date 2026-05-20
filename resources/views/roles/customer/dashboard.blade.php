@@ -1012,7 +1012,7 @@ body {
             </div>
           </div>
         </div>
-        <a href="{{ route('customer.order.detail', ['order' => $pesananAktif->id, 'from' => 'dashboard']) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
+        <a href="{{ route('customer.order.detail', ['order' => $pesananAktif->id, 'back' => route('customer.dashboard')]) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
           Lacak
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1105,7 +1105,7 @@ body {
         $ico      = $icons[$svcSlug] ?? '🫧';
         $bgCls    = $bgColors[$svcSlug] ?? 'qi-blue';
       @endphp
-      <a href="{{ route('customer.order.detail', ['order' => $order->id, 'from' => 'dashboard']) }}" class="hist-item" aria-label="Detail pesanan {{ $order->order_code }}">
+      <a href="{{ route('customer.order.detail', ['order' => $order->id, 'back' => route('customer.dashboard')]) }}" class="hist-item" aria-label="Detail pesanan {{ $order->order_code }}">
         <div class="hist-ico {{ $bgCls }}" aria-hidden="true">{{ $ico }}</div>
         <div class="hist-texts">
           <div class="hist-name">{{ $order->service->name ?? 'Cuci Kiloan' }}</div>

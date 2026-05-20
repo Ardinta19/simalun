@@ -1,3 +1,6 @@
-{{-- Shared meta tags for customer pages - prevents console warnings --}}
+{{-- Shared meta tags for all pages --}}
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230077b6'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>A</text></svg>">
 <meta name="theme-color" content="#002f5c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">

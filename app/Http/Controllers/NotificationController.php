@@ -39,18 +39,22 @@ class NotificationController extends Controller
         $orderId = $notif->data['order_id'] ?? null;
         $role    = Auth::user()->role;
 
+        // Tentukan halaman notifikasi asal (untuk back button di halaman tujuan)
+        $backUrl = match ($role) {
+            'admin'  => route('admin.notifications'),
+            'driver' => route('driver.notifications'),
+            default  => route('customer.notifications'),
+        };
+
         if (!$orderId) {
-            return match ($role) {
-                'admin'  => redirect()->route('admin.notifications'),
-                'driver' => redirect()->route('driver.notifications'),
-                default  => redirect()->route('customer.notifications'),
-            };
+            return redirect($backUrl);
         }
 
+        // Redirect ke detail order dengan ?back= mengarah ke halaman notifikasi
         return match ($role) {
-            'admin'  => redirect()->route('admin.orders'),
-            'driver' => redirect()->route('driver.orders.show', ['order' => $orderId, 'from' => 'notifications']),
-            default  => redirect()->route('customer.order.detail', ['order' => $orderId, 'from' => 'notifications']),
+            'admin'  => redirect()->route('admin.orders', ['back' => $backUrl]),
+            'driver' => redirect()->route('driver.orders.show', ['order' => $orderId, 'back' => $backUrl]),
+            default  => redirect()->route('customer.order.detail', ['order' => $orderId, 'back' => $backUrl]),
         };
     }
 
