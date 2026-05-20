@@ -43,10 +43,25 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name'   => ['required', 'string', 'max:255'],
-            'email'  => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone'  => ['nullable', 'string', 'max:20'],
+            'email'  => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone'  => [
+                'required',
+                'string',
+                'regex:/^(?:\+?62|0)?8[0-9]{8,12}$/',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'phone.regex'    => 'Format nomor HP tidak valid (contoh: 081234567890).',
+            'phone.unique'   => 'Nomor HP sudah dipakai akun lain.',
         ]);
+
+        // Normalisasi nomor HP ke kanonik 8xxxxxxxxxx
+        if (!empty($validated['phone'])) {
+            $normalized = preg_replace('/[\s\-\.]/', '', $validated['phone']);
+            $validated['phone'] = preg_replace('/^(\+?62|0)/', '', $normalized);
+        }
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
@@ -55,7 +70,12 @@ class ProfileController extends Controller
             $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
-        if ($user->email !== $validated['email']) {
+        // Normalisasi email: string kosong → null supaya tidak menabrak unique constraint.
+        if (array_key_exists('email', $validated) && $validated['email'] === '') {
+            $validated['email'] = null;
+        }
+
+        if (($validated['email'] ?? null) !== $user->email) {
             $validated['email_verified_at'] = null;
         }
 

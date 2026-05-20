@@ -58,8 +58,18 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
 
 <div class="hero">
     <div class="hero-inner">
+        @php
+            $from = request('from');
+            $backMap = [
+                'notifications' => ['url' => route('driver.notifications'), 'label' => 'Notifikasi'],
+                'dashboard'     => ['url' => route('driver.dashboard'),     'label' => 'Beranda'],
+                'tracking'      => ['url' => route('driver.tracking'),      'label' => 'Tracking'],
+                'orders'        => ['url' => route('driver.orders'),        'label' => 'Daftar Tugas'],
+            ];
+            $back = $backMap[$from] ?? $backMap['orders'];
+        @endphp
         <div class="hero-nav">
-            <a href="{{ route('driver.orders') }}" class="btn-back">
+            <a href="{{ $back['url'] }}" class="btn-back" aria-label="Kembali ke {{ $back['label'] }}" title="Kembali ke {{ $back['label'] }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </a>
             <div class="hero-code">#{{ strtoupper($order->order_code) }}</div>
@@ -185,7 +195,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
             <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
             <span class="driver-nav__label">Notif</span>
         </a>
-        <a href="{{ route('profile.edit') }}" class="driver-nav__item">
+        <a href="{{ route('driver.profile') }}" class="driver-nav__item">
             <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             <span class="driver-nav__label">Profil</span>
         </a>

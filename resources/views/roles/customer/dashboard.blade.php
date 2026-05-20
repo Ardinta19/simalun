@@ -888,7 +888,7 @@ body {
     </div>
 
     {{-- Greeting --}}
-    <p class="hd-greet">Selamat datang kembali ☀️</p>
+    <p class="hd-greet">Selamat datang kembali</p>
     <h1 class="hd-name">Halo, {{ explode(' ', auth()->user()->name)[0] }}!</h1>
     <p class="hd-slogan">"Budayakan malas nyuci, itu pekerjaan kami."</p>
   </div>
@@ -1012,7 +1012,7 @@ body {
             </div>
           </div>
         </div>
-        <a href="{{ route('customer.order.detail', $pesananAktif->id) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
+        <a href="{{ route('customer.order.detail', ['order' => $pesananAktif->id, 'from' => 'dashboard']) }}" class="btn-lacak" aria-label="Lacak pesanan {{ $pesananAktif->order_code }}">
           Lacak
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -1031,7 +1031,7 @@ body {
     </div>
     <div class="no-order" role="region" aria-label="Tidak ada pesanan aktif">
       <span class="no-order-icon" aria-hidden="true">🧺</span>
-      <p class="no-order-txt">Belum ada cucian diproses.<br>Yuk, buat harimu lebih ringan!</p>
+      <p class="no-order-txt">Belum ada pesanan aktif.<br>Buat pesanan baru kapan pun kamu butuh.</p>
       <a href="{{ route('order.create') }}" class="btn-lacak" style="display:inline-flex;margin:0 auto;">
         Pesan Sekarang
       </a>
@@ -1105,7 +1105,7 @@ body {
         $ico      = $icons[$svcSlug] ?? '🫧';
         $bgCls    = $bgColors[$svcSlug] ?? 'qi-blue';
       @endphp
-      <a href="{{ route('customer.order.detail', $order->id) }}" class="hist-item" aria-label="Detail pesanan {{ $order->order_code }}">
+      <a href="{{ route('customer.order.detail', ['order' => $order->id, 'from' => 'dashboard']) }}" class="hist-item" aria-label="Detail pesanan {{ $order->order_code }}">
         <div class="hist-ico {{ $bgCls }}" aria-hidden="true">{{ $ico }}</div>
         <div class="hist-texts">
           <div class="hist-name">{{ $order->service->name ?? 'Cuci Kiloan' }}</div>

@@ -354,7 +354,7 @@ html, body {
   </div>
 
   <div id="card">
-    <div class="card-title">Buat Akun Baru 🧺</div>
+    <div class="card-title">Buat Akun Baru</div>
     <div class="card-sub">Daftar sebagai pelanggan SIMALUN</div>
 
     @if(session('error'))
@@ -428,16 +428,21 @@ html, body {
       <!-- ══ STEP 2: Akun & Password ══ -->
       <div class="form-step" id="step-2">
         <div class="form-group">
-          <label class="form-label" for="email">Alamat Email</label>
+          <label class="form-label" for="email">
+            Email <span style="font-weight:700;color:rgba(255,255,255,.55);text-transform:none;letter-spacing:0;">(opsional)</span>
+          </label>
           <div class="input-wrap">
-            <span class="input-icon">📧</span>
+            <span class="input-icon">@</span>
             <input class="form-input @error('email') error @enderror"
               type="email" id="email" name="email"
-              placeholder="email@contoh.com"
+              placeholder="Boleh dikosongkan"
               value="{{ old('email') }}" autocomplete="email" inputmode="email">
           </div>
           @error('email')<div class="form-error show">{{ $message }}</div>@enderror
           <div class="form-error" id="err-email"></div>
+          <div style="font-size:.66rem;font-weight:700;color:rgba(255,255,255,.55);margin-top:.35rem;line-height:1.4;">
+            Notifikasi pesanan kami kirim lewat WhatsApp ke nomor HP kamu. Email hanya cadangan.
+          </div>
         </div>
 
         <div class="form-group">
@@ -518,7 +523,7 @@ html, body {
           <button type="button" class="btn-back-step" onclick="goStep(2)">&#8592;</button>
           <button type="submit" class="btn-submit" id="btn-submit">
             <span class="btn-spinner"></span>
-            <span class="btn-text">Daftar Sekarang 🎉</span>
+            <span class="btn-text">Daftar Sekarang</span>
           </button>
         </div>
       </div>
@@ -653,7 +658,8 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('password').classList.remove('error');
       document.getElementById('password_confirmation').classList.remove('error');
 
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      // Email opsional — hanya validasi format jika diisi
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showErr('err-email','Format email tidak valid'); document.getElementById('email').classList.add('error'); ok=false;
       }
       if (!pw || pw.length < 8) {

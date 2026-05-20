@@ -382,10 +382,22 @@ body {
 <body>
 
 {{-- HERO HEADER --}}
+@php
+    // Smart back: ikuti referrer kontekstual lewat query ?from=...
+    $from = request('from');
+    $backMap = [
+        'notifications' => ['url' => route('customer.notifications'), 'label' => 'Notifikasi'],
+        'dashboard'     => ['url' => route('customer.dashboard'),     'label' => 'Beranda'],
+        'tracking'      => ['url' => route('customer.tracking'),      'label' => 'Lacak Pesanan'],
+        'success'       => ['url' => route('customer.dashboard'),     'label' => 'Beranda'],
+        'orders'        => ['url' => route('customer.orders'),        'label' => 'Pesanan'],
+    ];
+    $back = $backMap[$from] ?? $backMap['orders'];
+@endphp
 <div class="hero" id="js-hero">
     <div class="hero-inner">
         <div class="hero-nav">
-            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('customer.orders') }}" class="btn-back">
+            <a href="{{ $back['url'] }}" class="btn-back" aria-label="Kembali ke {{ $back['label'] }}" title="Kembali ke {{ $back['label'] }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 5l-7 7 7 7"/>
                 </svg>
@@ -674,12 +686,31 @@ body {
     </div>
     @endif
 
+    {{-- Cancel button — hanya muncul selama status masih menunggu/dijemput --}}
+    @if(in_array($order->status, ['menunggu', 'dijemput']))
+    <div style="margin-bottom: 14px;">
+        <form method="POST" action="{{ route('customer.order.cancel', $order) }}" id="form-cancel-order">
+            @csrf
+            <button type="button" onclick="confirmCancel()" style="width:100%;padding:13px;background:#fff;border:1.5px solid #fecaca;border-radius:var(--radius-sm);color:#dc2626;font-family:'Nunito',sans-serif;font-weight:900;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                Batalkan Pesanan
+            </button>
+        </form>
+    </div>
+    @endif
+
 </div>
 
 {{-- BOTTOM NAVBAR --}}
 @include('layouts.component.customer._navbar_customer', ['active' => 'pesanan'])
 
 <script>
+    function confirmCancel() {
+        if (confirm('Yakin ingin membatalkan pesanan ini? Tindakan ini tidak bisa dibatalkan.')) {
+            document.getElementById('form-cancel-order').submit();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof gsap === 'undefined') return;
 

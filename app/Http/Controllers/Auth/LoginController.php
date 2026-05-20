@@ -9,45 +9,51 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /**
-     * Handle authentication dan role-based redirect
+     * Handle authentication dan role-based redirect.
+     *
+     * Login mendukung 3 format identifier:
+     *  - Email  → dicari di kolom `email`
+     *  - HP raw → 081234567890, +6281234567890, 6281234567890
+     *            → dinormalisasi ke format DB: 81234567890
      */
     public function authenticate(Request $request)
     {
-        // Validasi input
         $credentials = $request->validate([
             'identifier' => ['nullable', 'string'],
             'email'      => ['nullable', 'string'],
             'password'   => ['required', 'string'],
         ], [
-            'password.required'   => 'Password wajib diisi',
+            'password.required' => 'Password wajib diisi',
         ]);
 
-        $identifier = $credentials['identifier'] ?? $credentials['email'] ?? null;
+        $identifier = trim($credentials['identifier'] ?? $credentials['email'] ?? '');
         $password   = $credentials['password'];
 
         if (!$identifier) {
             return back()->withErrors([
                 'identifier' => 'Email atau No. HP wajib diisi',
-            ]);
+            ])->onlyInput('identifier');
         }
 
-        // Cek apakah identifier adalah email atau phone
-        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        
-        // Attempt authentication
-        if (Auth::attempt([$field => $identifier, 'password' => $password], $request->boolean('remember'))) {
+        // Tentukan apakah email atau phone
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $field = 'email';
+            $value = strtolower($identifier);
+        } else {
+            $field = 'phone';
+            // Normalisasi ke format kanonik yang disimpan di DB: 8xxxxxxxxxx
+            $value = preg_replace('/[\s\-\.]/', '', $identifier);
+            $value = preg_replace('/^(\+?62|0)/', '', $value);
+        }
+
+        if (Auth::attempt([$field => $value, 'password' => $password], $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
-            // Ambil role dari database
-            $user = Auth::user();
-            
-            // Redirect sesuai role yang tersimpan di database
-            return $this->redirectByRole($user->role);
+
+            return $this->redirectByRole(Auth::user()->role);
         }
 
-        // Jika gagal, kembali ke form dengan error (web-friendly)
         return back()->withErrors([
-            'identifier' => 'Email/No. HP atau password yang Anda masukkan salah.',
+            'identifier' => 'Email/No. HP atau password yang kamu masukkan salah.',
         ])->onlyInput('identifier');
     }
 

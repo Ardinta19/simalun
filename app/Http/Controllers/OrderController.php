@@ -177,11 +177,43 @@ class OrderController extends Controller
                 'created_by'  => Auth::id(),
             ]);
 
+            // Auto-assign ke satu-satunya driver aktif (skip confirm admin)
+            $driver = User::where('role', 'driver')->where('is_active', true)->first();
+            if ($driver) {
+                // Pakai withoutEvents supaya observer tidak duplikat notifikasi
+                Order::withoutEvents(function () use ($order, $driver) {
+                    $order->update([
+                        'driver_id' => $driver->id,
+                        'status'    => 'dijemput',
+                    ]);
+                });
+
+                OrderStatusHistory::create([
+                    'order_id'    => $order->id,
+                    'status_code' => 'dijemput',
+                    'status_note' => "Kurir {$driver->name} otomatis ditugaskan untuk penjemputan.",
+                    'updated_by'  => $order->customer_id,
+                ]);
+
+                $order->customer->notify(new OrderStatusUpdated(
+                    $order,
+                    'Kurir Sedang Menuju',
+                    "Kurir {$driver->name} sedang menuju lokasi kamu untuk jemput cucian."
+                ));
+
+                $driver->notify(new OrderStatusUpdated(
+                    $order,
+                    'Tugas Baru',
+                    "Pesanan #{$order->order_code} dari {$order->customer->name} siap dijemput."
+                ));
+            }
+
+            // Notifikasi admin tetap jalan (untuk awareness)
             User::where('role', 'admin')->each(function ($admin) use ($order) {
                 $admin->notify(new OrderStatusUpdated(
                     $order,
                     'Pesanan Baru Masuk',
-                    "Pesanan #{$order->order_code} dari {$order->customer->name} menunggu penugasan kurir."
+                    "Pesanan #{$order->order_code} dari {$order->customer->name} — kurir sudah ditugaskan otomatis."
                 ));
             });
 
@@ -196,16 +228,36 @@ class OrderController extends Controller
         return redirect()->route('order.show', $newOrder->order_code);
     }
 
+    /**
+     * Halaman pasca-checkout (success). Untuk akses berikutnya
+     * (refresh, share link, admin click "Detail"), kita arahkan
+     * ke halaman detail sesuai role agar tidak terjebak di state
+     * "success" yang sudah tidak relevan.
+     */
     public function show(string $orderCode)
     {
         $order = Order::with(['service', 'items.service'])
             ->where('order_code', $orderCode)
             ->firstOrFail();
 
+        $user = Auth::user();
+
+        // Customer hanya boleh lihat ordernya sendiri.
         abort_if(
-            Auth::user()->role === 'customer' && $order->customer_id !== Auth::id(),
+            $user && $user->role === 'customer' && $order->customer_id !== $user->id,
             403
         );
+
+        // Tampilkan layar success hanya saat order baru dibuat (menunggu/dijemput).
+        // Kalau sudah masuk proses lebih lanjut, arahkan ke detail.
+        $showSuccess = in_array($order->status, ['menunggu', 'dijemput']);
+        if (!$showSuccess) {
+            return match ($user->role ?? 'customer') {
+                'admin'  => redirect()->route('admin.orders.receipt', $order),
+                'driver' => redirect()->route('driver.orders.show', ['order' => $order->id, 'from' => 'orders']),
+                default  => redirect()->route('customer.order.detail', ['order' => $order->id, 'from' => 'success']),
+            };
+        }
 
         return view('order.success', compact('order'));
     }
@@ -255,6 +307,53 @@ class OrderController extends Controller
             ->get();
 
         return view('roles.customer.orders.order', compact('order', 'histori'));
+    }
+
+    /**
+     * Customer batal pesanan — hanya bisa selama status masih 'menunggu' atau 'dijemput'.
+     * Setelah masuk workshop (dicuci dst), tidak bisa dibatalkan.
+     */
+    public function customerCancel(Request $request, Order $order)
+    {
+        abort_if($order->customer_id !== Auth::id(), 403);
+
+        $allowedCancel = ['menunggu', 'dijemput'];
+
+        if (!in_array($order->status, $allowedCancel, true)) {
+            return back()->with('error', 'Pesanan tidak bisa dibatalkan karena sudah dalam proses pencucian.');
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->update(['status' => 'dibatalkan']);
+
+            OrderStatusHistory::create([
+                'order_id'    => $order->id,
+                'status_code' => 'dibatalkan',
+                'status_note' => 'Dibatalkan oleh customer.',
+                'updated_by'  => Auth::id(),
+            ]);
+
+            // Notifikasi ke admin
+            User::where('role', 'admin')->each(function ($admin) use ($order) {
+                $admin->notify(new OrderStatusUpdated(
+                    $order,
+                    'Pesanan Dibatalkan',
+                    "Pesanan #{$order->order_code} dibatalkan oleh customer."
+                ));
+            });
+
+            // Notifikasi ke driver (jika sudah ditugaskan)
+            if ($order->driver) {
+                $order->driver->notify(new OrderStatusUpdated(
+                    $order,
+                    'Pesanan Dibatalkan',
+                    "Pesanan #{$order->order_code} dibatalkan oleh customer. Tidak perlu dijemput."
+                ));
+            }
+        });
+
+        return redirect()->route('customer.orders')
+            ->with('success', 'Pesanan berhasil dibatalkan.');
     }
 
     public function tracking()

@@ -37,7 +37,7 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
   @if($notifications->count() > 0)
   <div class="notif-list">
     @foreach($notifications as $notif)
-    <a href="{{ isset($notif->data['order_id']) ? route('customer.notifications.open', $notif->id) : '#' }}" class="notif-item {{ is_null($notif->read_at) ? 'unread' : '' }}" style="text-decoration:none">
+    <a href="{{ route('customer.notifications.open', ['id' => $notif->id, 'from' => 'notifications']) }}" class="notif-item {{ is_null($notif->read_at) ? 'unread' : '' }}" style="text-decoration:none">
       <div class="notif-icon">
         @php
           $status = $notif->data['status'] ?? '';

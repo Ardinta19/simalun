@@ -37,11 +37,21 @@ class NotificationController extends Controller
         $notif->markAsRead();
 
         $orderId = $notif->data['order_id'] ?? null;
-        if ($orderId) {
-            return redirect()->route('customer.order.detail', $orderId);
+        $role    = Auth::user()->role;
+
+        if (!$orderId) {
+            return match ($role) {
+                'admin'  => redirect()->route('admin.notifications'),
+                'driver' => redirect()->route('driver.notifications'),
+                default  => redirect()->route('customer.notifications'),
+            };
         }
 
-        return redirect()->route('customer.notifications');
+        return match ($role) {
+            'admin'  => redirect()->route('admin.orders'),
+            'driver' => redirect()->route('driver.orders.show', ['order' => $orderId, 'from' => 'notifications']),
+            default  => redirect()->route('customer.order.detail', ['order' => $orderId, 'from' => 'notifications']),
+        };
     }
 
     public function adminIndex()

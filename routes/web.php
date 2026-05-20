@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Email verification (opsional — hanya untuk user yang mengisi email)
     Route::get('/verify-email', fn() => view('auth.verify-email'))->name('verification.notice');
     Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
@@ -64,10 +65,10 @@ Route::middleware('auth')->group(function () {
         ->name('profile.primary-address');
 
     Route::get('/order/create', [OrderController::class, 'create'])
-        ->middleware(['role:customer', 'verified'])
+        ->middleware(['role:customer'])
         ->name('order.create');
     Route::post('/order/store', [OrderController::class, 'store'])
-        ->middleware(['role:customer', 'verified', 'throttle:6,1'])
+        ->middleware(['role:customer', 'throttle:6,1'])
         ->name('order.store');
     Route::get('/order/{orderCode}', [OrderController::class, 'show'])
         ->name('order.show');
@@ -82,6 +83,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/orders', [OrderController::class, 'customerIndex'])->name('orders');
         Route::get('/orders/{order}', [OrderController::class, 'customerDetail'])->name('order.detail');
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'customerCancel'])->name('order.cancel');
         Route::get('/tracking', [OrderController::class, 'tracking'])->name('tracking');
 
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');
