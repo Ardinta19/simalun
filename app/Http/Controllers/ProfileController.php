@@ -47,7 +47,7 @@ class ProfileController extends Controller
             'phone'  => [
                 'required',
                 'string',
-                'regex:/^(?:\+?62|0)8[0-9]{8,12}$/',
+                'regex:/^(?:\+?62|0)?8[0-9]{8,12}$/',
                 Rule::unique('users')->ignore($user->id),
             ],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
