@@ -84,6 +84,14 @@ class DashboardController extends Controller
             ->whereDate('entry_date', today())
             ->sum('amount');
 
+        $pemasukanBulan = FinanceEntry::where('entry_type', 'income')
+            ->where('period_key', now()->format('Y-m'))
+            ->sum('amount');
+
+        $pesananSelesaiHariIni = Order::where('status', 'selesai')
+            ->whereDate('updated_at', today())
+            ->count();
+
         $adminUnread = Auth::user()->unreadNotifications->count();
 
         return view('roles.admin.dashboard', compact(
@@ -93,6 +101,8 @@ class DashboardController extends Controller
             'orderPrioritas',
             'daftarDriver',
             'pemasukanHari',
+            'pemasukanBulan',
+            'pesananSelesaiHariIni',
             'adminUnread'
         ));
     }
