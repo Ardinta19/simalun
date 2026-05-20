@@ -157,6 +157,10 @@ class FinanceController extends Controller
      */
     public function export(Request $request)
     {
+        if (!class_exists(\OpenSpout\Writer\XLSX\Writer::class)) {
+            return back()->with('error', 'Fitur export Excel belum tersedia. Jalankan: composer install');
+        }
+
         $filters = [
             'range'      => $request->get('range', 'bulanan'),
             'start_date' => $request->get('start_date'),

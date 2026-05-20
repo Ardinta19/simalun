@@ -41,6 +41,16 @@ body {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 20px; padding-top: max(env(safe-area-inset-top, 0px), 8px);
 }
+.page-header__left { display: flex; align-items: center; gap: 10px; }
+.page-header__back {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--blue-lt); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue-dark); text-decoration: none; flex-shrink: 0;
+    transition: background .15s;
+}
+.page-header__back:active { background: #cce7f7; }
+.page-header__back svg { width: 16px; height: 16px; }
 .page-title { font-size: 1.2rem; font-weight: 800; color: var(--blue-dark); }
 .header-actions { display: flex; gap: 8px; }
 .header-btn {
@@ -185,6 +195,7 @@ body {
     z-index: 9999; box-shadow: 0 4px 20px rgba(5,150,105,0.3);
     animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
 }
+.toast--error { background: var(--red); box-shadow: 0 4px 20px rgba(220,38,38,0.3); }
 @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(-20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
 @keyframes toastOut { to { opacity:0; transform:translateX(-50%) translateY(-20px); } }
 </style>
@@ -194,12 +205,20 @@ body {
 @if(session('success'))
 <div class="toast">{{ session('success') }}</div>
 @endif
+@if(session('error'))
+<div class="toast toast--error">{{ session('error') }}</div>
+@endif
 
 <main class="wrap">
 
     {{-- Page Header --}}
     <header class="page-header">
-        <h1 class="page-title">Laporan Keuangan</h1>
+        <div class="page-header__left">
+            <a href="{{ route('admin.dashboard') }}" class="page-header__back" aria-label="Kembali">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            </a>
+            <h1 class="page-title">Laporan Keuangan</h1>
+        </div>
         <div class="header-actions">
             <a href="{{ route('admin.finance.export', request()->query()) }}" class="header-btn header-btn--green">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

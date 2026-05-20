@@ -53,6 +53,19 @@ body {
     align-items: center;
     gap: 10px;
 }
+.profile-header__back {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(13,111,184,.08);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background .15s;
+}
+.profile-header__back:active { background: rgba(13,111,184,.15); }
+.profile-header__back svg { width: 16px; height: 16px; }
 .profile-header__avatar {
     width: 34px; height: 34px;
     border-radius: 50%;
@@ -303,6 +316,9 @@ body {
 
 <header class="profile-header">
     <div class="profile-header__left">
+        <a href="{{ route('admin.dashboard') }}" class="profile-header__back" aria-label="Kembali">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </a>
         <img src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=0d6fb8&color=fff&size=72' }}"
              alt="{{ $user->name }}" class="profile-header__avatar">
         <span class="profile-header__title">Profil Admin</span>
@@ -405,11 +421,11 @@ body {
     </div>
 
     {{-- Logout --}}
-    <form method="POST" action="{{ route('logout') }}">
+    <form method="POST" action="{{ route('logout') }}" id="form-logout">
         @csrf
-        <button type="submit" class="btn-logout">
+        <button type="button" class="btn-logout" id="btn-logout">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Logout
+            Keluar dari Akun
         </button>
     </form>
     <div class="version-text">{{ config('laundry.name', 'Azka Laundry') }} v{{ config('laundry.version', '2.4.0') }} &middot; Admin Panel</div>
@@ -417,6 +433,27 @@ body {
 </div>
 
 @include('layouts.component.admin._navbar_admin', ['active' => 'profil'])
+@include('layouts.component._confirm_modal')
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', function() {
+            showConfirmModal({
+                title: 'Keluar dari Akun?',
+                message: 'Kamu akan keluar dari sesi ini. Yakin ingin melanjutkan?',
+                confirmText: 'Ya, Keluar',
+                cancelText: 'Batal',
+                type: 'danger',
+                onConfirm: function() {
+                    document.getElementById('form-logout').submit();
+                }
+            });
+        });
+    }
+});
+</script>
 
 </body>
 </html>
