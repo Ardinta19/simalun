@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Buat Pesanan – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -30,7 +29,7 @@
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html { scroll-behavior:smooth; }
-body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; }
+body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--surface); color:var(--ink); min-height:100vh; }
 
 /* ── TOP HEADER ── */
 .top-header {
@@ -57,7 +56,7 @@ body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--i
 .btn-back svg { width:18px; height:18px; color:#fff; }
 .header-title { flex:1; }
 .header-title h1 {
-  font-family:'Fredoka One',cursive;
+  font-weight:800;
   font-size:clamp(1.1rem,4.5vw,1.4rem);
   color:#fff; line-height:1;
   text-shadow:0 2px 8px rgba(0,0,0,.2);
@@ -105,12 +104,12 @@ body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--i
 .section-num {
   width:28px; height:28px; border-radius:50%;
   background:var(--blue-mid); color:#fff;
-  font-family:'Fredoka One',cursive; font-size:.9rem;
+  font-weight:800; font-size:.9rem;
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
 .section-head h2 {
-  font-family:'Fredoka One',cursive;
+  font-weight:800;
   font-size:1rem; color:var(--blue-dark); letter-spacing:.2px;
 }
 .section-body { padding:14px 16px; display:flex; flex-direction:column; gap:12px; }
@@ -123,7 +122,7 @@ body { font-family:'Nunito',sans-serif; background:var(--surface); color:var(--i
 .field-input {
   width:100%; padding:12px 14px;
   border:1.5px solid var(--border); border-radius:var(--radius-sm);
-  font-family:'Nunito',sans-serif; font-size:.95rem; font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:.95rem; font-weight:600;
   color:var(--ink); background:#fff;
   transition:border-color .2s, box-shadow .2s;
   outline:none; appearance:none;
@@ -181,7 +180,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
   transition:all .2s; background:#fff; position:relative;
 }
 .zone-pill input[type=radio] { position:absolute; opacity:0; }
-.zone-pill .zone-name { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--ink); display:block; }
+.zone-pill .zone-name { font-weight:800; font-size:1rem; color:var(--ink); display:block; }
 .zone-pill .zone-price { font-size:.72rem; font-weight:800; color:var(--ink-lt); display:block; margin-top:2px; }
 .zone-pill:has(input:checked) {
   border-color:var(--blue-mid);
@@ -206,9 +205,9 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
   flex-shrink:0; font-size:1.2rem;
 }
 .service-info { flex:1; min-width:0; }
-.service-name { font-family:'Fredoka One',cursive; font-size:.95rem; color:var(--ink); line-height:1; }
+.service-name { font-weight:800; font-size:.95rem; color:var(--ink); line-height:1; }
 .service-eta  { font-size:.72rem; font-weight:700; color:var(--ink-lt); margin-top:2px; }
-.service-price { font-family:'Fredoka One',cursive; font-size:1.05rem; color:var(--blue-mid); flex-shrink:0; }
+.service-price { font-weight:800; font-size:1.05rem; color:var(--blue-mid); flex-shrink:0; }
 
 .service-card:has(input:checked) {
   border-color:var(--orange);
@@ -261,7 +260,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
   text-align:center;
   border-left:1.5px solid var(--border);
   border-right:1.5px solid var(--border);
-  font-family:'Fredoka One',cursive;
+  font-weight:800;
   font-size:1.1rem;
   color:var(--ink);
 }
@@ -300,11 +299,11 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 .ws-btn:active { background:var(--blue-mid); color:#fff; }
 .ws-display {
   flex:1; text-align:center;
-  font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--ink);
+  font-weight:800; font-size:1.4rem; color:var(--ink);
   padding:0 8px;
   border-left:1.5px solid var(--border); border-right:1.5px solid var(--border);
 }
-.ws-unit { font-family:'Nunito',sans-serif; font-size:.8rem; color:var(--ink-lt); font-weight:700; }
+.ws-unit { font-family:'Plus Jakarta Sans',sans-serif; font-size:.8rem; color:var(--ink-lt); font-weight:700; }
 
 /* ── DATE CHIPS ── */
 .date-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
@@ -317,7 +316,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 }
 .date-chip input[type=radio] { position:absolute; opacity:0; }
 .date-chip .dc-day { font-size:.65rem; font-weight:800; color:var(--ink-lt); text-transform:uppercase; letter-spacing:.5px; }
-.date-chip .dc-num { font-family:'Fredoka One',cursive; font-size:1.3rem; color:var(--ink); line-height:1; }
+.date-chip .dc-num { font-weight:800; font-size:1.3rem; color:var(--ink); line-height:1; }
 .date-chip:has(input:checked) {
   border-color:var(--blue-mid); background:var(--blue-mid);
 }
@@ -350,8 +349,8 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 .sum-value { font-size:.82rem; font-weight:800; color:var(--ink); }
 .sum-discount { color:#e53e3e; }
 .sum-divider { border:none; border-top:1.5px dashed rgba(0,119,182,.2); margin:8px 0; }
-.sum-total-label { font-family:'Fredoka One',cursive; font-size:.95rem; color:var(--blue-dark); }
-.sum-total-value { font-family:'Fredoka One',cursive; font-size:1.2rem; color:var(--blue-mid); }
+.sum-total-label { font-weight:800; font-size:.95rem; color:var(--blue-dark); }
+.sum-total-value { font-weight:800; font-size:1.2rem; color:var(--blue-mid); }
 
 /* ── FIXED BOTTOM CTA ── */
 .bottom-cta {
@@ -366,7 +365,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 .btn-order {
   width:100%; padding:15px;
   background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);
-  color:#fff; font-family:'Nunito',sans-serif; font-weight:900;
+  color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900;
   font-size:1rem; border:none; border-radius:var(--radius-sm);
   cursor:pointer; letter-spacing:.3px;
   box-shadow:0 6px 20px rgba(255,107,53,.4);

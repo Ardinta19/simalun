@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Daftar Pesanan – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 /* ── CSS VARIABLES ─────────────────────── */
@@ -39,7 +38,7 @@
 }
 html { scroll-behavior: smooth; }
 body {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     min-height: 100vh;
@@ -77,7 +76,7 @@ body {
 .btn-back svg { width: 18px; height: 18px; }
 .header-title {
     flex: 1;
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.3rem;
     color: white;
     letter-spacing: 0.2px;
@@ -121,7 +120,7 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .filter-chip.is-active {
     background: var(--blue-mid);
@@ -149,7 +148,7 @@ body {
     opacity: 0.6;
 }
 .empty-title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.1rem;
     color: var(--ink-mid);
     margin-bottom: 8px;
@@ -229,7 +228,7 @@ body {
     margin-bottom: 2px;
 }
 .order-card__service {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1rem;
     color: var(--ink);
     line-height: 1.2;
@@ -314,7 +313,7 @@ body {
     border-top: 1px solid #f1f5f9;
 }
 .order-card__price {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1.05rem;
     color: var(--blue-mid);
 }
@@ -336,7 +335,7 @@ body {
 
 /* ── SECTION TITLE ───────────────────── */
 .section-title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 0.9rem;
     color: var(--ink-mid);
     margin: 4px 0 12px;
@@ -400,7 +399,7 @@ body {
     text-transform: uppercase;
 }
 .active-banner__title {
-    font-family: 'Fredoka One', cursive;
+    font-weight: 800;
     font-size: 1rem;
     color: white;
     margin-top: 2px;

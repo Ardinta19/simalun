@@ -101,7 +101,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-family: 'Plus Jakarta Sans', 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .driver-nav__badge {
     position: absolute;

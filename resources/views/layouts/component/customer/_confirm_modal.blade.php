@@ -88,7 +88,7 @@
     border: 2px solid #bae6fd;
 }
 .confirm-title {
-    font-family: 'Fredoka One', cursive;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
     font-size: 1.1rem;
     color: #1a2332;
     margin-bottom: 8px;
@@ -109,7 +109,7 @@
     flex: 1;
     padding: 12px 16px;
     border-radius: 12px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.88rem;
     font-weight: 800;
     cursor: pointer;

@@ -7,7 +7,6 @@
 @include('layouts.component.customer._head_meta')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
@@ -41,7 +40,7 @@
 }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   background: var(--c-surface);
   color: var(--c-ink);
   min-height: 100vh;
@@ -103,7 +102,7 @@ body {
   gap: 9px;
 }
 .hd-logo-text {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: 1.1rem;
   color: #fff;
   letter-spacing: .2px;
@@ -156,7 +155,7 @@ body {
   letter-spacing: .2px;
 }
 .hd-name {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: clamp(1.65rem, 6.5vw, 2rem);
   color: #fff;
   line-height: 1;
@@ -230,7 +229,7 @@ body {
 .cta-texts { flex: 1; padding: 0 12px; }
 .cta-label {
   display: block;
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: 1.05rem;
   line-height: 1.1;
   margin-bottom: 3px;
@@ -277,7 +276,7 @@ body {
   justify-content: space-between;
 }
 .ah-order-id {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: .82rem;
   color: var(--c-ocean-mid);
   letter-spacing: .5px;
@@ -469,7 +468,7 @@ body {
   margin: 18px 0 10px;
 }
 .sec-title {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: .95rem;
   color: var(--c-ink);
   letter-spacing: .2px;
@@ -515,7 +514,7 @@ body {
   display: block;
 }
 .stat-num {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: 1.8rem;
   color: var(--c-ocean-mid);
   line-height: 1;
@@ -563,7 +562,7 @@ body {
 .promo-tag {
   background: var(--c-fire);
   color: #fff;
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: 1.7rem;
   padding: 8px 14px;
   border-radius: 14px;
@@ -572,7 +571,7 @@ body {
 }
 .promo-texts { flex: 1; }
 .promo-title {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: 1rem;
   color: #fff;
   line-height: 1.2;
@@ -694,7 +693,7 @@ body {
 }
 .hist-right { text-align: right; flex-shrink: 0; }
 .hist-price {
-  font-family: 'Fredoka One', cursive;
+  font-weight: 800;
   font-size: .95rem;
   color: var(--c-ocean-mid);
 }

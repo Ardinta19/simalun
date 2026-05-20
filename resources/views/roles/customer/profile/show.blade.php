@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Profil Saya</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     :root {
@@ -16,7 +15,7 @@
     }
     *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
-        font-family:'Nunito', sans-serif;
+        font-family:'Plus Jakarta Sans', sans-serif;
         background:var(--surface);
         color:var(--ink);
         min-height:100vh;
@@ -56,7 +55,7 @@
         flex-shrink:0;
     }
     .header-title {
-        font-family:'Fredoka One', cursive;
+        font-weight:800;
         font-size:1.2rem;
         color:#fff;
         flex:1;
@@ -85,7 +84,7 @@
         overflow:hidden;
     }
     .avatar-wrap img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
-    .profile-name { font-family:'Fredoka One', cursive; font-size:1.3rem; color:var(--ink); }
+    .profile-name { font-weight:800; font-size:1.3rem; color:var(--ink); }
     .profile-role {
         font-size:.75rem;
         font-weight:800;
@@ -127,7 +126,7 @@
         gap:8px;
     }
     .section-title {
-        font-family:'Fredoka One', cursive;
+        font-weight:800;
         font-size:.95rem;
         color:var(--blue-dark);
         display:flex;

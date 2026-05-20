@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Login – Azka Laundry SIMALUN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body {
-  width:100%; min-height:100%; font-family:'Nunito',sans-serif;
+  width:100%; min-height:100%; font-family:'Plus Jakarta Sans',sans-serif;
   background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
   overflow-x:hidden;
 }
@@ -29,17 +29,17 @@ html, body {
 @keyframes halo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.09)} }
 #drum-spin-ring { position:absolute; inset:-5px; border-radius:50%; border:2px dashed rgba(255,255,255,.28); animation:ring-spin 6s linear infinite; pointer-events:none; }
 @keyframes ring-spin { to{transform:rotate(360deg);} }
-.wm-name { font-family:'Fredoka One',cursive; font-size:clamp(1.6rem,6vw,2.2rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
+.wm-name { font-weight:800; font-size:clamp(1.6rem,6vw,2.2rem); color:#fff; letter-spacing:-.5px; text-shadow:0 3px 18px rgba(0,0,0,.28); line-height:1; }
 .wm-sub  { font-size:clamp(.52rem,2vw,.65rem); font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.2rem; }
 .wm-bar  { width:70px; height:2.5px; background:#FF6B35; border-radius:99px; margin:.35rem auto 0; opacity:.75; }
 #card { width:100%; max-width:420px; background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:24px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 16px 48px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.2); padding:1.8rem 1.6rem 1.6rem; opacity:0; transform:translateY(32px); }
-.card-title { font-family:'Fredoka One',cursive; font-size:clamp(1.3rem,5vw,1.6rem); color:#fff; text-align:center; margin-bottom:.25rem; text-shadow:0 2px 12px rgba(0,0,0,.2); }
+.card-title { font-weight:800; font-size:clamp(1.3rem,5vw,1.6rem); color:#fff; text-align:center; margin-bottom:.25rem; text-shadow:0 2px 12px rgba(0,0,0,.2); }
 .card-sub { font-size:.8rem; font-weight:700; color:rgba(255,255,255,.7); text-align:center; margin-bottom:1.3rem; letter-spacing:.2px; }
 .form-group { margin-bottom:1rem; position:relative; }
 .form-label { display:block; font-size:.75rem; font-weight:800; color:rgba(255,255,255,.85); letter-spacing:.3px; margin-bottom:.45rem; text-transform:uppercase; }
 .input-wrap { position:relative; }
 .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; opacity:.7; }
-.form-input { width:100%; padding:.82rem .9rem .82rem 2.7rem; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:12px; color:#fff; font-family:'Nunito',sans-serif; font-size:.93rem; font-weight:600; outline:none; transition:border-color .2s, background .2s, box-shadow .2s; -webkit-appearance:none; }
+.form-input { width:100%; padding:.82rem .9rem .82rem 2.7rem; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:12px; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:.93rem; font-weight:600; outline:none; transition:border-color .2s, background .2s, box-shadow .2s; -webkit-appearance:none; }
 .form-input::placeholder { color:rgba(255,255,255,.45); }
 .form-input:focus { border-color:rgba(255,255,255,.6); background:rgba(255,255,255,.18); box-shadow:0 0 0 3px rgba(255,255,255,.1); }
 .pw-toggle { position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1rem; color:rgba(255,255,255,.5); padding:.25rem; transition:color .2s; line-height:1; }
@@ -54,7 +54,7 @@ html, body {
 .remember-label input[type=checkbox] { width:16px; height:16px; border-radius:4px; cursor:pointer; accent-color:#FF6B35; }
 .forgot-link { font-size:.78rem; font-weight:800; color:rgba(144,224,239,.9); text-decoration:none; letter-spacing:.2px; white-space:nowrap; transition:color .2s; }
 .forgot-link:hover { color:#fff; }
-#btn-login { width:100%; padding:.9rem; border:none; border-radius:99px; background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%); color:#fff; font-family:'Nunito',sans-serif; font-weight:900; font-size:1rem; letter-spacing:.4px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 8px 24px rgba(255,107,53,.45), inset 0 1px 0 rgba(255,255,255,.2); transition:transform .15s, box-shadow .15s; }
+#btn-login { width:100%; padding:.9rem; border:none; border-radius:99px; background:linear-gradient(135deg,#FF6B35 0%,#ff8c5a 100%); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:1rem; letter-spacing:.4px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 8px 24px rgba(255,107,53,.45), inset 0 1px 0 rgba(255,255,255,.2); transition:transform .15s, box-shadow .15s; }
 #btn-login::before { content:''; position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent); animation:shimmer 2.8s ease-in-out infinite; }
 @keyframes shimmer { 0%{left:-100%} 60%,100%{left:160%} }
 #btn-login:active { transform:scale(.97); }

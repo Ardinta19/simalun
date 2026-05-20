@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Pesanan Berhasil – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue-dark:#002f5c;--blue-mid:#0077b6;--orange:#FF6B35;--green:#00C48C;--surface:#f5f9ff;--border:#ddeeff;--radius:16px;}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Nunito',sans-serif;background:var(--surface);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;}
 
 .card{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);padding:32px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,47,92,.1);}
 
@@ -18,13 +17,13 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);min-height:100vh;
 @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .success-ring svg{width:38px;height:38px;color:#fff;}
 
-h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);margin-bottom:6px;}
+h1{font-weight:800;font-size:1.5rem;color:var(--blue-dark);margin-bottom:6px;}
 .subtitle{font-size:.88rem;font-weight:600;color:#6b7a8d;margin-bottom:24px;}
 
 /* order code badge */
 .order-code{background:var(--surface);border:1.5px dashed var(--border);border-radius:10px;padding:12px;margin-bottom:20px;}
 .oc-label{font-size:.7rem;font-weight:800;color:#8899aa;letter-spacing:.8px;text-transform:uppercase;}
-.oc-value{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--blue-mid);letter-spacing:1px;}
+.oc-value{font-weight:800;font-size:1.3rem;color:var(--blue-mid);letter-spacing:1px;}
 
 /* detail rows */
 .detail-list{text-align:left;margin-bottom:24px;}
@@ -32,7 +31,7 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
 .detail-row:last-child{border-bottom:none;}
 .dr-label{font-size:.8rem;font-weight:700;color:#8899aa;}
 .dr-value{font-size:.85rem;font-weight:800;color:var(--blue-dark);}
-.dr-value.total{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--orange);}
+.dr-value.total{font-weight:800;font-size:1rem;color:var(--orange);}
 
 /* status badge */
 .status-badge{display:inline-flex;align-items:center;gap:5px;background:#fff8f0;border:1.5px solid #ffd4b8;border-radius:99px;padding:5px 12px;margin-bottom:24px;}
@@ -40,9 +39,9 @@ h1{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--blue-dark);mar
 @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .status-label{font-size:.78rem;font-weight:800;color:var(--orange);}
 
-.btn-home{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;box-shadow:0 6px 18px rgba(255,107,53,.35);transition:transform .15s;}
+.btn-home{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--orange) 0%,#ff8c5a 100%);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;font-size:.95rem;border:none;border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;box-shadow:0 6px 18px rgba(255,107,53,.35);transition:transform .15s;}
 .btn-home:active{transform:scale(.97);}
-.btn-secondary{display:block;width:100%;padding:12px;margin-top:10px;background:none;color:var(--blue-mid);font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;transition:background .2s;}
+.btn-secondary{display:block;width:100%;padding:12px;margin-top:10px;background:none;color:var(--blue-mid);font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.9rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;transition:background .2s;}
 .btn-secondary:hover{background:var(--surface);}
 </style>
 </head>
