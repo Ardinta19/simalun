@@ -552,7 +552,41 @@ class OrderController extends Controller
 
         $order->load(['customer', 'service', 'items.service', 'driver']);
 
-        return view('order.receipt', compact('order'));
+        $format = request('format', 'a5');
+        $laundry = \App\Support\Laundry::receiptHeader();
+
+        return view('order.receipt', compact('order', 'format', 'laundry'));
+    }
+
+    public function receiptPdf(Order $order)
+    {
+        if (Auth::user()->role === 'customer') {
+            abort_if($order->customer_id !== Auth::id(), 403);
+        }
+
+        $order->load(['customer', 'service', 'items.service', 'driver']);
+
+        $format = request('format', 'a5');
+        $laundry = \App\Support\Laundry::receiptHeader();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('order.receipt-pdf', compact('order', 'format', 'laundry'));
+
+        $paperSize = match ($format) {
+            '58mm'    => [0, 0, 164, 600],
+            '80mm'    => [0, 0, 226, 600],
+            'thermal' => [0, 0, 226, 600],
+            default   => 'a5',
+        };
+
+        if (is_array($paperSize)) {
+            $pdf->setPaper($paperSize);
+        } else {
+            $pdf->setPaper($paperSize, 'portrait');
+        }
+
+        $filename = "nota-{$order->order_code}.pdf";
+
+        return $pdf->download($filename);
     }
 
     public function walkinForm()

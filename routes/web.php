@@ -75,6 +75,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])
         ->name('admin.orders.receipt');
+    Route::get('/orders/{order}/receipt/pdf', [OrderController::class, 'receiptPdf'])
+        ->name('orders.receipt.pdf');
 
     Route::middleware('role:customer')->prefix('customer')->name('customer.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'customer'])->name('dashboard');
