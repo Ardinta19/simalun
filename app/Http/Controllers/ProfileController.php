@@ -84,6 +84,19 @@ class ProfileController extends Controller
         return back()->with('status', 'profile-updated');
     }
 
+    public function deleteAvatar()
+    {
+        $user = Auth::user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->update(['avatar' => null]);
+
+        return back()->with('status', 'avatar-deleted');
+    }
+
     public function destroy(Request $request)
     {
         $request->validate([

@@ -4,217 +4,445 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Dashboard Admin – Azka Laundry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+@include('layouts.component.customer._head_meta')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
-:root{--blue:#0077b6;--blue-dark:#002f5c;--cyan:#00b4d8;--orange:#f59e0b;--green:#10b981;--bg:#f4f8fc;--card:#fff;--ink:#1a2332;--muted:#7b8b9a;--line:#ddeeff;--r:24px;--nav-h:74px}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));}
-.wrap{max-width:520px;margin:0 auto;padding:14px}
+:root {
+    --blue: #0077b6;
+    --blue-dark: #002f5c;
+    --blue-lt: #e8f4fd;
+    --teal: #0d9488;
+    --teal-lt: #ccfbf1;
+    --orange: #f59e0b;
+    --orange-lt: #fef3c7;
+    --green: #059669;
+    --green-lt: #ecfdf5;
+    --red: #dc2626;
+    --surface: #f4f8fc;
+    --card: #ffffff;
+    --ink: #1a2332;
+    --ink-mid: #4a5568;
+    --ink-lt: #8896a6;
+    --border: #e2e8f0;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 2px 12px rgba(0,47,92,0.04);
+    --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: var(--font);
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+}
+.wrap { max-width: 520px; margin: 0 auto; padding: 16px; padding-top: max(env(safe-area-inset-top, 0px), 16px); }
 
-/* Header Profil */
-.profile-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 0 4px;
+/* ── HEADER ──────────────────────── */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
-.profile-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-.profile-img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2.5px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.brand__icon {
+    width: 32px; height: 32px;
+    background: var(--blue);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 0.8rem; font-weight: 800;
 }
-.profile-text .name {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: var(--ink);
-}
-.profile-text .role {
-  font-size: .75rem;
-  font-weight: 800;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .5px;
+.brand__name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    letter-spacing: -0.3px;
 }
 .notif-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid var(--line);
-  color: var(--blue-mid);
-  font-size: 1.1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+.notif-btn svg { width: 20px; height: 20px; color: var(--ink-mid); }
+.notif-badge {
+    position: absolute; top: -3px; right: -3px;
+    background: var(--orange); color: white;
+    font-size: 0.55rem; font-weight: 800;
+    min-width: 16px; height: 16px;
+    border-radius: 99px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--surface);
+    padding: 0 3px;
 }
 
-.hero{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:12px;box-shadow: 0 4px 20px rgba(0,47,92,0.04)}
-.hello{font-family: 'Fredoka One', cursive; font-size:1.6rem; line-height:1.1}.sub{font-size:.85rem;color:#4b5563;margin-top:6px;font-weight:700}
+/* ── GREETING HERO ───────────────── */
+.hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+}
+.hero__greeting {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+}
+.hero__sub {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-mid);
+    margin-top: 4px;
+}
 
-.kpi{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
-.k{border-radius:26px;padding:18px;min-height:130px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
-.k.blue{background:#58a8e8;color:#fff}.k.orange{background:#f6b443;color:#fff}
-.k-ico { position: absolute; right: -12px; bottom: -12px; font-size: 4.5rem; opacity: 0.18; transform: rotate(-15deg); }
-.k .n{font-size:2.2rem;font-family:'Fredoka One',cursive;line-height:1}.k .l{font-size:.9rem;font-weight:900;margin-top:4px;letter-spacing: .2px}
+/* ── KPI CARDS ───────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+.kpi-card {
+    border-radius: var(--radius-sm);
+    padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 110px;
+}
+.kpi-card--teal { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); color: white; }
+.kpi-card--orange { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; }
+.kpi-card__icon {
+    position: absolute;
+    right: -8px; bottom: -8px;
+    font-size: 3.5rem;
+    opacity: 0.15;
+}
+.kpi-card__value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+.kpi-card__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: auto;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+}
 
-.sec{margin-top:20px}
-.sec-h{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px}
-.sec-t{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--ink)}.sec-a{font-size:.82rem;font-weight:900;color:var(--blue);text-decoration:none}
+/* ── SECTION ─────────────────────── */
+.section { margin-top: 20px; }
+.section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 2px;
+}
+.section__title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+.section__link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--blue);
+    text-decoration: none;
+}
 
-.orders{display:flex;gap:14px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}.orders::-webkit-scrollbar{display:none}
-.o{min-width:280px;background:#fff;border:1.5px solid var(--line);border-radius:26px;padding:18px;box-shadow: 0 6px 16px rgba(0,47,92,0.05)}
-.o-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.o-avatar { width: 50px; height: 50px; border-radius: 50%; background: #f0f7ff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1.5px solid var(--line); }
-.o-name{font-family: 'Fredoka One', cursive; font-size:1.1rem; color: var(--ink)}
-.o-badge{font-size:.68rem;font-weight:900;background:#dbeafe;color:#0369a1;border-radius:99px;padding:.2rem .6rem;text-transform:uppercase}
-.o-meta{color:#4b5563;font-size:.82rem;font-weight:700;line-height:1.7}
-.o-meta div { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
-.o-btn{display:flex;align-items:center;justify-content:center;margin-top:16px;background:#0d6fb8;color:#fff;text-decoration:none;border-radius:99px;padding:.85rem;font-weight:900;font-size:.85rem;gap:8px;box-shadow: 0 4px 12px rgba(13,111,184,0.3)}
+/* ── ORDER CARDS (horizontal scroll) ── */
+.order-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+.order-scroll::-webkit-scrollbar { display: none; }
 
-.quick{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.q{display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid var(--line);border-radius:26px;padding:18px;text-decoration:none;color:inherit;box-shadow: 0 4px 16px rgba(0,47,92,0.04)}
-.q-ico{width:44px;height:44px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.q.ic-g .q-ico { background:#10b981; color:#fff }
-.q.ic-y .q-ico { background:#854d0e; color:#fff }
-.q-t{font-family: 'Fredoka One', cursive; font-size:.9rem;line-height:1.2;color:var(--ink)}
+.order-card {
+    min-width: 270px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+}
+.order-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.order-card__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.order-card__avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--blue-lt);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    border: 1px solid var(--border);
+}
+.order-card__name {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--ink);
+}
+.order-card__code {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--blue);
+    margin-top: 1px;
+}
+.order-card__badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    background: var(--blue-lt);
+    color: var(--blue);
+    border-radius: 99px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+}
+.order-card__meta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-mid);
+    line-height: 1.8;
+}
+.order-card__meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.order-card__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 11px;
+    background: var(--blue);
+    color: white;
+    border-radius: 99px;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,119,182,0.2);
+}
+.order-card__btn svg { width: 16px; height: 16px; }
 
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);background:rgba(255,255,255,.98);backdrop-filter:blur(16px);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:100}
-.nav-in{max-width:520px;margin:0 auto;height:100%;display:flex;align-items:center}
-.nav-item{flex:1;text-decoration:none;color:#94a3b8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:.68rem;text-transform:uppercase;letter-spacing:.6px}.nav-item.active{color:#0d6fb8}
-.nav-item svg { width: 24px; height: 24px; margin-bottom: 2px; }
+.order-empty {
+    width: 100%;
+    text-align: center;
+    padding: 30px 20px;
+    background: var(--card);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    color: var(--ink-lt);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
 
-.logout{margin:24px 0 12px;display:flex;justify-content:center}
-.logout button{width:100%;height:50px;border-radius:99px;border:1.5px solid #fecaca;background:#fff1f1;color:#b91c1c;font-family:'Nunito',sans-serif;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:.9rem}
-.version{text-align:center;margin-bottom:12px;color:#94a3b8;font-size:.75rem;font-weight:700;letter-spacing:.4px}
+/* ── QUICK ACTIONS ───────────────── */
+.quick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.quick-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s, box-shadow 0.12s;
+}
+.quick-item:active { transform: scale(0.97); }
+.quick-item__icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.quick-item__label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+}
+
+/* ── LOGOUT ──────────────────────── */
+.logout-section { margin-top: 24px; margin-bottom: 12px; }
+.logout-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.version-tag {
+    text-align: center;
+    margin: 8px 0 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--ink-lt);
+    letter-spacing: 0.3px;
+}
 </style>
 </head>
 <body>
 <main class="wrap">
-  <!-- Header Profil sesuai Mockup -->
-  <header class="profile-header js-in">
-    <div class="profile-info">
-      <img src="https://ui-avatars.com/api/?name=Admin&background=0077b6&color=fff" class="profile-img" alt="Admin">
-      <div class="profile-text">
-        <div class="name">Profil Admin</div>
-        <div class="role">Administrator Utama</div>
-      </div>
-    </div>
-    <a href="{{ route('admin.notifications') }}" class="notif-btn" style="text-decoration:none; position:relative">
-      🔔
-      @php $adminUnread = auth()->user()->unreadNotifications->count(); @endphp
-      @if($adminUnread > 0)
-        <span style="position:absolute; top:-2px; right:-2px; background:var(--orange); color:#fff; font-size:0.6rem; font-weight:900; min-width:18px; height:18px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:2.5px solid #fff">{{ $adminUnread }}</span>
-      @endif
-    </a>
-  </header>
 
-  <section class="hero js-in">
-    <div class="hello">Halo, Admin! 👋</div>
-    <div class="sub">Berikut ringkasan operasional hari ini.</div>
-
-    <div class="kpi">
-      <div class="k blue">
-        <div class="k-ico">🧺</div>
-        <div class="n">{{ $jumlahDiproses ?? 0 }}</div>
-        <div class="l">Pesanan Masuk</div>
-      </div>
-      <div class="k orange">
-        <div class="k-ico">🚚</div>
-        <div class="n">{{ $jumlahPrioritas ?? 0 }}</div>
-        <div class="l">Belum Dijemput</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec js-in">
-    <div class="sec-h">
-      <div class="sec-t">Daftar Pesanan</div>
-      <a href="{{ route('admin.orders') }}" class="sec-a">Lihat Semua</a>
-    </div>
-    <div class="orders">
-      @forelse(($orderPrioritas ?? collect()) as $order)
-      <article class="o">
-        <div class="o-top">
-          <div style="display:flex; align-items:center; gap:12px">
-            <div class="o-avatar">👤</div>
-            <div>
-              <div class="o-name">{{ Str::limit($order->customer->name ?? 'Customer', 12) }}</div>
-              <div style="font-size:.7rem; font-weight:900; color:var(--blue)">#{{ strtoupper($order->order_code) }}</div>
-            </div>
-          </div>
-          <span class="o-badge">Baru</span>
+    {{-- Top Bar --}}
+    <header class="top-bar js-in">
+        <div class="brand">
+            <div class="brand__icon">A</div>
+            <span class="brand__name">AZKA LAUNDRY</span>
         </div>
-        <div class="o-meta">
-          <div>📍 {{ Str::limit($order->address ?? '-', 28) }}</div>
-          <div>⏰ Dijemput jam {{ $order->pickup_time ?? '-' }}</div>
-        </div>
-        <a href="{{ route('admin.orders') }}" class="o-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
-          Tugaskan Kurir
+        <a href="{{ route('admin.notifications') }}" class="notif-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            @if(($adminUnread ?? 0) > 0)
+                <span class="notif-badge">{{ $adminUnread }}</span>
+            @endif
         </a>
-      </article>
-      @empty
-      <div style="text-align:center; padding:30px; width:100%; color:var(--muted); font-weight:800; background:#fff; border-radius:26px; border:1.5px dashed var(--line)">Belum ada pesanan masuk.</div>
-      @endforelse
-    </div>
-  </section>
+    </header>
 
-  <section class="sec js-in">
-    <div class="sec-h"><div class="sec-t">Aksi Cepat</div></div>
-    <div class="quick">
-      <a href="{{ route('admin.walkin.form') }}" class="q ic-g">
-        <div class="q-ico">👤</div>
-        <span class="q-t">Tambah<br>Pelanggan</span>
-      </a>
-      <a href="{{ route('admin.finance.index') }}" class="q ic-y">
-        <div class="q-ico">🧾</div>
-        <span class="q-t">Laporan<br>Keuangan</span>
-      </a>
-      <a href="{{ route('admin.reports') }}" class="q" style="border-color:#fecaca;">
-        <div class="q-ico" style="background:#ef4444;color:#fff;">🐛</div>
-        <span class="q-t">Laporan<br>Kendala</span>
-      </a>
-      <a href="{{ route('admin.orders') }}?status=selesai" class="q" style="border-color:#a7f3d0;">
-        <div class="q-ico" style="background:#059669;color:#fff;">✅</div>
-        <span class="q-t">Pesanan<br>Selesai</span>
-      </a>
-    </div>
-  </section>
+    {{-- Hero Greeting --}}
+    <section class="hero js-in">
+        <div class="hero__greeting">Halo, Admin! 👋</div>
+        <div class="hero__sub">Berikut ringkasan operasional hari ini.</div>
 
-  <div class="logout js-in">
-    <form action="{{ route('logout') }}" method="POST" style="width:100%;">
-      @csrf
-      <button type="submit">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Logout
-      </button>
-    </form>
-  </div>
-  <div class="version js-in">Azka Laundry v2.4.0 &bull; Admin Panel</div>
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-card--teal">
+                <div class="kpi-card__icon">🧺</div>
+                <div class="kpi-card__value">{{ $jumlahDiproses ?? 0 }}</div>
+                <div class="kpi-card__label">Pesanan Masuk</div>
+            </div>
+            <div class="kpi-card kpi-card--orange">
+                <div class="kpi-card__icon">🚚</div>
+                <div class="kpi-card__value">{{ $jumlahPrioritas ?? 0 }}</div>
+                <div class="kpi-card__label">Belum Dijemput</div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Daftar Pesanan --}}
+    <section class="section js-in">
+        <div class="section__header">
+            <span class="section__title">Daftar Pesanan</span>
+            <a href="{{ route('admin.orders') }}" class="section__link">Lihat Semua</a>
+        </div>
+        <div class="order-scroll">
+            @forelse(($orderPrioritas ?? collect()) as $order)
+            <article class="order-card">
+                <div class="order-card__top">
+                    <div class="order-card__user">
+                        <div class="order-card__avatar">👤</div>
+                        <div>
+                            <div class="order-card__name">{{ Str::limit($order->customer->name ?? 'Customer', 14) }}</div>
+                            <div class="order-card__code">#{{ strtoupper($order->order_code) }}</div>
+                        </div>
+                    </div>
+                    <span class="order-card__badge">Baru</span>
+                </div>
+                <div class="order-card__meta">
+                    <span>📍 {{ Str::limit($order->address ?? '-', 30) }}</span>
+                    <span>⏰ Dijemput {{ $order->pickup_time ?? '-' }}</span>
+                </div>
+                <a href="{{ route('admin.orders') }}" class="order-card__btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+                    Tugaskan Kurir
+                </a>
+            </article>
+            @empty
+            <div class="order-empty">Belum ada pesanan masuk hari ini.</div>
+            @endforelse
+        </div>
+    </section>
+
+    {{-- Aksi Cepat --}}
+    <section class="section js-in">
+        <div class="section__header">
+            <span class="section__title">Aksi Cepat</span>
+        </div>
+        <div class="quick-grid">
+            <a href="{{ route('admin.walkin.form') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:var(--green-lt); color:var(--green);">👤</div>
+                <span class="quick-item__label">Tambah Pelanggan</span>
+            </a>
+            <a href="{{ route('admin.finance.index') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:var(--orange-lt); color:#92400e;">🧾</div>
+                <span class="quick-item__label">Laporan Keuangan</span>
+            </a>
+            <a href="{{ route('admin.reports') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:#fef2f2; color:var(--red);">🐛</div>
+                <span class="quick-item__label">Laporan Kendala</span>
+            </a>
+            <a href="{{ route('admin.orders') }}?status=selesai" class="quick-item">
+                <div class="quick-item__icon" style="background:var(--teal-lt); color:var(--teal);">✅</div>
+                <span class="quick-item__label">Pesanan Selesai</span>
+            </a>
+        </div>
+    </section>
+
+    {{-- Logout --}}
+    <div class="logout-section js-in">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="logout-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Keluar dari Akun
+            </button>
+        </form>
+    </div>
+    <div class="version-tag">Azka Laundry v{{ \App\Support\Laundry::version() }} &bull; Admin Panel</div>
+
 </main>
 
 @include('layouts.component.admin._navbar_admin', ['active' => 'beranda'])
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  gsap.from('.js-in',{y:40, opacity:0, duration:0.7, stagger:0.12, ease:'power4.out'});
-
-  document.querySelectorAll('.k, .o, .q').forEach(el => {
-    el.addEventListener('mouseenter', () => gsap.to(el, {y:-5, scale:1.02, duration:0.3, ease:'power2.out'}));
-    el.addEventListener('mouseleave', () => gsap.to(el, {y:0, scale:1, duration:0.3, ease:'power2.out'}));
-  });
+    gsap.from('.js-in', { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out' });
 });
 </script>
 </body>
