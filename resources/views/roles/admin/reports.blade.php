@@ -38,9 +38,18 @@ body {
 .wrap { max-width: 540px; margin: 0 auto; padding: 16px; }
 
 .page-header {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; gap: 10px;
     margin-bottom: 16px; padding-top: max(env(safe-area-inset-top, 0px), 8px);
 }
+.page-header__back {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--blue-lt); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue-dark); text-decoration: none; flex-shrink: 0;
+    transition: background .15s;
+}
+.page-header__back:active { background: #cce7f7; }
+.page-header__back svg { width: 16px; height: 16px; }
 .page-title { font-size: 1.1rem; font-weight: 800; color: var(--blue-dark); }
 
 /* STATS */
@@ -148,6 +157,9 @@ body {
 <main class="wrap">
 
     <header class="page-header">
+        <a href="{{ route('admin.dashboard') }}" class="page-header__back" aria-label="Kembali">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </a>
         <h1 class="page-title">Laporan Kendala</h1>
     </header>
 
@@ -216,7 +228,7 @@ body {
                     <option value="resolved" {{ $report->status === 'resolved' ? 'selected' : '' }}>Selesai</option>
                     <option value="closed" {{ $report->status === 'closed' ? 'selected' : '' }}>Ditutup</option>
                 </select>
-                <button type="submit" class="status-btn">Update</button>
+                <button type="button" class="status-btn js-status-btn">Update</button>
             </form>
         </div>
     </div>
@@ -233,6 +245,29 @@ body {
 </main>
 
 @include('layouts.component.admin._navbar_admin', ['active' => ''])
+@include('layouts.component._confirm_modal')
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.js-status-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var form = btn.closest('form');
+            var statusLabel = form.querySelector('.status-select option:checked').textContent;
+            showConfirmModal({
+                title: 'Update Status Laporan?',
+                message: 'Status laporan akan diubah menjadi "' + statusLabel + '". Lanjutkan?',
+                confirmText: 'Ya, Update',
+                cancelText: 'Batal',
+                type: 'info',
+                onConfirm: function() {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 
 </body>
 </html>

@@ -426,9 +426,9 @@ body {
 
     {{-- Logout --}}
     <div class="logout-section js-in">
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST" id="form-logout">
             @csrf
-            <button type="submit" class="logout-btn">
+            <button type="button" class="logout-btn" id="btn-logout">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Keluar dari Akun
             </button>
@@ -439,10 +439,27 @@ body {
 </main>
 
 @include('layouts.component.admin._navbar_admin', ['active' => 'beranda'])
+@include('layouts.component._confirm_modal')
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     gsap.from('.js-in', { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out' });
+
+    var btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', function() {
+            showConfirmModal({
+                title: 'Keluar dari Akun?',
+                message: 'Kamu akan keluar dari sesi ini. Yakin ingin melanjutkan?',
+                confirmText: 'Ya, Keluar',
+                cancelText: 'Batal',
+                type: 'danger',
+                onConfirm: function() {
+                    document.getElementById('form-logout').submit();
+                }
+            });
+        });
+    }
 });
 </script>
 </body>
