@@ -300,6 +300,13 @@ body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);
           <div class="contact-sub">cs@azkalaundry.id (balasan 1x24 jam)</div>
         </div>
       </a>
+      <a href="{{ route('customer.report') }}" class="contact-row">
+        <div class="contact-icon" style="background:#fef2f2;font-size:1.2rem;">🐛</div>
+        <div class="contact-body">
+          <div class="contact-label">Lapor Kendala</div>
+          <div class="contact-sub">Kirim bug, saran, atau komplain langsung dari aplikasi</div>
+        </div>
+      </a>
     </div>
 
     <div class="section-title">Lokasi Outlet</div>

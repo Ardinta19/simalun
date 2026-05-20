@@ -180,7 +180,15 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);min-h
       </a>
       <a href="{{ route('admin.finance.index') }}" class="q ic-y">
         <div class="q-ico">🧾</div>
-        <span class="q-t">Laporan<br>Harian</span>
+        <span class="q-t">Laporan<br>Keuangan</span>
+      </a>
+      <a href="{{ route('admin.reports') }}" class="q" style="border-color:#fecaca;">
+        <div class="q-ico" style="background:#ef4444;color:#fff;">🐛</div>
+        <span class="q-t">Laporan<br>Kendala</span>
+      </a>
+      <a href="{{ route('admin.orders') }}?status=selesai" class="q" style="border-color:#a7f3d0;">
+        <div class="q-ico" style="background:#059669;color:#fff;">✅</div>
+        <span class="q-t">Pesanan<br>Selesai</span>
       </a>
     </div>
   </section>
