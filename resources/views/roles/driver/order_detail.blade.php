@@ -5,194 +5,526 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Detail Tugas #{{ strtoupper($order->order_code) }} – Azka Laundry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+@include('layouts.component.customer._head_meta')
 <style>
-:root{--blue-dark:#002f5c;--blue-mid:#0077b6;--blue-light:#00b4d8;--blue-sky:#e0f4ff;--orange:#FF6B35;--green:#00C48C;--red:#ef4444;--surface:#f4f8fc;--ink:#1a2332;--ink-lt:#8899aa;--border:#ddeeff;--radius:18px;--radius-sm:12px;}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
-.hero{background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue-mid) 65%,var(--blue-light) 100%);padding:max(env(safe-area-inset-top,0px),20px) 20px 32px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);top:-60px;right:-40px}
-.hero-inner{max-width:520px;margin:0 auto;position:relative;z-index:2}
-.hero-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.btn-back{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none}
-.hero-code{font-family:'Fredoka One',cursive;font-size:.85rem;color:rgba(255,255,255,.75);letter-spacing:1px;text-transform:uppercase}
-.hero-status{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:5px 12px;font-size:.7rem;font-weight:900;color:#fff;text-transform:uppercase;margin-bottom:10px}
-.hero-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:#fff;line-height:1.1}
-.hero-sub{font-size:.85rem;font-weight:700;color:rgba(255,255,255,.78);margin-top:4px}
-.content{max-width:520px;margin:-16px auto 0;padding:0 16px;position:relative;z-index:10}
-.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px;box-shadow:0 4px 16px rgba(0,47,92,.05);overflow:hidden}
-.card-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
-.card-icon{width:30px;height:30px;border-radius:10px;background:var(--blue-sky);display:flex;align-items:center;justify-content:center;font-size:.9rem}
-.card-title{font-family:'Fredoka One',cursive;font-size:.92rem;color:var(--blue-dark)}
-.row{display:flex;align-items:flex-start;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f1f5f9;gap:12px}
-.row:last-child{border-bottom:none}
-.row-l{font-size:.78rem;font-weight:700;color:var(--ink-lt)}
-.row-v{font-size:.85rem;font-weight:800;color:var(--ink);text-align:right;max-width:60%;word-break:break-word}
-.row-v.green{color:var(--green)}
-.contact-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px;background:#f8fafc}
-.contact-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:var(--radius-sm);font-weight:900;font-size:.78rem;text-decoration:none;border:none;cursor:pointer}
-.contact-btn.wa{background:#e6fff6;color:#065f46}
-.contact-btn.call{background:var(--blue-sky);color:var(--blue-mid)}
-.action-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,47,92,.06)}
-.action-title{font-family:'Fredoka One',cursive;font-size:.95rem;color:var(--blue-dark);margin-bottom:8px}
-.action-hint{font-size:.74rem;font-weight:700;color:var(--ink-lt);margin-bottom:12px}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.field-label{font-size:.72rem;font-weight:800;color:var(--ink-lt)}
-.field input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;background:#f8fafc}
-.field input:focus{outline:none;border-color:var(--blue-mid);background:#fff}
-.btn-action{width:100%;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-action:active{transform:scale(.97)}
-.btn-action.success{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(0,196,140,.3)}
-.btn-action.warn{background:var(--orange);color:#fff;box-shadow:0 4px 14px rgba(255,107,53,.3)}
-.alert-ok{background:rgba(0,196,140,.12);border:1.5px solid rgba(0,196,140,.3);color:#065f46;padding:12px 14px;border-radius:12px;font-size:.84rem;font-weight:800;margin-bottom:12px}
-.alert-err{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.25);color:#b91c1c;padding:12px 14px;border-radius:12px;font-size:.82rem;font-weight:800;margin-bottom:12px}
-.driver-nav{position:fixed;bottom:0;left:0;right:0;z-index:999;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);box-shadow:0 -4px 24px rgba(0,47,92,.08);padding-bottom:env(safe-area-inset-bottom,0px)}
-.driver-nav__inner{max-width:520px;margin:0 auto;display:flex;align-items:center;height:64px;padding:0 16px}
-.driver-nav__item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#94a3b8;padding:6px 0}
-.driver-nav__item.is-active{color:var(--blue-mid)}
-.driver-nav__icon svg{width:22px;height:22px}
-.driver-nav__label{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+:root {
+    --primary: #0d6fb8;
+    --primary-dark: #002f5c;
+    --primary-light: #e0f4ff;
+    --accent: #FF6B35;
+    --accent-light: #fff3ee;
+    --success: #059669;
+    --success-light: #ecfdf5;
+    --warning: #d97706;
+    --warning-light: #fffbeb;
+    --danger: #dc2626;
+    --surface: #f4f8fc;
+    --card: #ffffff;
+    --ink: #1a2332;
+    --ink-secondary: #475569;
+    --ink-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 12px rgba(0,47,92,.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+}
+
+/* Hero Header */
+.detail-hero {
+    background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary) 100%);
+    padding: max(env(safe-area-inset-top, 0px), 18px) 20px 28px;
+    position: relative;
+    overflow: hidden;
+}
+.detail-hero::after {
+    content: '';
+    position: absolute;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.04);
+    top: -50px; right: -40px;
+}
+.detail-hero__inner {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+.detail-hero__nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.detail-hero__back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    text-decoration: none;
+}
+.detail-hero__back svg { width: 18px; height: 18px; }
+.detail-hero__code {
+    font-size: .72rem;
+    font-weight: 700;
+    color: rgba(255,255,255,.6);
+    letter-spacing: .8px;
+}
+.detail-hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 99px;
+    padding: 5px 12px;
+    font-size: .68rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    margin-bottom: 8px;
+}
+.detail-hero__status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+}
+.detail-hero__name {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #fff;
+    line-height: 1.2;
+}
+.detail-hero__service {
+    font-size: .82rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.7);
+    margin-top: 4px;
+}
+
+/* Content */
+.detail-content {
+    max-width: 520px;
+    margin: -14px auto 0;
+    padding: 0 16px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Alert */
+.detail-alert {
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    font-size: .82rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.detail-alert--success { background: var(--success-light); color: var(--success); border: 1px solid rgba(5,150,105,.2); }
+.detail-alert--error { background: #fef2f2; color: var(--danger); border: 1px solid rgba(220,38,38,.15); }
+
+/* Section Card */
+.section-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.section-card__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+.section-card__icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.section-card__icon svg { width: 16px; height: 16px; color: var(--primary); }
+.section-card__title {
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--ink);
+}
+
+/* Data Row */
+.data-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border-light);
+    gap: 12px;
+}
+.data-row:last-child { border-bottom: none; }
+.data-row__label {
+    font-size: .76rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+}
+.data-row__value {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+.data-row__value--accent { color: var(--success); }
+.data-row__value--primary { color: var(--primary); }
+
+/* Contact Bar */
+.contact-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--border-light);
+}
+.contact-bar__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: .76rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.contact-bar__btn--wa { background: var(--success-light); color: var(--success); }
+.contact-bar__btn--call { background: var(--primary-light); color: var(--primary); }
+
+/* Action Card */
+.action-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-md);
+}
+.action-card__title {
+    font-weight: 800;
+    font-size: .92rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+.action-card__hint {
+    font-size: .74rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-bottom: 14px;
+}
+.action-card__field {
+    margin-bottom: 12px;
+}
+.action-card__label {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--ink-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+.action-card__input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .88rem;
+    background: var(--border-light);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .2s;
+}
+.action-card__input:focus {
+    border-color: var(--primary);
+    background: #fff;
+}
+.action-card__submit {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform .12s;
+}
+.action-card__submit:active { transform: scale(.97); }
+.action-card__submit--success { background: var(--success); color: #fff; }
+.action-card__submit--accent { background: var(--accent); color: #fff; }
+
+/* Proof */
+.proof-img {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    max-height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+/* History Timeline */
+.timeline {
+    padding: 12px 16px;
+}
+.timeline__item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.timeline__item:last-child { border-bottom: none; }
+.timeline__dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+.timeline__text {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+.timeline__meta {
+    font-size: .7rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-top: 2px;
+}
 </style>
 </head>
 <body>
 
-<div class="hero">
-    <div class="hero-inner">
+<div class="detail-hero">
+    <div class="detail-hero__inner">
         @php
             $backUrl = \App\Support\BackUrl::resolve(request(), 'driver.orders');
         @endphp
-        <div class="hero-nav">
-            <a href="{{ $backUrl }}" class="btn-back" aria-label="Kembali" title="Kembali">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <div class="detail-hero__nav">
+            <a href="{{ $backUrl }}" class="detail-hero__back" aria-label="Kembali">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </a>
-            <div class="hero-code">#{{ strtoupper($order->order_code) }}</div>
+            <div class="detail-hero__code">#{{ strtoupper($order->order_code) }}</div>
         </div>
-        <div class="hero-status">
-            <span style="width:7px;height:7px;border-radius:50%;background:{{ $order->status_color }}"></span>
+        <div class="detail-hero__status">
+            <span class="detail-hero__status-dot" style="background:{{ $order->status_color }}"></span>
             {{ $order->status_label }}
         </div>
-        <div class="hero-title">{{ $order->customer->name ?? 'Customer' }}</div>
-        <div class="hero-sub">{{ $order->service->name ?? 'Layanan' }} &bull; {{ ucfirst($order->pickup_time ?? '-') }}</div>
+        <div class="detail-hero__name">{{ $order->customer->name ?? 'Customer' }}</div>
+        <div class="detail-hero__service">{{ $order->service->name ?? 'Layanan' }} &middot; {{ ucfirst($order->pickup_time ?? '-') }}</div>
     </div>
 </div>
 
-<div class="content">
+<div class="detail-content">
 
     @if(session('success'))
-        <div class="alert-ok">{{ session('success') }}</div>
+        <div class="detail-alert detail-alert--success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {{ session('success') }}
+        </div>
     @endif
     @if(session('error'))
-        <div class="alert-err">{{ session('error') }}</div>
+        <div class="detail-alert detail-alert--error">{{ session('error') }}</div>
     @endif
     @if($errors->any())
-        <div class="alert-err">{{ $errors->first() }}</div>
+        <div class="detail-alert detail-alert--error">{{ $errors->first() }}</div>
     @endif
 
     {{-- Lokasi Customer --}}
-    <div class="card">
-        <div class="card-head"><div class="card-icon">📍</div><div class="card-title">Lokasi Customer</div></div>
-        <div class="row"><span class="row-l">Alamat</span><span class="row-v">{{ $order->customerAddress?->full_address ?? $order->address ?? '-' }}</span></div>
-        @if($order->address_note)<div class="row"><span class="row-l">Patokan</span><span class="row-v">{{ $order->address_note }}</span></div>@endif
-        <div class="row"><span class="row-l">Zona</span><span class="row-v">Zona {{ $order->zone ?? 'A' }}</span></div>
+    <div class="section-card">
+        <div class="section-card__head">
+            <div class="section-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="section-card__title">Lokasi Customer</div>
+        </div>
+        <div class="data-row">
+            <span class="data-row__label">Alamat</span>
+            <span class="data-row__value">{{ $order->customerAddress?->full_address ?? $order->address ?? '-' }}</span>
+        </div>
+        @if($order->address_note)
+        <div class="data-row">
+            <span class="data-row__label">Patokan</span>
+            <span class="data-row__value">{{ $order->address_note }}</span>
+        </div>
+        @endif
+        <div class="data-row">
+            <span class="data-row__label">Zona</span>
+            <span class="data-row__value">Zona {{ $order->zone ?? 'A' }}</span>
+        </div>
         @if($order->customer?->phone)
         <div class="contact-bar">
-            <a href="https://wa.me/62{{ ltrim(preg_replace('/[^0-9]/','', $order->customer->phone),'0') }}?text=Halo%2C%20saya%20kurir%20Azka%20Laundry%20untuk%20pesanan%20%23{{ $order->order_code }}" target="_blank" class="contact-btn wa">💬 Chat WA</a>
-            <a href="tel:{{ $order->customer->phone }}" class="contact-btn call">📞 Telepon</a>
+            <a href="https://wa.me/62{{ ltrim(preg_replace('/[^0-9]/','', $order->customer->phone),'0') }}?text=Halo%2C%20saya%20kurir%20Azka%20Laundry%20untuk%20pesanan%20%23{{ $order->order_code }}" target="_blank" class="contact-bar__btn contact-bar__btn--wa">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                Chat WA
+            </a>
+            <a href="tel:{{ $order->customer->phone }}" class="contact-bar__btn contact-bar__btn--call">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+                Telepon
+            </a>
         </div>
         @endif
     </div>
 
     {{-- Detail Pesanan --}}
-    <div class="card">
-        <div class="card-head"><div class="card-icon">🧺</div><div class="card-title">Detail Pesanan</div></div>
-        <div class="row"><span class="row-l">Layanan</span><span class="row-v">{{ $order->service->name ?? '-' }}</span></div>
-        <div class="row"><span class="row-l">Estimasi Berat</span><span class="row-v">{{ $order->weight_estimate }} kg</span></div>
-        @if($order->weight_actual)<div class="row"><span class="row-l">Berat Aktual</span><span class="row-v" style="color:var(--blue-mid)">{{ $order->weight_actual }} kg</span></div>@endif
-        <div class="row"><span class="row-l">Jadwal Jemput</span><span class="row-v">{{ $order->pickup_date?->format('d/m/Y') ?? '-' }}, {{ ucfirst($order->pickup_time ?? '-') }}</span></div>
-        <div class="row"><span class="row-l">Total</span><span class="row-v green">Rp {{ number_format($order->total_cost, 0, ',', '.') }}</span></div>
-        <div class="row"><span class="row-l">Pembayaran</span><span class="row-v">{{ $order->is_paid ? 'Lunas' : 'COD' }}</span></div>
-        @if($order->notes)<div class="row"><span class="row-l">Catatan</span><span class="row-v">{{ $order->notes }}</span></div>@endif
+    <div class="section-card">
+        <div class="section-card__head">
+            <div class="section-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            </div>
+            <div class="section-card__title">Detail Pesanan</div>
+        </div>
+        <div class="data-row">
+            <span class="data-row__label">Layanan</span>
+            <span class="data-row__value">{{ $order->service->name ?? '-' }}</span>
+        </div>
+        <div class="data-row">
+            <span class="data-row__label">Estimasi Berat</span>
+            <span class="data-row__value">{{ $order->weight_estimate }} kg</span>
+        </div>
+        @if($order->weight_actual)
+        <div class="data-row">
+            <span class="data-row__label">Berat Aktual</span>
+            <span class="data-row__value data-row__value--primary">{{ $order->weight_actual }} kg</span>
+        </div>
+        @endif
+        <div class="data-row">
+            <span class="data-row__label">Jadwal Jemput</span>
+            <span class="data-row__value">{{ $order->pickup_date?->format('d/m/Y') ?? '-' }}, {{ ucfirst($order->pickup_time ?? '-') }}</span>
+        </div>
+        <div class="data-row">
+            <span class="data-row__label">Total</span>
+            <span class="data-row__value data-row__value--accent">Rp {{ number_format($order->total_cost, 0, ',', '.') }}</span>
+        </div>
+        <div class="data-row">
+            <span class="data-row__label">Pembayaran</span>
+            <span class="data-row__value">{{ $order->is_paid ? 'Lunas' : 'COD' }}</span>
+        </div>
+        @if($order->notes)
+        <div class="data-row">
+            <span class="data-row__label">Catatan</span>
+            <span class="data-row__value">{{ $order->notes }}</span>
+        </div>
+        @endif
     </div>
 
-    {{-- Aksi Berdasarkan Status --}}
+    {{-- Aksi: Konfirmasi Jemput --}}
     @if($order->status === 'dijemput')
     <div class="action-card">
-        <div class="action-title">🛵 Konfirmasi Jemput</div>
-        <div class="action-hint">Masukkan berat aktual setelah pakaian diterima dari customer.</div>
+        <div class="action-card__title">Konfirmasi Penjemputan</div>
+        <div class="action-card__hint">Masukkan berat aktual setelah pakaian diterima dari customer.</div>
         <form method="POST" action="{{ route('driver.orders.action', $order) }}">
             @csrf
             <input type="hidden" name="status" value="dicuci">
-            <div class="field">
-                <label class="field-label" for="weight_actual">Berat Aktual (kg)</label>
-                <input type="number" step="0.1" min="0.1" max="50" name="weight_actual" id="weight_actual" placeholder="contoh: 4.5" value="{{ old('weight_actual', $order->weight_estimate) }}" required>
+            <div class="action-card__field">
+                <label class="action-card__label" for="weight_actual">Berat Aktual (kg)</label>
+                <input type="number" step="0.1" min="0.1" max="50" name="weight_actual" id="weight_actual"
+                       class="action-card__input" placeholder="Contoh: 4.5"
+                       value="{{ old('weight_actual', $order->weight_estimate) }}" required>
             </div>
-            <button type="submit" class="btn-action success">Konfirmasi Jemput</button>
+            <button type="submit" class="action-card__submit action-card__submit--success">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Konfirmasi Jemput
+            </button>
         </form>
     </div>
     @endif
 
+    {{-- Aksi: Selesaikan Pesanan --}}
     @if($order->status === 'dikirim')
     <div class="action-card">
-        <div class="action-title">📦 Konfirmasi Selesai</div>
-        <div class="action-hint">Upload foto bukti setelah pakaian diserahkan ke customer.</div>
+        <div class="action-card__title">Konfirmasi Pengiriman</div>
+        <div class="action-card__hint">Upload foto bukti setelah pakaian diserahkan ke customer.</div>
         <form method="POST" action="{{ route('driver.orders.action', $order) }}" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="status" value="selesai">
-            <div class="field">
-                <label class="field-label" for="proof_image">Foto Bukti Pengiriman</label>
-                <input type="file" name="proof_image" id="proof_image" accept="image/*" capture="environment" required>
+            <div class="action-card__field">
+                <label class="action-card__label" for="proof_image">Foto Bukti Pengiriman</label>
+                <input type="file" name="proof_image" id="proof_image" accept="image/*" capture="environment"
+                       class="action-card__input" required>
             </div>
-            <button type="submit" class="btn-action warn">Selesaikan Pesanan</button>
+            <button type="submit" class="action-card__submit action-card__submit--accent">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Selesaikan Pesanan
+            </button>
         </form>
     </div>
     @endif
 
     {{-- Bukti Foto --}}
     @if($order->status === 'selesai' && $order->proof_image)
-    <div class="card">
-        <div class="card-head"><div class="card-icon">📸</div><div class="card-title">Bukti Pengiriman</div></div>
-        <div style="padding:14px"><img src="{{ asset('storage/' . $order->proof_image) }}" style="width:100%;border-radius:12px;max-height:280px;object-fit:cover" alt="Bukti"></div>
+    <div class="section-card">
+        <div class="section-card__head">
+            <div class="section-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <div class="section-card__title">Bukti Pengiriman</div>
+        </div>
+        <div style="padding:12px 16px">
+            <img src="{{ asset('storage/' . $order->proof_image) }}" class="proof-img" alt="Bukti pengiriman">
+        </div>
     </div>
     @endif
 
     {{-- Riwayat Status --}}
     @if(isset($histori) && $histori->count() > 0)
-    <div class="card">
-        <div class="card-head"><div class="card-icon">🕒</div><div class="card-title">Riwayat Status</div></div>
-        <div style="padding:12px 16px">
+    <div class="section-card">
+        <div class="section-card__head">
+            <div class="section-card__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="section-card__title">Riwayat Status</div>
+        </div>
+        <div class="timeline">
             @foreach($histori as $h)
-            <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9">
-                <div style="width:10px;height:10px;border-radius:50%;background:var(--blue-mid);margin-top:4px;flex-shrink:0"></div>
+            <div class="timeline__item">
+                <div class="timeline__dot"></div>
                 <div>
-                    <div style="font-size:.82rem;font-weight:800">{{ ucfirst(str_replace('_',' ',$h->status_code)) }}</div>
-                    <div style="font-size:.7rem;color:var(--ink-lt)">{{ $h->status_note ?? '-' }} @if($h->updated_at)&bull; {{ $h->updated_at->format('d M, H:i') }}@endif</div>
+                    <div class="timeline__text">{{ ucfirst(str_replace('_',' ',$h->status_code)) }}</div>
+                    <div class="timeline__meta">{{ $h->status_note ?? '-' }} @if($h->updated_at)&middot; {{ $h->updated_at->format('d M, H:i') }}@endif</div>
                 </div>
             </div>
             @endforeach
         </div>
     </div>
     @endif
+
 </div>
 
-<nav class="driver-nav">
-    <div class="driver-nav__inner">
-        <a href="{{ route('driver.dashboard') }}" class="driver-nav__item">
-            <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-            <span class="driver-nav__label">Beranda</span>
-        </a>
-        <a href="{{ route('driver.orders') }}" class="driver-nav__item is-active">
-            <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg></span>
-            <span class="driver-nav__label">Tugas</span>
-        </a>
-        <a href="{{ route('driver.notifications') }}" class="driver-nav__item">
-            <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
-            <span class="driver-nav__label">Notif</span>
-        </a>
-        <a href="{{ route('driver.profile') }}" class="driver-nav__item">
-            <span class="driver-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span class="driver-nav__label">Profil</span>
-        </a>
-    </div>
-</nav>
+@include('layouts.component.driver._navbar_driver', ['active' => 'tugas'])
+
 </body>
 </html>

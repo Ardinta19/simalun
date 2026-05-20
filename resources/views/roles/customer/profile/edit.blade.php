@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Edit Profil</title>
 @include('layouts.component.customer._head_meta')
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     :root {
@@ -16,7 +15,7 @@
     }
     *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
-        font-family:'Nunito', sans-serif;
+        font-family:'Plus Jakarta Sans', sans-serif;
         background:var(--surface);
         color:var(--ink);
         min-height:100vh;
@@ -51,7 +50,7 @@
     .btn-back svg { width:18px; height:18px; }
     .header-title {
         flex:1;
-        font-family:'Fredoka One', cursive;
+        font-weight:800;
         font-size:1.3rem;
         color:#fff;
     }
@@ -104,13 +103,13 @@
         border-radius:50%;
         background:var(--blue-mid);
         color:#fff;
-        font-family:'Fredoka One', cursive;
+        font-weight:800;
         font-size:.88rem;
         display:flex; align-items:center; justify-content:center;
         flex-shrink:0;
     }
     .section-title {
-        font-family:'Fredoka One', cursive;
+        font-weight:800;
         font-size:.98rem;
         color:var(--blue-dark);
     }
@@ -155,7 +154,7 @@
         padding:12px 14px;
         border:1.5px solid var(--border);
         border-radius:var(--radius-sm);
-        font-family:'Nunito', sans-serif;
+        font-family:'Plus Jakarta Sans', sans-serif;
         font-size:.93rem;
         font-weight:600;
         color:var(--ink);
@@ -273,6 +272,12 @@
                     </label>
                     <div class="field-hint">Maksimal 2 MB · format JPG, PNG, atau WebP</div>
                 </div>
+
+                @if($user->avatar)
+                <div style="text-align:center; margin-top:4px;">
+                    <button type="button" class="btn-danger" style="width:auto; padding:8px 18px; font-size:.78rem;" id="btn-delete-avatar">Hapus Foto Profil</button>
+                </div>
+                @endif
 
                 <div>
                     <div class="field-label">Nama Lengkap <span class="req">*</span></div>
@@ -432,6 +437,11 @@
 
 @include('layouts.component.customer._confirm_modal')
 
+<form method="POST" action="{{ route('profile.avatar.delete') }}" id="form-delete-avatar" style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 <script>
 (function() {
     var avatarInput = document.getElementById('avatar-input');
@@ -458,6 +468,22 @@
                 document.getElementById('avatar-preview').src = e.target.result;
             };
             reader.readAsDataURL(file);
+        });
+    }
+
+    var btnDeleteAvatar = document.getElementById('btn-delete-avatar');
+    if (btnDeleteAvatar) {
+        btnDeleteAvatar.addEventListener('click', function() {
+            showConfirmModal({
+                title: 'Hapus Foto Profil?',
+                message: 'Foto profil kamu akan dihapus dan diganti dengan avatar default.',
+                confirmText: 'Ya, Hapus',
+                cancelText: 'Batal',
+                type: 'warning',
+                onConfirm: function() {
+                    document.getElementById('form-delete-avatar').submit();
+                }
+            });
         });
     }
 

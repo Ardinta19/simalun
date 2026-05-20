@@ -305,16 +305,7 @@
         </div>
         <div class="profile-name">{{ $user->name }}</div>
         <div class="profile-role">{{ ucfirst($user->role) }}</div>
-        <div style="display:flex; gap:8px; align-items:center; justify-content:center; margin-top:10px;">
-            <a href="{{ route('profile.edit') }}" class="edit-btn">Edit Profil</a>
-            @if($user->avatar)
-            <form method="POST" action="{{ route('profile.avatar.delete') }}" onsubmit="return confirm('Hapus foto profil?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="edit-btn" style="background:#fef2f2; color:#dc2626; border-color:#fecaca;">Hapus Foto</button>
-            </form>
-            @endif
-        </div>
+        <a href="{{ route('profile.edit') }}" class="edit-btn" style="margin-top:14px;">Edit Profil</a>
     </div>
 
     <div class="section-card">
