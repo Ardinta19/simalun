@@ -38,7 +38,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ── HERO HEADER ─────────────────── */
+/* HEADER */
 .hero {
     background: linear-gradient(145deg, var(--blue-dark) 0%, var(--blue) 65%, #00b4d8 100%);
     padding: max(env(safe-area-inset-top, 0px), 24px) 20px 32px;
@@ -130,7 +130,7 @@ body {
     letter-spacing: 0.3px;
 }
 
-/* ── CONTENT ─────────────────────── */
+/* CONTENT */
 .content {
     max-width: 520px;
     margin: -16px auto 0;
@@ -139,7 +139,7 @@ body {
     z-index: 10;
 }
 
-/* ── SECTION HEADER ──────────────── */
+/* SECTION HEADER */
 .section-hd {
     display: flex;
     align-items: center;
@@ -158,7 +158,7 @@ body {
     text-decoration: none;
 }
 
-/* ── TASK CARD ───────────────────── */
+/* TASK CARD */
 .task-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -244,7 +244,7 @@ body {
 .task-btn--muted { background: #f8fafc; color: var(--ink-lt); cursor: default; }
 .task-btn svg { width: 14px; height: 14px; }
 
-/* ── EMPTY STATE ─────────────────── */
+/* EMPTY STATE */
 .empty-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -255,7 +255,7 @@ body {
 .empty-card__icon { font-size: 2rem; margin-bottom: 8px; }
 .empty-card__text { font-size: 0.78rem; font-weight: 700; color: var(--ink-lt); line-height: 1.5; }
 
-/* ── LOGOUT ──────────────────────── */
+/* LOGOUT */
 .logout-section { margin-top: 20px; margin-bottom: 10px; }
 .logout-btn {
     width: 100%;

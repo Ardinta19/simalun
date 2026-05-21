@@ -16,25 +16,25 @@
 }
 html, body { width:100%; height:100%; overflow:hidden; font-family:'Plus Jakarta Sans',sans-serif; background:#001f3f; }
 
-/* ── STAGE ── */
+/* STAGE */
 #stage {
   position:fixed; inset:0; overflow:hidden;
   background:linear-gradient(168deg, #002f5c 0%, #0077b6 45%, #00b4d8 78%, #48cae4 100%);
   cursor:pointer;
 }
 
-/* ── AMBIENT ── */
+/* AMBIENT */
 #ambient { position:absolute; inset:0; pointer-events:none; z-index:1; }
 #particles { position:absolute; inset:0; pointer-events:none; z-index:3; }
 
-/* ── WAVES ── */
+/* WAVES */
 #wave-band { position:absolute; bottom:0; left:-5%; right:-5%; height:46%; pointer-events:none; z-index:2; }
 .ws { position:absolute; left:0; width:200%; overflow:visible; }
 .ws.w1 { bottom:42%; }
 .ws.w2 { bottom:38%; opacity:.55; }
 .ws.w3 { bottom:34%; opacity:.28; }
 
-/* ── LOGO ZONE ── */
+/* LOGO ZONE */
 #logo-zone {
   position:absolute; top:0; left:0; right:0; height:34%;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -67,7 +67,7 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Plus Jakarta
 .wm-sub  { font-size:clamp(.55rem,2vw,.68rem); font-weight:800; color:rgba(144,224,239,.9); letter-spacing:5px; text-transform:uppercase; margin-top:.25rem; }
 .wm-bar  { width:80px; height:2.5px; background:#FF6B35; border-radius:99px; margin:.4rem auto 0; opacity:.75; }
 
-/* ── CAROUSEL ── */
+/* CAROUSEL */
 #carousel-viewport {
   position:absolute; top:34%; bottom:0; left:0; right:0;
   overflow:hidden; z-index:4;
@@ -77,11 +77,10 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Plus Jakarta
   width:300vw; height:100%; will-change:transform;
 }
 
-/* ─────────────────────────────────────────────
-   PANEL — flex column, konten dari atas
+/*   PANEL — flex column, konten dari atas
    padding-bottom dibuat cukup agar tidak
    tertutup oleh #controls (tinggi ~160px)
-───────────────────────────────────────────── */
+ */
 .panel {
   flex:0 0 100vw; height:100%;
   display:flex; flex-direction:column; align-items:center;
@@ -100,10 +99,10 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Plus Jakarta
   top:40%; left:50%; transform:translate(-50%,-50%); pointer-events:none;
 }
 
-/* ─────────────────────────────────────────────
+/*
    PANEL IMAGE WRAPPER — lebar penuh, sudut
    rounded, BUKAN lingkaran
-───────────────────────────────────────────── */
+*/
 .panel-icon-wrap {
   position:relative;
   width:min(310px,88vw);
