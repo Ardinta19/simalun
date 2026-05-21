@@ -495,7 +495,7 @@ body.print-thermal-58 .receipt { width: 100%; }
     $itemTotal = $order->items ? $order->items->where('service_id', '!=', $order->service_id)->sum('line_total') : 0;
     $pickupCost = (int) ($order->pickup_cost ?? 0);
     $discount = (int) ($order->discount ?? 0);
-    $total = (int) ($order->total_cost ?? 0);
+    $total = $subtotalService + $itemTotal + $pickupCost - $discount;
 @endphp
 
 <div class="receipt-wrap">

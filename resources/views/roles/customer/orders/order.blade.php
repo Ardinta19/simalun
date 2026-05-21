@@ -541,7 +541,11 @@ body {
             {{ $order->status_label }}
         </div>
 
-        <div class="hero-price">Rp {{ number_format($order->total_cost, 0, ',', '.') }}</div>
+        @php
+            $heroItemTotal = $order->items ? $order->items->where('service_id', '!=', $order->service_id)->sum('line_total') : 0;
+            $heroTotal = (int)($order->service_cost ?? 0) + $heroItemTotal + (int)($order->pickup_cost ?? 0) - (int)($order->discount ?? 0);
+        @endphp
+        <div class="hero-price">Rp {{ number_format($heroTotal, 0, ',', '.') }}</div>
         <div class="hero-price-est">
             @if($order->weight_actual)
                 Berat aktual: {{ $order->weight_actual }} kg
@@ -741,8 +745,8 @@ body {
             $serviceCost = $order->service_cost ?? ($order->weight_estimate * ($order->service->effective_unit_price ?? 0));
             $pickupCost  = $order->pickup_cost ?? 0;
             $discount    = $order->discount ?? 0;
-            $total       = $order->total_cost ?? 0;
-            $itemTotal   = $order->items ? $order->items->sum('line_total') : 0;
+            $itemTotal   = $order->items ? $order->items->where('service_id', '!=', $order->service_id)->sum('line_total') : 0;
+            $total       = (int) $serviceCost + $itemTotal + $pickupCost - $discount;
         @endphp
         <div class="total-row" style="position:relative;z-index:2">
             <span class="total-label">Layanan Utama</span>

@@ -229,7 +229,7 @@ body {
     $itemTotal = $order->items ? $order->items->where('service_id', '!=', $order->service_id)->sum('line_total') : 0;
     $pickupCost = (int) ($order->pickup_cost ?? 0);
     $discount = (int) ($order->discount ?? 0);
-    $total = (int) ($order->total_cost ?? 0);
+    $total = (int) ($order->service_cost ?? 0) + $itemTotal + $pickupCost - $discount;
 @endphp
 
 {{-- HEADER --}}
