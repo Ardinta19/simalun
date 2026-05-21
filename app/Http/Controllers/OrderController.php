@@ -282,7 +282,7 @@ class OrderController extends Controller
         $filter = $request->get('filter', 'semua');
 
         $query = $user->customerOrders()
-            ->with(['service', 'driver'])
+            ->with(['service', 'driver', 'items'])
             ->latest();
 
         match ($filter) {
@@ -293,7 +293,7 @@ class OrderController extends Controller
         };
 
         $pesananAktif = $user->customerOrders()
-            ->with(['service', 'driver'])
+            ->with(['service', 'driver', 'items'])
             ->whereIn('status', Order::STATUS_AKTIF)
             ->latest()
             ->first();
@@ -400,7 +400,7 @@ class OrderController extends Controller
     {
         $status = $request->get('status');
 
-        $query = Order::with(['customer', 'service', 'driver'])->latest();
+        $query = Order::with(['customer', 'service', 'driver', 'items'])->latest();
 
         if ($status) {
             $query->where('status', $status);
@@ -721,9 +721,14 @@ class OrderController extends Controller
             $actualWeight = (float) $request->weight_actual;
             $actualCost   = (int) ($order->service->effective_unit_price * $actualWeight);
 
+            // Hitung item satuan (service selain layanan utama)
+            $itemTotal = $order->items()
+                ->where('service_id', '!=', $order->service_id)
+                ->sum('line_total');
+
             $updateData['weight_actual'] = $actualWeight;
             $updateData['service_cost']  = $actualCost;
-            $updateData['total_cost']    = $actualCost + $order->pickup_cost - $order->discount;
+            $updateData['total_cost']    = $actualCost + (int) $itemTotal + $order->pickup_cost - $order->discount;
             $note = "Berat aktual: {$actualWeight} kg.";
         }
 

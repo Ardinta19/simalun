@@ -151,4 +151,20 @@ class Order extends Model
             default => 5000,
         };
     }
+
+    /**
+     * Hitung total dari komponen aktual (bukan dari kolom total_cost yang mungkin outdated).
+     * Digunakan di list views agar konsisten.
+     */
+    public function getCalculatedTotalAttribute(): int
+    {
+        $serviceCost = (int) ($this->service_cost ?? 0);
+        $itemTotal   = $this->relationLoaded('items')
+            ? (int) $this->items->where('service_id', '!=', $this->service_id)->sum('line_total')
+            : (int) $this->items()->where('service_id', '!=', $this->service_id)->sum('line_total');
+        $pickupCost  = (int) ($this->pickup_cost ?? 0);
+        $discount    = (int) ($this->discount ?? 0);
+
+        return $serviceCost + $itemTotal + $pickupCost - $discount;
+    }
 }

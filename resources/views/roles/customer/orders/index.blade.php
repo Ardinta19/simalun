@@ -576,7 +576,7 @@ body {
                 {{-- Footer --}}
                 <div class="order-card__footer">
                     <div>
-                        <div class="order-card__price">Rp {{ number_format($o->total_cost, 0, ',', '.') }}</div>
+                        <div class="order-card__price">Rp {{ number_format($o->calculated_total, 0, ',', '.') }}</div>
                         <div class="order-card__price-est">
                             {{ $o->is_paid ? '✓ Lunas' : 'Bayar COD' }}
                         </div>

@@ -35,9 +35,8 @@ class OrderObserver
             return;
         }
 
-        if ($order->status === 'selesai') {
-            FinanceController::recordIncomeFromOrder($order);
-        }
+        // Income recording dihapus dari sini — sudah ditangani di controller
+        // (driverAction dan updateStatus) agar timing-nya tepat setelah recalculation.
 
         OrderStatusHistory::create([
             'order_id'    => $order->id,

@@ -896,7 +896,7 @@ body {
         <div class="ah-meta">
           <div class="ah-meta-item">
             <div class="ah-meta-lbl">Total</div>
-            <div class="ah-meta-val">Rp {{ number_format($pesananAktif->total_cost ?? 0, 0, ',', '.') }}</div>
+            <div class="ah-meta-val">Rp {{ number_format($pesananAktif->calculated_total ?? 0, 0, ',', '.') }}</div>
           </div>
           <div class="ah-meta-item">
             <div class="ah-meta-lbl">Layanan</div>
@@ -1006,7 +1006,7 @@ body {
           <span class="hist-done-badge">✓ Selesai</span>
         </div>
         <div class="hist-right">
-          <div class="hist-price">Rp {{ number_format($order->total_cost ?? 0, 0, ',', '.') }}</div>
+          <div class="hist-price">Rp {{ number_format($order->calculated_total ?? 0, 0, ',', '.') }}</div>
           <div class="hist-date">{{ \Carbon\Carbon::parse($order->created_at)->isoFormat('D MMM YY') }}</div>
         </div>
       </a>

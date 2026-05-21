@@ -409,7 +409,7 @@ body {
                 <span class="order-card__chip">{{ $o->pickup_date->format('d/m') }}</span>
                 @endif
             </div>
-            <div class="order-card__total">Rp {{ number_format($o->total_cost, 0, ',', '.') }}</div>
+            <div class="order-card__total">Rp {{ number_format($o->calculated_total, 0, ',', '.') }}</div>
         </div>
 
         {{-- Panel: Tugaskan Driver Pickup --}}

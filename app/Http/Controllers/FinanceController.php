@@ -99,13 +99,20 @@ class FinanceController extends Controller
             return;
         }
 
+        // Recalculate dari komponen agar tidak bergantung pada total_cost yang mungkin outdated
+        $serviceCost = (int) ($order->service_cost ?? 0);
+        $itemTotal   = (int) $order->items()->where('service_id', '!=', $order->service_id)->sum('line_total');
+        $pickupCost  = (int) ($order->pickup_cost ?? 0);
+        $discount    = (int) ($order->discount ?? 0);
+        $calculatedTotal = $serviceCost + $itemTotal + $pickupCost - $discount;
+
         try {
             FinanceEntry::create([
                 'entry_date'  => today(),
                 'period_key'  => now()->format('Y-m'),
                 'entry_type'  => 'income',
                 'category'    => 'income',
-                'amount'      => $order->total_cost,
+                'amount'      => $calculatedTotal,
                 'source_type' => 'order',
                 'source_id'   => $order->id,
                 'order_id'    => $order->id,

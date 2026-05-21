@@ -427,7 +427,7 @@ body {
         </div>
         <div class="data-row">
             <span class="data-row__label">Total</span>
-            <span class="data-row__value data-row__value--accent">Rp {{ number_format($order->total_cost, 0, ',', '.') }}</span>
+            <span class="data-row__value data-row__value--accent">Rp {{ number_format($order->calculated_total, 0, ',', '.') }}</span>
         </div>
         <div class="data-row">
             <span class="data-row__label">Pembayaran</span>

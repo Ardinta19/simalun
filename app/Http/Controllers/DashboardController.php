@@ -25,13 +25,13 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $pesananAktif = $user->customerOrders()
-            ->with(['service', 'driver'])
+            ->with(['service', 'driver', 'items'])
             ->whereIn('status', Order::STATUS_AKTIF)
             ->latest()
             ->first();
 
         $riwayat = $user->customerOrders()
-            ->with('service')
+            ->with(['service', 'items'])
             ->whereIn('status', Order::statusSelesaiSemua())
             ->latest()
             ->take(5)
