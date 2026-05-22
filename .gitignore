@@ -19,6 +19,10 @@
 /storage/*.key
 /storage/pail
 /vendor
+
+# Dokumen kerja / draf yang tidak perlu masuk repo
+/docs/temp
+/docs/temp/**
 Homestead.json
 Homestead.yaml
 Thumbs.db
