@@ -8,6 +8,8 @@ use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Voucher;
+use App\Models\VoucherUsage;
 use App\Notifications\OrderStatusUpdated;
 use App\Support\Laundry;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -44,6 +46,7 @@ class OrderController extends Controller
             'weight_estimate' => ['required', 'numeric', 'min:1', 'max:50'],
             'notes' => ['nullable', 'string', 'max:500'],
             'customer_address_id' => ['nullable', 'integer', 'exists:customer_addresses,id'],
+            'voucher_code' => ['nullable', 'string', 'max:30'],
             'item_lines' => ['nullable', 'array', 'max:30'],
             'item_lines.*.service_id' => ['required_with:item_lines', 'exists:services,id'],
             'item_lines.*.qty' => ['required_with:item_lines', 'integer', 'min:0', 'max:200'],
@@ -124,10 +127,34 @@ class OrderController extends Controller
 
         $totalCost = $serviceCost + $itemTotal + $pickupCost;
 
+        // Voucher: divalidasi & dihitung di luar transaksi (read-only). Pemakaian
+        // (increment used_count + insert ke voucher_usages) dilakukan di dalam
+        // transaksi supaya konsisten dengan order. Subtotal yang dihitung untuk
+        // diskon adalah service_cost + item_total + pickup_cost.
+        $voucher = null;
+        $discount = 0;
+        if (! empty($validated['voucher_code'])) {
+            $voucher = Voucher::where('code', Str::upper($validated['voucher_code']))->first();
+
+            if (! $voucher || ! $voucher->isCurrentlyValid()) {
+                return back()->withInput()
+                    ->withErrors(['voucher_code' => 'Voucher tidak berlaku.']);
+            }
+
+            if ($totalCost < $voucher->min_order) {
+                return back()->withInput()
+                    ->withErrors(['voucher_code' => 'Minimum order Rp '.number_format($voucher->min_order, 0, ',', '.').' untuk pakai voucher ini.']);
+            }
+
+            $discount = $voucher->calculateDiscount($totalCost);
+        }
+
+        $totalCost -= $discount;
+
         try {
             $result = DB::transaction(function () use (
                 $request, $service, $weight, $zone, $pickupCost,
-                $serviceCost, $itemLines, $totalCost
+                $serviceCost, $itemLines, $totalCost, $voucher, $discount
             ) {
                 $order = Order::create([
                     'order_code' => Order::generateCode(),
@@ -141,7 +168,8 @@ class OrderController extends Controller
                     'pickup_time' => $request->pickup_time,
                     'weight_estimate' => $weight,
                     'service_cost' => $serviceCost,
-                    'discount' => 0,
+                    'discount' => $discount,
+                    'voucher_code' => $voucher?->code,
                     'total_cost' => $totalCost,
                     'status' => 'menunggu',
                     'notes' => $request->notes,
@@ -149,6 +177,20 @@ class OrderController extends Controller
                     'is_paid' => false,
                     'customer_address_id' => $request->customer_address_id ?: null,
                 ]);
+
+                if ($voucher) {
+                    // Audit + idempotency: catat pemakaian per (voucher, order).
+                    VoucherUsage::create([
+                        'voucher_id' => $voucher->id,
+                        'order_id' => $order->id,
+                        'customer_id' => Auth::id(),
+                        'discount_amount' => $discount,
+                    ]);
+                    // Increment counter pemakaian. Pakai increment supaya
+                    // aman dari race kalau beberapa order pakai voucher
+                    // yang sama bersamaan.
+                    $voucher->increment('used_count');
+                }
 
                 OrderItem::create([
                     'order_id' => $order->id,

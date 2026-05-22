@@ -16,6 +16,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderRatingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -92,6 +93,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/orders/{order}/rating', [OrderRatingController::class, 'store'])
             ->middleware('throttle:6,1')
             ->name('order.rating');
+        Route::post('/voucher/check', [VoucherController::class, 'check'])
+            ->middleware('throttle:30,1')
+            ->name('voucher.check');
         Route::get('/tracking', [OrderController::class, 'tracking'])->name('tracking');
 
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');
@@ -127,6 +131,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/finance', [FinanceController::class, 'store'])->name('finance.store');
         Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
         Route::get('/finance/export-pdf', [FinanceController::class, 'exportPdf'])->name('finance.export-pdf');
+
+        Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+        Route::get('/vouchers/create', [VoucherController::class, 'create'])->name('vouchers.create');
+        Route::post('/vouchers', [VoucherController::class, 'store'])->name('vouchers.store');
+        Route::patch('/vouchers/{voucher}/toggle', [VoucherController::class, 'toggle'])->name('vouchers.toggle');
+        Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
 
         Route::get('/reports', [ReportController::class, 'adminIndex'])->name('reports');
         Route::patch('/reports/{report}/status', [ReportController::class, 'updateStatus'])->name('reports.update-status');

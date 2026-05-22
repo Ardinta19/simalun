@@ -40,6 +40,7 @@ class Order extends Model
         'weight_actual',
         'service_cost',
         'discount',
+        'voucher_code',
         'total_cost',
         'status',
         'notes',
