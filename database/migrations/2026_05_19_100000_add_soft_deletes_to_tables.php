@@ -6,33 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Tambahkan kolom deleted_at ke tabel inti supaya semua model yang pakai
+     * SoftDeletes konsisten. Pakai pengecekan kolom dulu — di environment lama
+     * (mis. yang sudah migrate dengan softDeletes() di create_users_table awal)
+     * kolom ini sudah ada, jadi skip biar idempotent.
+     */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        $tables = ['users', 'orders', 'customer_addresses'];
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        foreach ($tables as $table) {
+            if (Schema::hasColumn($table, 'deleted_at')) {
+                continue;
+            }
 
-        Schema::table('customer_addresses', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->softDeletes();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        $tables = ['users', 'orders', 'customer_addresses'];
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        foreach ($tables as $table) {
+            if (! Schema::hasColumn($table, 'deleted_at')) {
+                continue;
+            }
 
-        Schema::table('customer_addresses', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+            Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->dropSoftDeletes();
+            });
+        }
     }
 };
