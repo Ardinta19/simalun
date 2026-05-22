@@ -1,25 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ConfirmablePasswordController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CustomerAddressController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderRatingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', fn() => view('welcome'))->name('welcome');
+    Route::get('/', fn () => view('welcome'))->name('welcome');
 
-    Route::get('/login', fn() => view('auth.login'))->name('login');
+    Route::get('/login', fn () => view('auth.login'))->name('login');
     Route::post('/login', [LoginController::class, 'authenticate'])
         ->middleware('throttle:5,1')
         ->name('login.post');
@@ -44,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Email verification (opsional — hanya untuk user yang mengisi email)
-    Route::get('/verify-email', fn() => view('auth.verify-email'))->name('verification.notice');
+    Route::get('/verify-email', fn () => view('auth.verify-email'))->name('verification.notice');
     Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
@@ -87,6 +89,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders', [OrderController::class, 'customerIndex'])->name('orders');
         Route::get('/orders/{order}', [OrderController::class, 'customerDetail'])->name('order.detail');
         Route::post('/orders/{order}/cancel', [OrderController::class, 'customerCancel'])->name('order.cancel');
+        Route::post('/orders/{order}/rating', [OrderRatingController::class, 'store'])
+            ->middleware('throttle:6,1')
+            ->name('order.rating');
         Route::get('/tracking', [OrderController::class, 'tracking'])->name('tracking');
 
         Route::get('/notifications', [NotificationController::class, 'customerIndex'])->name('notifications');
@@ -102,10 +107,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/addresses/{address}', [CustomerAddressController::class, 'destroy'])->name('addresses.destroy');
         Route::patch('/addresses/{address}/primary', [CustomerAddressController::class, 'setPrimary'])->name('addresses.set-primary');
 
-        Route::get('/report', [\App\Http\Controllers\ReportController::class, 'create'])->name('report');
-        Route::post('/report', [\App\Http\Controllers\ReportController::class, 'store'])->name('report.store');
+        Route::get('/report', [ReportController::class, 'create'])->name('report');
+        Route::post('/report', [ReportController::class, 'store'])->name('report.store');
 
-        Route::get('/help', fn() => view('roles.customer.help'))->name('help');
+        Route::get('/help', fn () => view('roles.customer.help'))->name('help');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
@@ -123,14 +128,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
         Route::get('/finance/export-pdf', [FinanceController::class, 'exportPdf'])->name('finance.export-pdf');
 
-        Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'adminIndex'])->name('reports');
-        Route::patch('/reports/{report}/status', [\App\Http\Controllers\ReportController::class, 'updateStatus'])->name('reports.update-status');
+        Route::get('/reports', [ReportController::class, 'adminIndex'])->name('reports');
+        Route::patch('/reports/{report}/status', [ReportController::class, 'updateStatus'])->name('reports.update-status');
 
         Route::get('/notifications', [NotificationController::class, 'adminIndex'])->name('notifications');
 
         Route::get('/profile', [ProfileController::class, 'adminShow'])->name('profile');
 
-        Route::get('/help', fn() => view('roles.admin.help'))->name('help');
+        Route::get('/help', fn () => view('roles.admin.help'))->name('help');
     });
 
     Route::middleware('role:driver')->prefix('driver')->name('driver.')->group(function () {
@@ -144,15 +149,15 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/notifications', [NotificationController::class, 'driverIndex'])->name('notifications');
 
-        Route::get('/help', fn() => view('roles.driver.help'))->name('help');
+        Route::get('/help', fn () => view('roles.driver.help'))->name('help');
 
-        Route::get('/report', [\App\Http\Controllers\ReportController::class, 'create'])->name('report');
-        Route::post('/report', [\App\Http\Controllers\ReportController::class, 'store'])->name('report.store');
+        Route::get('/report', [ReportController::class, 'create'])->name('report');
+        Route::post('/report', [ReportController::class, 'store'])->name('report.store');
 
-        Route::get('/profile', fn() => view('roles.driver.profile'))->name('profile');
+        Route::get('/profile', fn () => view('roles.driver.profile'))->name('profile');
     });
 
-    Route::get('/dashboard/admin',  [DashboardController::class, 'admin'])->middleware('role:admin')->name('dashboard.admin');
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->middleware('role:admin')->name('dashboard.admin');
     Route::get('/dashboard/driver', [DashboardController::class, 'driver'])->middleware('role:driver')->name('dashboard.driver');
     Route::get('/dashboard/customer', [DashboardController::class, 'customer'])->middleware('role:customer')->name('dashboard.customer');
 });

@@ -658,6 +658,11 @@ body {
     </div>
     @endif
 
+    {{-- Rating & Ulasan (muncul setelah pesanan selesai) --}}
+    @if($order->status === 'selesai')
+        @include('roles.customer.orders._rating_card')
+    @endif
+
     {{-- Order Detail --}}
     <div class="info-card js-section">
         <div class="info-card__head">

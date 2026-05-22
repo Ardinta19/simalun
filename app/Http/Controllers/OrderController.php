@@ -339,6 +339,7 @@ class OrderController extends Controller
             'items.service',
             'customerAddress',
             'statusHistories.updater',
+            'rating',
         ]);
 
         $histori = $order->statusHistories()
