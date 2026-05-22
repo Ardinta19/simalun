@@ -421,8 +421,15 @@ body {
                 <div class="quick-item__icon" style="background:var(--teal-lt); color:var(--teal);">✅</div>
                 <span class="quick-item__label">Pesanan Selesai</span>
             </a>
+            <a href="{{ route('admin.vouchers.index') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:#fff7ed; color:#c2410c;">🎟️</div>
+                <span class="quick-item__label">Voucher Promo</span>
+            </a>
         </div>
     </section>
+
+    {{-- Analitik 30 Hari --}}
+    @include('roles.admin._analytics_section')
 
     {{-- Logout --}}
     <div class="logout-section js-in">

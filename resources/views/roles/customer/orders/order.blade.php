@@ -640,9 +640,14 @@ body {
             <div class="driver-meta">Kurir Azka Laundry</div>
         </div>
         <div class="driver-actions">
-            @if($order->driver->phone)
-            <a href="https://wa.me/62{{ ltrim(preg_replace('/[^0-9]/', '', $order->driver->phone), '0') }}?text=Halo%20Kurir%20Azka%20Laundry%2C%20saya%20ingin%20tanya%20status%20pesanan%20%23{{ $order->order_code }}"
-               target="_blank" class="driver-btn wa" title="WhatsApp Kurir">
+            @php
+                $waDriverUrl = \App\Support\WhatsApp::link(
+                    $order->driver->phone,
+                    \App\Support\WhatsApp::driverMessage($order),
+                );
+            @endphp
+            @if($order->driver->phone && $waDriverUrl)
+            <a href="{{ $waDriverUrl }}" target="_blank" rel="noopener" class="driver-btn wa" title="WhatsApp Kurir">
                 💬
             </a>
             <a href="tel:{{ $order->driver->phone }}" class="driver-btn call" title="Telepon Kurir">
@@ -651,6 +656,11 @@ body {
             @endif
         </div>
     </div>
+    @endif
+
+    {{-- Rating & Ulasan (muncul setelah pesanan selesai) --}}
+    @if($order->status === 'selesai')
+        @include('roles.customer.orders._rating_card')
     @endif
 
     {{-- Order Detail --}}

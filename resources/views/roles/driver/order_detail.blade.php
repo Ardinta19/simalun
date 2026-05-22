@@ -385,9 +385,17 @@ body {
             <span class="data-row__label">Zona</span>
             <span class="data-row__value">Zona {{ $order->zone ?? 'A' }}</span>
         </div>
-        @if($order->customer?->phone)
+        @php
+            // Pesan WA disesuaikan dengan tahap order: kurir lagi jemput vs lagi antar.
+            $waContext = in_array($order->status, ['dijemput', 'menunggu']) ? 'pickup' : 'delivery';
+            $waUrl = \App\Support\WhatsApp::link(
+                $order->customer?->phone,
+                \App\Support\WhatsApp::customerMessage($order, $waContext),
+            );
+        @endphp
+        @if($order->customer?->phone && $waUrl)
         <div class="contact-bar">
-            <a href="https://wa.me/62{{ ltrim(preg_replace('/[^0-9]/','', $order->customer->phone),'0') }}?text=Halo%2C%20saya%20kurir%20Azka%20Laundry%20untuk%20pesanan%20%23{{ $order->order_code }}" target="_blank" class="contact-bar__btn contact-bar__btn--wa">
+            <a href="{{ $waUrl }}" target="_blank" rel="noopener" class="contact-bar__btn contact-bar__btn--wa">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
                 Chat WA
             </a>

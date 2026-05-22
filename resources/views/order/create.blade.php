@@ -613,11 +613,39 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
             <span class="sum-label">Biaya Jemput</span>
             <span class="sum-value" id="sum-pickup-cost">Rp 5.000</span>
           </div>
+          <div class="sum-row" id="sum-discount-row" style="display: none;">
+            <span class="sum-label" style="color: #059669;">Diskon Voucher</span>
+            <span class="sum-value" id="sum-discount" style="color: #059669;">- Rp 0</span>
+          </div>
           <hr class="sum-divider">
           <div class="sum-row">
             <span class="sum-label sum-total-label">Total Sementara</span>
             <span class="sum-value sum-total-value" id="sum-total">Rp 45.000</span>
           </div>
+        </div>
+
+        {{-- Voucher Promo --}}
+        <div class="voucher-box" style="margin-top: 12px; padding: 12px; background: #fff7ed; border-radius: 12px; border: 1px dashed #fb923c;">
+          <label for="voucher-input" style="display: block; font-size: .76rem; font-weight: 700; color: #9a3412; margin-bottom: 6px;">
+            🎟️ Punya kode voucher?
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" name="voucher_code" id="voucher-input"
+                   value="{{ old('voucher_code') }}" maxlength="30" autocomplete="off"
+                   placeholder="Masukkan kode (mis. WELCOME10)"
+                   style="flex: 1; padding: 9px 11px; border: 1px solid #fdba74; border-radius: 9px;
+                          font-family: 'Courier New', monospace; text-transform: uppercase;
+                          letter-spacing: 1px; font-weight: 700; font-size: .85rem; background: #fff;">
+            <button type="button" id="voucher-check-btn"
+                    style="background: #ea580c; color: #fff; border: none; padding: 0 16px; border-radius: 9px;
+                           font-weight: 700; font-size: .8rem; cursor: pointer;">
+              Cek
+            </button>
+          </div>
+          <div id="voucher-result" style="margin-top: 8px; font-size: .76rem; font-weight: 600;"></div>
+          @error('voucher_code')
+            <div style="color: #dc2626; font-size: .72rem; margin-top: 6px; font-weight: 600;">{{ $message }}</div>
+          @enderror
         </div>
         <p style="margin-top:10px; font-size:.7rem; color:var(--ink-lt); font-weight:700; line-height:1.4;">
           * Harga di atas hanyalah estimasi awal. Berat aktual dan harga final akan ditentukan setelah kurir melakukan penimbangan di lokasi.
@@ -816,7 +844,9 @@ function recalc() {
     }
   });
 
-  const total = svcCost + itemCost + pickupCost;
+  const subtotal = svcCost + itemCost + pickupCost;
+  const discount = appliedVoucher ? appliedVoucher.discount : 0;
+  const total = Math.max(0, subtotal - discount);
 
   document.getElementById('sum-service-name').textContent = `${svcName} (${weight} kg)`;
   document.getElementById('sum-service-cost').textContent = fmt(svcCost);
@@ -824,6 +854,118 @@ function recalc() {
   if (itemCostEl) itemCostEl.textContent = fmt(itemCost);
   document.getElementById('sum-pickup-cost').textContent  = fmt(pickupCost);
   document.getElementById('sum-total').textContent        = fmt(total);
+
+  // Baris diskon hanya muncul kalau voucher sudah di-apply.
+  const discountRow = document.getElementById('sum-discount-row');
+  const discountEl  = document.getElementById('sum-discount');
+  if (discount > 0) {
+    discountRow.style.display = '';
+    discountEl.textContent = '- ' + fmt(discount);
+  } else {
+    discountRow.style.display = 'none';
+  }
+
+  // Kalau subtotal berubah dan voucher punya min_order, re-validate diam-diam.
+  if (appliedVoucher && appliedVoucher.subtotalAtCheck !== subtotal) {
+    // Subtotal berubah setelah voucher di-cek — minta user re-cek
+    // supaya nominal diskon ter-update sesuai subtotal terbaru.
+    setVoucherWarning('Total berubah. Tekan Cek lagi untuk hitung ulang voucher.');
+  }
+}
+
+/* ── Voucher: cek di server lewat AJAX ───────── */
+let appliedVoucher = null;
+const voucherInput = document.getElementById('voucher-input');
+const voucherBtn = document.getElementById('voucher-check-btn');
+const voucherResult = document.getElementById('voucher-result');
+
+function setVoucherSuccess(data) {
+  voucherResult.innerHTML = '<span style="color: #059669;">✓ ' + data.description
+    + ' &mdash; potongan ' + data.discount_label + '</span>';
+}
+
+function setVoucherError(msg) {
+  voucherResult.innerHTML = '<span style="color: #dc2626;">✕ ' + msg + '</span>';
+}
+
+function setVoucherWarning(msg) {
+  voucherResult.innerHTML = '<span style="color: #d97706;">! ' + msg + '</span>';
+}
+
+function getCurrentSubtotal() {
+  const svcInput = document.querySelector('input[name="service_id"]:checked');
+  const pricePerKg = svcInput ? parseInt(svcInput.dataset.price) : 8000;
+  const zoneInput = document.querySelector('input[name="zone"]:checked');
+  const zone = zoneInput ? zoneInput.value : 'A';
+  const pickupCost = zoneCosts[zone] || 5000;
+  let itemCost = 0;
+  document.querySelectorAll('.item-qty').forEach(i => {
+    itemCost += (parseInt(i.value || 0) || 0) * (parseInt(i.dataset.itemPrice || 0) || 0);
+  });
+  return (pricePerKg * weight) + itemCost + pickupCost;
+}
+
+if (voucherBtn) {
+  voucherBtn.addEventListener('click', function () {
+    const code = (voucherInput.value || '').trim().toUpperCase();
+    if (! code) {
+      setVoucherError('Masukkan kode voucher dulu.');
+      appliedVoucher = null;
+      recalc();
+      return;
+    }
+
+    const subtotal = getCurrentSubtotal();
+    voucherBtn.disabled = true;
+    voucherBtn.textContent = '...';
+    voucherResult.innerHTML = '';
+
+    fetch('{{ route('customer.voucher.check') }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ code: code, subtotal: subtotal }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.valid) {
+          appliedVoucher = {
+            code: data.code,
+            discount: data.discount,
+            description: data.description,
+            subtotalAtCheck: subtotal,
+          };
+          voucherInput.value = data.code;
+          setVoucherSuccess(data);
+        } else {
+          appliedVoucher = null;
+          setVoucherError(data.message || 'Voucher tidak berlaku.');
+        }
+        recalc();
+      })
+      .catch(() => {
+        appliedVoucher = null;
+        setVoucherError('Gagal terhubung ke server. Coba lagi.');
+        recalc();
+      })
+      .finally(() => {
+        voucherBtn.disabled = false;
+        voucherBtn.textContent = 'Cek';
+      });
+  });
+
+  voucherInput.addEventListener('input', function () {
+    // Kalau user ngubah kode setelah berhasil di-apply, batalkan apply
+    // sampai dia tekan Cek lagi.
+    if (appliedVoucher && this.value.trim().toUpperCase() !== appliedVoucher.code) {
+      appliedVoucher = null;
+      voucherResult.innerHTML = '';
+      recalc();
+    }
+  });
 }
 
 document.querySelectorAll('input[name="service_id"], input[name="zone"], .item-qty')

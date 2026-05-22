@@ -198,6 +198,10 @@ body {
     margin-bottom: 2px;
 }
 .order-card__phone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     font-size: .7rem;
     font-weight: 600;
     color: var(--ink-muted);
@@ -401,7 +405,16 @@ body {
         </div>
         <div class="order-card__body">
             <div class="order-card__customer">{{ $o->customer->name ?? '-' }}</div>
-            <div class="order-card__phone">{{ $o->customer->phone ?? '' }}</div>
+            <div class="order-card__phone">
+                {{ $o->customer->phone ?? '' }}
+                @if($o->customer?->phone)
+                    <x-wa-button
+                        :phone="$o->customer->phone"
+                        :message="\App\Support\WhatsApp::customerMessage($o, 'confirm')"
+                        label="WA"
+                    />
+                @endif
+            </div>
             <div class="order-card__meta">
                 <span class="order-card__chip">{{ $o->service->name ?? '-' }}</span>
                 <span class="order-card__chip">{{ $o->weight_estimate }} kg</span>
