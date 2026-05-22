@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\FinanceEntry;
 use App\Models\Order;
+use App\Models\OrderRating;
 use App\Models\User;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -14,9 +16,9 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         return match ($user->role) {
-            'admin'  => redirect()->route('dashboard.admin'),
+            'admin' => redirect()->route('dashboard.admin'),
             'driver' => redirect()->route('driver.dashboard'),
-            default  => redirect()->route('customer.dashboard'),
+            default => redirect()->route('customer.dashboard'),
         };
     }
 
@@ -39,7 +41,7 @@ class DashboardController extends Controller
 
         $totalPesanan = $user->customerOrders()->count();
         $totalSelesai = $user->customerOrders()->where('status', 'selesai')->count();
-        $totalKg      = (float) $user->customerOrders()
+        $totalKg = (float) $user->customerOrders()
             ->where('status', 'selesai')
             ->sum('weight_actual');
 
@@ -63,8 +65,8 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        $jumlahDiproses    = Order::whereIn('status', Order::STATUS_AKTIF)->count();
-        $jumlahPrioritas   = Order::where('status', 'menunggu')->count();
+        $jumlahDiproses = Order::whereIn('status', Order::STATUS_AKTIF)->count();
+        $jumlahPrioritas = Order::where('status', 'menunggu')->count();
         $jumlahSelesaiHari = Order::where('status', 'selesai')
             ->whereDate('updated_at', today())
             ->count();
@@ -94,6 +96,55 @@ class DashboardController extends Controller
 
         $adminUnread = Auth::user()->unreadNotifications->count();
 
+        // ── Analitik 30 hari terakhir ─────────────────────────────────
+        // Sengaja pakai window 30 hari supaya tetap relevan saat usaha tumbuh.
+        // Window lifetime cenderung condong ke layanan/customer lama saja.
+        $sejak = now()->subDays(30)->startOfDay();
+
+        $topServices = Order::query()
+            ->selectRaw('service_id, COUNT(*) as total_order')
+            ->whereNotNull('service_id')
+            ->where('created_at', '>=', $sejak)
+            ->groupBy('service_id')
+            ->orderByDesc('total_order')
+            ->take(5)
+            ->with('service:id,name')
+            ->get();
+
+        // Distribusi jam pickup (pagi/siang/sore) — bantu admin atur jadwal kurir.
+        $pickupBuckets = Order::query()
+            ->selectRaw('pickup_time, COUNT(*) as total')
+            ->whereNotNull('pickup_time')
+            ->where('created_at', '>=', $sejak)
+            ->groupBy('pickup_time')
+            ->pluck('total', 'pickup_time');
+
+        $pickupBuckets = collect(['pagi', 'siang', 'sore'])
+            ->mapWithKeys(fn ($slot) => [$slot => (int) ($pickupBuckets[$slot] ?? 0)])
+            ->toArray();
+
+        $topCustomers = Order::query()
+            ->selectRaw('customer_id, COUNT(*) as total_order, SUM(total_cost) as total_spent')
+            ->whereNotNull('customer_id')
+            ->where('created_at', '>=', $sejak)
+            ->groupBy('customer_id')
+            ->orderByDesc('total_order')
+            ->take(5)
+            ->with('customer:id,name,phone')
+            ->get();
+
+        $ratingStats = OrderRating::query()
+            ->where('created_at', '>=', $sejak)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_rating')
+            ->first();
+
+        $ulasanTerbaru = OrderRating::with(['customer:id,name', 'order:id,order_code'])
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $voucherAktif = Voucher::where('is_active', true)->count();
+
         return view('roles.admin.dashboard', compact(
             'jumlahDiproses',
             'jumlahPrioritas',
@@ -103,7 +154,13 @@ class DashboardController extends Controller
             'pemasukanHari',
             'pemasukanBulan',
             'pesananSelesaiHariIni',
-            'adminUnread'
+            'adminUnread',
+            'topServices',
+            'pickupBuckets',
+            'topCustomers',
+            'ratingStats',
+            'ulasanTerbaru',
+            'voucherAktif',
         ));
     }
 

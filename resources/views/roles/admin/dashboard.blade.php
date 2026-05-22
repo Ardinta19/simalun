@@ -428,6 +428,9 @@ body {
         </div>
     </section>
 
+    {{-- Analitik 30 Hari --}}
+    @include('roles.admin._analytics_section')
+
     {{-- Logout --}}
     <div class="logout-section js-in">
         <form action="{{ route('logout') }}" method="POST" id="form-logout">
