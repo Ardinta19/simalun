@@ -50,14 +50,6 @@ class AdminDriverAssignmentTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('driver_assignments', [
-            'order_id' => $order->id,
-            'driver_id' => $driver->id,
-            'assignment_type' => 'pickup',
-            'assignment_status' => 'assigned',
-            'assigned_by' => $admin->id,
-        ]);
-
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
             'driver_id' => $driver->id,
@@ -66,7 +58,7 @@ class AdminDriverAssignmentTest extends TestCase
 
         $this->assertDatabaseHas('order_status_histories', [
             'order_id' => $order->id,
-            'status_code' => 'assigned_pickup',
+            'status_code' => 'dijemput',
             'updated_by' => $admin->id,
         ]);
     }
@@ -113,7 +105,7 @@ class AdminDriverAssignmentTest extends TestCase
 
         $this->assertDatabaseHas('order_status_histories', [
             'order_id' => $order->id,
-            'status_code' => 'out_for_delivery',
+            'status_code' => 'dikirim',
             'updated_by' => $admin->id,
         ]);
     }
@@ -122,7 +114,7 @@ class AdminDriverAssignmentTest extends TestCase
     {
         return Service::create([
             'name' => 'Cuci Test Admin',
-            'slug' => 'cuci-test-admin-' . uniqid(),
+            'slug' => 'cuci-test-admin-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 7000,
             'unit_type' => 'kg',

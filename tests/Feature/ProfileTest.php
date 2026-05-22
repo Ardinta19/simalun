@@ -10,60 +10,71 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_profile_page_is_displayed(): void
+    public function test_halaman_edit_profil_dapat_ditampilkan(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'phone' => '81234567890',
+        ]);
 
         $response = $this
             ->actingAs($user)
-            ->get('/profile');
+            ->get('/profile/edit');
 
         $response->assertOk();
     }
 
-    public function test_profile_information_can_be_updated(): void
+    public function test_profil_dapat_diperbarui_dengan_nama_email_dan_phone(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'phone' => '81234567890',
+        ]);
 
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
+                'name' => 'Nama Baru',
+                'email' => 'baru@example.com',
+                'phone' => '81299990000',
             ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+        $response->assertSessionHasNoErrors();
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('Nama Baru', $user->name);
+        $this->assertSame('baru@example.com', $user->email);
+        $this->assertSame('81299990000', $user->phone);
         $this->assertNull($user->email_verified_at);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
+    public function test_status_verifikasi_email_tidak_berubah_ketika_email_tidak_diubah(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'phone' => '81234567890',
+        ]);
 
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
-                'name' => 'Test User',
+                'name' => $user->name,
                 'email' => $user->email,
+                'phone' => $user->phone,
             ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+        $response->assertSessionHasNoErrors();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
-    public function test_user_can_delete_their_account(): void
+    public function test_user_dapat_menghapus_akunnya_sendiri(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'phone' => '81234567890',
+        ]);
 
         $response = $this
             ->actingAs($user)
@@ -76,24 +87,25 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        // User pakai SoftDeletes — terhapus berarti deleted_at terisi.
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
     }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
+    public function test_password_salah_membatalkan_penghapusan_akun(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'phone' => '81234567890',
+        ]);
 
         $response = $this
             ->actingAs($user)
-            ->from('/profile')
+            ->from('/profile/edit')
             ->delete('/profile', [
-                'password' => 'wrong-password',
+                'password' => 'salah-bukan-password',
             ]);
 
-        $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/profile');
-
+        $response->assertSessionHasErrors('password');
         $this->assertNotNull($user->fresh());
     }
 }

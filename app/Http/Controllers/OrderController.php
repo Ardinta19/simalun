@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Service;
 use App\Models\User;
-use App\Models\CustomerAddress;
-use App\Models\FinanceEntry;
 use App\Notifications\OrderStatusUpdated;
+use App\Support\Laundry;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +20,8 @@ class OrderController extends Controller
 {
     public function create()
     {
-        $services     = Service::where('is_active', true)->orderBy('id')->get();
-        $kgServices   = $services->where('pricing_model', 'per_kg')->values();
+        $services = Service::where('is_active', true)->orderBy('id')->get();
+        $kgServices = $services->where('pricing_model', 'per_kg')->values();
         $itemServices = $services->where('pricing_model', 'per_item')->values();
 
         $alamatTersimpan = Auth::user()->customerAddresses()
@@ -34,31 +35,31 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'service_id'              => ['required', 'exists:services,id'],
-            'address'                 => ['required', 'string', 'min:10', 'max:300'],
-            'address_note'            => ['nullable', 'string', 'max:200'],
-            'zone'                    => ['required', 'in:A,B,C'],
-            'pickup_date'             => ['required', 'date', 'after_or_equal:today', 'before_or_equal:' . now()->addDays(14)->toDateString()],
-            'pickup_time'             => ['required', 'in:pagi,siang,sore'],
-            'weight_estimate'         => ['required', 'numeric', 'min:1', 'max:50'],
-            'notes'                   => ['nullable', 'string', 'max:500'],
-            'customer_address_id'     => ['nullable', 'integer', 'exists:customer_addresses,id'],
-            'item_lines'              => ['nullable', 'array', 'max:30'],
+            'service_id' => ['required', 'exists:services,id'],
+            'address' => ['required', 'string', 'min:10', 'max:300'],
+            'address_note' => ['nullable', 'string', 'max:200'],
+            'zone' => ['required', 'in:A,B,C'],
+            'pickup_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:'.now()->addDays(14)->toDateString()],
+            'pickup_time' => ['required', 'in:pagi,siang,sore'],
+            'weight_estimate' => ['required', 'numeric', 'min:1', 'max:50'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'customer_address_id' => ['nullable', 'integer', 'exists:customer_addresses,id'],
+            'item_lines' => ['nullable', 'array', 'max:30'],
             'item_lines.*.service_id' => ['required_with:item_lines', 'exists:services,id'],
-            'item_lines.*.qty'        => ['required_with:item_lines', 'integer', 'min:0', 'max:200'],
-            'item_lines.*.notes'      => ['nullable', 'string', 'max:200'],
+            'item_lines.*.qty' => ['required_with:item_lines', 'integer', 'min:0', 'max:200'],
+            'item_lines.*.notes' => ['nullable', 'string', 'max:200'],
         ], [
             'pickup_date.before_or_equal' => 'Tanggal jemput maksimal 14 hari ke depan.',
-            'weight_estimate.max'         => 'Estimasi berat melebihi batas (maks 50 kg).',
-            'item_lines.max'              => 'Item satuan terlalu banyak (maks 30 baris).',
+            'weight_estimate.max' => 'Estimasi berat melebihi batas (maks 50 kg).',
+            'item_lines.max' => 'Item satuan terlalu banyak (maks 30 baris).',
         ]);
 
         // Ownership check for customer_address_id
-        if (!empty($validated['customer_address_id'])) {
+        if (! empty($validated['customer_address_id'])) {
             $owns = CustomerAddress::where('id', $validated['customer_address_id'])
                 ->where('customer_id', Auth::id())
                 ->exists();
-            abort_if(!$owns, 403, 'Alamat tersimpan tidak ditemukan.');
+            abort_if(! $owns, 403, 'Alamat tersimpan tidak ditemukan.');
         }
 
         // Duplicate-order prevention: same service+date+time within 30s
@@ -86,9 +87,9 @@ class OrderController extends Controller
 
         $request->merge($validated);
 
-        $service    = Service::findOrFail($request->service_id);
-        $weight     = (float) $request->weight_estimate;
-        $zone       = $request->zone;
+        $service = Service::findOrFail($request->service_id);
+        $weight = (float) $request->weight_estimate;
+        $zone = $request->zone;
         $pickupCost = Order::zoneCost($zone);
 
         $serviceCost = (int) ($service->effective_unit_price * $weight);
@@ -98,22 +99,26 @@ class OrderController extends Controller
 
         foreach ((array) $request->input('item_lines', []) as $line) {
             $qty = (int) ($line['qty'] ?? 0);
-            if ($qty <= 0) continue;
+            if ($qty <= 0) {
+                continue;
+            }
 
             $itemSvc = Service::find($line['service_id'] ?? null);
-            if (!$itemSvc) continue;
+            if (! $itemSvc) {
+                continue;
+            }
 
             $lineTotal = $itemSvc->effective_unit_price * $qty;
             $itemTotal += $lineTotal;
 
             $itemLines[] = [
-                'service_id'       => $itemSvc->id,
+                'service_id' => $itemSvc->id,
                 'item_description' => $itemSvc->name,
-                'qty'              => $qty,
-                'weight_kg'        => null,
-                'unit_price'       => $itemSvc->effective_unit_price,
-                'line_total'       => $lineTotal,
-                'notes'            => $line['notes'] ?? null,
+                'qty' => $qty,
+                'weight_kg' => null,
+                'unit_price' => $itemSvc->effective_unit_price,
+                'line_total' => $lineTotal,
+                'notes' => $line['notes'] ?? null,
             ];
         }
 
@@ -121,87 +126,107 @@ class OrderController extends Controller
 
         try {
             $result = DB::transaction(function () use (
-            $request, $service, $weight, $zone, $pickupCost,
-            $serviceCost, $itemLines, $totalCost
-        ) {
-            $order = Order::create([
-                'order_code'          => Order::generateCode(),
-                'customer_id'         => Auth::id(),
-                'service_id'          => $service->id,
-                'address'             => $request->address,
-                'address_note'        => $request->address_note,
-                'zone'                => $zone,
-                'pickup_cost'         => $pickupCost,
-                'pickup_date'         => $request->pickup_date,
-                'pickup_time'         => $request->pickup_time,
-                'weight_estimate'     => $weight,
-                'service_cost'        => $serviceCost,
-                'discount'            => 0,
-                'total_cost'          => $totalCost,
-                'status'              => 'menunggu',
-                'notes'               => $request->notes,
-                'payment_method'      => 'cod',
-                'is_paid'             => false,
-                'customer_address_id' => $request->customer_address_id ?: null,
-            ]);
+                $request, $service, $weight, $zone, $pickupCost,
+                $serviceCost, $itemLines, $totalCost
+            ) {
+                $order = Order::create([
+                    'order_code' => Order::generateCode(),
+                    'customer_id' => Auth::id(),
+                    'service_id' => $service->id,
+                    'address' => $request->address,
+                    'address_note' => $request->address_note,
+                    'zone' => $zone,
+                    'pickup_cost' => $pickupCost,
+                    'pickup_date' => $request->pickup_date,
+                    'pickup_time' => $request->pickup_time,
+                    'weight_estimate' => $weight,
+                    'service_cost' => $serviceCost,
+                    'discount' => 0,
+                    'total_cost' => $totalCost,
+                    'status' => 'menunggu',
+                    'notes' => $request->notes,
+                    'payment_method' => 'cod',
+                    'is_paid' => false,
+                    'customer_address_id' => $request->customer_address_id ?: null,
+                ]);
 
-            OrderItem::create([
-                'order_id'         => $order->id,
-                'service_id'       => $service->id,
-                'item_description' => $service->name,
-                'qty'              => 1,
-                'weight_kg'        => $weight,
-                'unit_price'       => $service->effective_unit_price,
-                'line_total'       => $serviceCost,
-            ]);
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'service_id' => $service->id,
+                    'item_description' => $service->name,
+                    'qty' => 1,
+                    'weight_kg' => $weight,
+                    'unit_price' => $service->effective_unit_price,
+                    'line_total' => $serviceCost,
+                ]);
 
-            foreach ($itemLines as $line) {
-                OrderItem::create(array_merge($line, ['order_id' => $order->id]));
-            }
+                foreach ($itemLines as $line) {
+                    OrderItem::create(array_merge($line, ['order_id' => $order->id]));
+                }
 
-            if ($request->customer_address_id) {
-                CustomerAddress::where('id', $request->customer_address_id)
-                    ->where('customer_id', Auth::id())
-                    ->update(['last_used_at' => now()]);
-            }
+                if ($request->customer_address_id) {
+                    CustomerAddress::where('id', $request->customer_address_id)
+                        ->where('customer_id', Auth::id())
+                        ->update(['last_used_at' => now()]);
+                } else {
+                    // Order pertama / pesanan tanpa alamat tersimpan: simpan alamat
+                    // manual ini ke buku alamat customer biar bisa dipakai ulang.
+                    $customer = Auth::user();
+                    $isFirst = ! $customer->customerAddresses()->exists();
 
-            // Income TIDAK dicatat di sini — dicatat saat order selesai (COD model).
-            // Lihat FinanceController::recordIncomeFromOrder()
-
-            // Auto-assign ke driver aktif (skala rumahan = 1 driver)
-            $driver = User::where('role', 'driver')
-                ->where('is_active', true)
-                ->first();
-
-            if ($driver) {
-                // Driver tersedia — langsung assign
-                Order::withoutEvents(function () use ($order, $driver) {
-                    $order->update([
-                        'driver_id' => $driver->id,
-                        'status'    => 'dijemput',
+                    $newAddress = CustomerAddress::create([
+                        'customer_id' => $customer->id,
+                        'label' => $isFirst ? 'Alamat Utama' : 'Alamat Pesanan',
+                        'recipient_name' => $customer->name,
+                        'phone' => $customer->phone,
+                        'full_address' => $request->address,
+                        'notes' => $request->address_note,
+                        'zone' => $zone,
+                        'is_primary' => $isFirst,
+                        'last_used_at' => now(),
                     ]);
-                });
 
-                OrderStatusHistory::create([
-                    'order_id'    => $order->id,
-                    'status_code' => 'dijemput',
-                    'status_note' => "Kurir {$driver->name} otomatis ditugaskan untuk penjemputan.",
-                    'updated_by'  => $order->customer_id,
-                ]);
-            } else {
-                // Tidak ada driver aktif — order tetap 'menunggu', notif admin untuk assign manual
-                OrderStatusHistory::create([
-                    'order_id'    => $order->id,
-                    'status_code' => 'menunggu',
-                    'status_note' => 'Pesanan masuk. Belum ada kurir aktif — menunggu penugasan manual.',
-                    'updated_by'  => $order->customer_id,
-                ]);
-            }
+                    $order->update(['customer_address_id' => $newAddress->id]);
+                }
 
-            return ['order' => $order, 'driver' => $driver];
-        });
+                // Income TIDAK dicatat di sini — dicatat saat order selesai (COD model).
+                // Lihat FinanceController::recordIncomeFromOrder()
+
+                // Auto-assign ke driver aktif (skala rumahan = 1 driver)
+                $driver = User::where('role', 'driver')
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($driver) {
+                    // Driver tersedia — langsung assign
+                    Order::withoutEvents(function () use ($order, $driver) {
+                        $order->update([
+                            'driver_id' => $driver->id,
+                            'status' => 'dijemput',
+                        ]);
+                    });
+
+                    OrderStatusHistory::create([
+                        'order_id' => $order->id,
+                        'status_code' => 'dijemput',
+                        'status_note' => "Kurir {$driver->name} otomatis ditugaskan untuk penjemputan.",
+                        'updated_by' => $order->customer_id,
+                    ]);
+                } else {
+                    // Tidak ada driver aktif — order tetap 'menunggu', notif admin untuk assign manual
+                    OrderStatusHistory::create([
+                        'order_id' => $order->id,
+                        'status_code' => 'menunggu',
+                        'status_note' => 'Pesanan masuk. Belum ada kurir aktif — menunggu penugasan manual.',
+                        'updated_by' => $order->customer_id,
+                    ]);
+                }
+
+                return ['order' => $order, 'driver' => $driver];
+            });
         } catch (\Throwable $e) {
             report($e);
+
             return back()->withInput()
                 ->withErrors(['service_id' => 'Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.']);
         }
@@ -265,11 +290,11 @@ class OrderController extends Controller
         // Tampilkan layar success hanya saat order baru dibuat (menunggu/dijemput).
         // Kalau sudah masuk proses lebih lanjut, arahkan ke detail.
         $showSuccess = in_array($order->status, ['menunggu', 'dijemput']);
-        if (!$showSuccess) {
+        if (! $showSuccess) {
             return match ($user->role ?? 'customer') {
-                'admin'  => redirect()->route('admin.orders.receipt', $order),
+                'admin' => redirect()->route('admin.orders.receipt', $order),
                 'driver' => redirect()->route('driver.orders.show', ['order' => $order->id]),
-                default  => redirect()->route('customer.order.detail', ['order' => $order->id]),
+                default => redirect()->route('customer.order.detail', ['order' => $order->id]),
             };
         }
 
@@ -278,7 +303,7 @@ class OrderController extends Controller
 
     public function customerIndex(Request $request)
     {
-        $user   = Auth::user();
+        $user = Auth::user();
         $filter = $request->get('filter', 'semua');
 
         $query = $user->customerOrders()
@@ -286,10 +311,10 @@ class OrderController extends Controller
             ->latest();
 
         match ($filter) {
-            'aktif'   => $query->whereIn('status', Order::statusAktifSemua()),
+            'aktif' => $query->whereIn('status', Order::statusAktifSemua()),
             'selesai' => $query->whereIn('status', Order::statusSelesaiSemua()),
-            'batal'   => $query->where('status', 'dibatalkan'),
-            default   => null,
+            'batal' => $query->where('status', 'dibatalkan'),
+            default => null,
         };
 
         $pesananAktif = $user->customerOrders()
@@ -299,7 +324,7 @@ class OrderController extends Controller
             ->first();
 
         return view('roles.customer.orders.index', [
-            'pesanan'      => $query->paginate(10)->withQueryString(),
+            'pesanan' => $query->paginate(10)->withQueryString(),
             'pesananAktif' => $pesananAktif,
         ]);
     }
@@ -333,7 +358,7 @@ class OrderController extends Controller
 
         $allowedCancel = ['menunggu', 'dijemput'];
 
-        if (!in_array($order->status, $allowedCancel, true)) {
+        if (! in_array($order->status, $allowedCancel, true)) {
             return back()->with('error', 'Pesanan tidak bisa dibatalkan karena sudah dalam proses pencucian.');
         }
 
@@ -348,10 +373,10 @@ class OrderController extends Controller
             $order->update(['status' => 'dibatalkan']);
 
             OrderStatusHistory::create([
-                'order_id'    => $order->id,
+                'order_id' => $order->id,
                 'status_code' => 'dibatalkan',
                 'status_note' => "Dibatalkan oleh customer. {$reasonText}",
-                'updated_by'  => Auth::id(),
+                'updated_by' => Auth::id(),
             ]);
         });
 
@@ -384,14 +409,14 @@ class OrderController extends Controller
             ->latest()
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             $order = Auth::user()->customerOrders()
                 ->with('driver')
                 ->latest()
                 ->first();
         }
 
-        abort_if(!$order, 404);
+        abort_if(! $order, 404);
 
         return view('roles.customer.orders.tracking', compact('order'));
     }
@@ -406,11 +431,11 @@ class OrderController extends Controller
             $query->where('status', $status);
         }
 
-        $pesanan       = $query->paginate(15)->withQueryString();
-        $jumlahSemua   = Order::count();
-        $jumlahAktif   = Order::whereIn('status', Order::STATUS_AKTIF)->count();
+        $pesanan = $query->paginate(15)->withQueryString();
+        $jumlahSemua = Order::count();
+        $jumlahAktif = Order::whereIn('status', Order::STATUS_AKTIF)->count();
         $jumlahSelesai = Order::whereIn('status', Order::statusSelesaiSemua())->count();
-        $daftarDriver  = User::where('role', 'driver')->where('is_active', true)->orderBy('name')->get();
+        $daftarDriver = User::where('role', 'driver')->where('is_active', true)->orderBy('name')->get();
 
         return view('roles.admin.orders', compact(
             'pesanan', 'jumlahSemua', 'jumlahAktif', 'jumlahSelesai', 'daftarDriver'
@@ -420,7 +445,7 @@ class OrderController extends Controller
     public function assignDriver(Request $request, Order $order)
     {
         $request->validate([
-            'driver_id'       => ['required', 'exists:users,id'],
+            'driver_id' => ['required', 'exists:users,id'],
             'assignment_type' => ['required', 'in:pickup,delivery'],
         ]);
 
@@ -435,7 +460,7 @@ class OrderController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$driver) {
+        if (! $driver) {
             return back()->with('error', 'Driver tidak ditemukan atau sedang nonaktif.');
         }
 
@@ -444,14 +469,14 @@ class OrderController extends Controller
         DB::transaction(function () use ($order, $driver, $newStatus, $request) {
             $order->update([
                 'driver_id' => $driver->id,
-                'status'    => $newStatus,
+                'status' => $newStatus,
             ]);
 
             OrderStatusHistory::create([
-                'order_id'    => $order->id,
+                'order_id' => $order->id,
                 'status_code' => $newStatus,
                 'status_note' => "Driver {$driver->name} ditugaskan untuk {$request->assignment_type}.",
-                'updated_by'  => Auth::id(),
+                'updated_by' => Auth::id(),
             ]);
         });
 
@@ -484,10 +509,10 @@ class OrderController extends Controller
         }
 
         $statusLabel = [
-            'dicuci'     => 'Sedang Dicuci',
-            'disetrika'  => 'Sedang Disetrika',
-            'siap'       => 'Siap Dikirim',
-            'selesai'    => 'Selesai',
+            'dicuci' => 'Sedang Dicuci',
+            'disetrika' => 'Sedang Disetrika',
+            'siap' => 'Siap Dikirim',
+            'selesai' => 'Selesai',
             'dibatalkan' => 'Dibatalkan',
         ];
 
@@ -495,10 +520,10 @@ class OrderController extends Controller
             $order->update(['status' => $request->status]);
 
             OrderStatusHistory::create([
-                'order_id'    => $order->id,
+                'order_id' => $order->id,
                 'status_code' => $request->status,
                 'status_note' => "Status diperbarui menjadi: {$statusLabel[$request->status]}.",
-                'updated_by'  => Auth::id(),
+                'updated_by' => Auth::id(),
             ]);
 
             // Record income saat order selesai (COD)
@@ -541,7 +566,7 @@ class OrderController extends Controller
         $order->load(['customer', 'service', 'items.service', 'driver']);
 
         $format = request('format', 'a5');
-        $laundry = \App\Support\Laundry::receiptHeader();
+        $laundry = Laundry::receiptHeader();
 
         return view('order.receipt', compact('order', 'format', 'laundry'));
     }
@@ -559,15 +584,15 @@ class OrderController extends Controller
         $order->load(['customer', 'service', 'items.service', 'driver']);
 
         $format = request('format', 'a5');
-        $laundry = \App\Support\Laundry::receiptHeader();
+        $laundry = Laundry::receiptHeader();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('order.receipt-pdf', compact('order', 'format', 'laundry'));
+        $pdf = Pdf::loadView('order.receipt-pdf', compact('order', 'format', 'laundry'));
 
         $paperSize = match ($format) {
-            '58mm'    => [0, 0, 164, 600],
-            '80mm'    => [0, 0, 226, 600],
+            '58mm' => [0, 0, 164, 600],
+            '80mm' => [0, 0, 226, 600],
             'thermal' => [0, 0, 226, 600],
-            default   => 'a5',
+            default => 'a5',
         };
 
         if (is_array($paperSize)) {
@@ -583,7 +608,7 @@ class OrderController extends Controller
 
     public function walkinForm()
     {
-        $daftarLayanan     = Service::where('is_active', true)->where('pricing_model', 'per_kg')->get();
+        $daftarLayanan = Service::where('is_active', true)->where('pricing_model', 'per_kg')->get();
         $daftarLayananItem = Service::where('is_active', true)->where('pricing_model', 'per_item')->get();
 
         return view('roles.admin.walkin', compact('daftarLayanan', 'daftarLayananItem'));
@@ -592,26 +617,39 @@ class OrderController extends Controller
     public function walkinStore(Request $request)
     {
         $request->validate([
-            'customer_name'   => 'required|string|max:120',
-            'customer_phone'  => 'nullable|string|max:20',
-            'service_id'      => 'required|exists:services,id',
+            'customer_name' => 'required|string|max:120',
+            'customer_phone' => 'nullable|string|max:20',
+            'service_category_id' => 'nullable|exists:service_categories,id',
+            'service_id' => 'required|exists:services,id',
             'weight_estimate' => 'required|numeric|min:0.5',
-            'pickup_time'     => 'required|in:pagi,siang,sore',
+            'pickup_time' => 'required|in:pagi,siang,sore',
         ]);
+
+        // Validasi konsistensi: kategori yang dipilih harus sama dengan kategori
+        // service utama. Mencegah admin tidak sengaja salah pilih (mis. layanan
+        // kiloan dengan kategori "Karpet").
+        if ($request->filled('service_category_id')) {
+            $selectedService = Service::find($request->service_id);
+            if ($selectedService && $selectedService->service_category_id !== null
+                && (int) $selectedService->service_category_id !== (int) $request->service_category_id) {
+                return back()->withInput()
+                    ->withErrors(['service_category_id' => 'Kategori yang dipilih tidak sesuai dengan layanan utama.']);
+            }
+        }
 
         $customer = User::firstOrCreate(
             ['phone' => $request->customer_phone ?: null],
             [
-                'name'     => $request->customer_name,
-                'email'    => null,
+                'name' => $request->customer_name,
+                'email' => null,
                 'password' => bcrypt(Str::random(12)),
-                'role'     => 'customer',
-                'phone'    => $request->customer_phone,
+                'role' => 'customer',
+                'phone' => $request->customer_phone,
             ]
         );
 
-        $service     = Service::findOrFail($request->service_id);
-        $weight      = (float) $request->weight_estimate;
+        $service = Service::findOrFail($request->service_id);
+        $weight = (float) $request->weight_estimate;
         $serviceCost = (int) ($service->effective_unit_price * $weight);
 
         $itemLines = [];
@@ -619,21 +657,25 @@ class OrderController extends Controller
 
         foreach ((array) $request->input('item_lines', []) as $line) {
             $qty = (int) ($line['qty'] ?? 0);
-            if ($qty <= 0) continue;
+            if ($qty <= 0) {
+                continue;
+            }
 
             $itemSvc = Service::find($line['service_id'] ?? null);
-            if (!$itemSvc) continue;
+            if (! $itemSvc) {
+                continue;
+            }
 
             $lineTotal = $itemSvc->effective_unit_price * $qty;
             $itemTotal += $lineTotal;
 
             $itemLines[] = [
-                'service_id'       => $itemSvc->id,
+                'service_id' => $itemSvc->id,
                 'item_description' => $itemSvc->name,
-                'qty'              => $qty,
-                'weight_kg'        => null,
-                'unit_price'       => $itemSvc->effective_unit_price,
-                'line_total'       => $lineTotal,
+                'qty' => $qty,
+                'weight_kg' => null,
+                'unit_price' => $itemSvc->effective_unit_price,
+                'line_total' => $lineTotal,
             ];
         }
 
@@ -643,32 +685,32 @@ class OrderController extends Controller
             $request, $customer, $service, $weight, $serviceCost, $itemLines, $totalCost
         ) {
             $order = Order::create([
-                'order_code'      => Order::generateCode(),
-                'customer_id'     => $customer->id,
-                'service_id'      => $service->id,
-                'address'         => 'Walk-in (Datang Langsung)',
-                'zone'            => 'A',
-                'pickup_cost'     => 0,
-                'pickup_date'     => today(),
-                'pickup_time'     => $request->pickup_time,
+                'order_code' => Order::generateCode(),
+                'customer_id' => $customer->id,
+                'service_id' => $service->id,
+                'address' => 'Walk-in (Datang Langsung)',
+                'zone' => 'A',
+                'pickup_cost' => 0,
+                'pickup_date' => today(),
+                'pickup_time' => $request->pickup_time,
                 'weight_estimate' => $weight,
-                'service_cost'    => $serviceCost,
-                'discount'        => 0,
-                'total_cost'      => $totalCost,
-                'status'          => 'dicuci',
-                'notes'           => $request->notes,
-                'payment_method'  => 'cod',
-                'is_paid'         => false,
+                'service_cost' => $serviceCost,
+                'discount' => 0,
+                'total_cost' => $totalCost,
+                'status' => 'dicuci',
+                'notes' => $request->notes,
+                'payment_method' => 'cod',
+                'is_paid' => false,
             ]);
 
             OrderItem::create([
-                'order_id'         => $order->id,
-                'service_id'       => $service->id,
+                'order_id' => $order->id,
+                'service_id' => $service->id,
                 'item_description' => $service->name,
-                'qty'              => 1,
-                'weight_kg'        => $weight,
-                'unit_price'       => $service->effective_unit_price,
-                'line_total'       => $serviceCost,
+                'qty' => 1,
+                'weight_kg' => $weight,
+                'unit_price' => $service->effective_unit_price,
+                'line_total' => $serviceCost,
             ]);
 
             foreach ($itemLines as $line) {
@@ -709,17 +751,17 @@ class OrderController extends Controller
         abort_if($order->driver_id !== Auth::id(), 403);
 
         $request->validate([
-            'status'        => 'required|in:dicuci,dikirim,selesai',
+            'status' => 'required|in:dicuci,dikirim,selesai',
             'weight_actual' => 'nullable|numeric|min:0.1',
-            'proof_image'   => 'nullable|image|max:5120',
+            'proof_image' => 'nullable|image|max:5120',
         ]);
 
         $updateData = ['status' => $request->status];
-        $note       = '';
+        $note = '';
 
         if ($request->status === 'dicuci' && $request->filled('weight_actual')) {
             $actualWeight = (float) $request->weight_actual;
-            $actualCost   = (int) ($order->service->effective_unit_price * $actualWeight);
+            $actualCost = (int) ($order->service->effective_unit_price * $actualWeight);
 
             // Hitung item satuan (service selain layanan utama)
             $itemTotal = $order->items()
@@ -727,15 +769,15 @@ class OrderController extends Controller
                 ->sum('line_total');
 
             $updateData['weight_actual'] = $actualWeight;
-            $updateData['service_cost']  = $actualCost;
-            $updateData['total_cost']    = $actualCost + (int) $itemTotal + $order->pickup_cost - $order->discount;
+            $updateData['service_cost'] = $actualCost;
+            $updateData['total_cost'] = $actualCost + (int) $itemTotal + $order->pickup_cost - $order->discount;
             $note = "Berat aktual: {$actualWeight} kg.";
         }
 
         if ($request->status === 'selesai' && $request->hasFile('proof_image')) {
             $updateData['proof_image'] = $request->file('proof_image')->store('proof', 'public');
-            $updateData['is_paid']     = true;
-            $updateData['paid_at']     = now();
+            $updateData['is_paid'] = true;
+            $updateData['paid_at'] = now();
             $note = 'Pesanan berhasil diantar. Foto bukti diunggah.';
         } elseif ($request->status === 'selesai') {
             $updateData['is_paid'] = true;
@@ -747,10 +789,10 @@ class OrderController extends Controller
             $order->update($updateData);
 
             OrderStatusHistory::create([
-                'order_id'    => $order->id,
+                'order_id' => $order->id,
                 'status_code' => $request->status,
                 'status_note' => $note ?: 'Status diperbarui oleh driver.',
-                'updated_by'  => Auth::id(),
+                'updated_by' => Auth::id(),
             ]);
 
             // Record income saat order selesai (COD — bayar di tempat)
@@ -761,12 +803,12 @@ class OrderController extends Controller
 
         // Notifikasi dikirim SETELAH transaksi commit
         $titles = [
-            'dicuci'  => 'Cucian Sedang Diproses',
+            'dicuci' => 'Cucian Sedang Diproses',
             'dikirim' => 'Kurir Sedang Mengantar',
             'selesai' => 'Pesanan Selesai',
         ];
         $messages = [
-            'dicuci'  => "Pakaian #{$order->order_code} sudah dijemput dan masuk proses cuci.",
+            'dicuci' => "Pakaian #{$order->order_code} sudah dijemput dan masuk proses cuci.",
             'dikirim' => "Kurir sedang mengantar pesanan #{$order->order_code} ke rumah kamu.",
             'selesai' => "Pesanan #{$order->order_code} sudah sampai. Terima kasih sudah menggunakan Azka Laundry.",
         ];
