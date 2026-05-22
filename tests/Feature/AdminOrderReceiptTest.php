@@ -19,7 +19,7 @@ class AdminOrderReceiptTest extends TestCase
 
         $service = Service::create([
             'name' => 'Express 1 Hari',
-            'slug' => 'express-1-hari-' . uniqid(),
+            'slug' => 'express-1-hari-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 12000,
             'unit_type' => 'kg',
@@ -52,7 +52,7 @@ class AdminOrderReceiptTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.orders.receipt', $order));
 
         $response->assertOk();
-        $response->assertSee('Resi Pesanan');
+        $response->assertSee('Nota');
         $response->assertSee('ORD-RESI-001');
         $response->assertSee('Express 1 Hari');
     }

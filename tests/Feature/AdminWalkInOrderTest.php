@@ -30,7 +30,7 @@ class AdminWalkInOrderTest extends TestCase
 
         $kgService = Service::create([
             'name' => 'Cuci Kiloan',
-            'slug' => 'cuci-kiloan-' . uniqid(),
+            'slug' => 'cuci-kiloan-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 8000,
             'unit_type' => 'kg',
@@ -43,7 +43,7 @@ class AdminWalkInOrderTest extends TestCase
 
         $itemService = Service::create([
             'name' => 'Bedcover Jumbo',
-            'slug' => 'bedcover-jumbo-' . uniqid(),
+            'slug' => 'bedcover-jumbo-'.uniqid(),
             'pricing_model' => 'per_item',
             'unit_price' => 25000,
             'unit_type' => 'item',
@@ -56,7 +56,7 @@ class AdminWalkInOrderTest extends TestCase
 
         $itemServiceSatuKategoriKilo = Service::create([
             'name' => 'Sepatu Sneakers',
-            'slug' => 'sepatu-sneakers-' . uniqid(),
+            'slug' => 'sepatu-sneakers-'.uniqid(),
             'pricing_model' => 'per_item',
             'unit_price' => 30000,
             'unit_type' => 'item',
@@ -66,7 +66,6 @@ class AdminWalkInOrderTest extends TestCase
             'service_category_id' => $kategoriKiloan->id,
             'is_active' => true,
         ]);
-
 
         $response = $this->actingAs($admin)->post(route('admin.orders.walk-in.store'), [
             'customer_name' => 'Walk In Test',
@@ -93,7 +92,11 @@ class AdminWalkInOrderTest extends TestCase
             'service_id' => $itemServiceSatuKategoriKilo->id,
             'qty' => 2,
         ]);
-        $this->assertDatabaseCount('finance_entries', 1);
+
+        // Income belum dicatat di walk-in: order dibuat dengan status 'dicuci',
+        // pemasukan baru tercatat saat order ditandai 'selesai' (lihat
+        // FinanceController::recordIncomeFromOrder).
+        $this->assertDatabaseCount('finance_entries', 0);
     }
 
     public function test_walkin_gagal_jika_kategori_tidak_cocok_dengan_layanan_utama(): void
@@ -114,7 +117,7 @@ class AdminWalkInOrderTest extends TestCase
 
         $kgService = Service::create([
             'name' => 'Cuci Kiloan Pro',
-            'slug' => 'cuci-kiloan-pro-' . uniqid(),
+            'slug' => 'cuci-kiloan-pro-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 9000,
             'unit_type' => 'kg',
@@ -150,7 +153,7 @@ class AdminWalkInOrderTest extends TestCase
 
         $kgService = Service::create([
             'name' => 'Cuci Kiloan Reguler',
-            'slug' => 'cuci-kiloan-reguler-' . uniqid(),
+            'slug' => 'cuci-kiloan-reguler-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 8000,
             'unit_type' => 'kg',

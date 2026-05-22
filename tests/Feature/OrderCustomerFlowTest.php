@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
-use App\Models\CustomerAddress;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,11 +30,11 @@ class OrderCustomerFlowTest extends TestCase
         $this->buatPesanan($customer, $layanan, 'menunggu', 'ORD-TEST-001');
         $this->buatPesanan($customer, $layanan, 'selesai', 'ORD-TEST-002');
 
-        $response = $this->actingAs($customer)->get(route('customer.orders', ['status' => 'active']));
+        $response = $this->actingAs($customer)->get(route('customer.orders', ['filter' => 'aktif']));
 
         $response->assertOk();
-        $response->assertSee('Menunggu');
-        $response->assertDontSee('spill selesai', false);
+        $response->assertSee('ORD-TEST-001');
+        $response->assertDontSee('ORD-TEST-002');
     }
 
     public function test_filter_status_selesai_di_daftar_pesanan(): void
@@ -42,14 +42,14 @@ class OrderCustomerFlowTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer']);
         $layanan = $this->buatLayanan();
 
-        $this->buatPesanan($customer, $layanan, 'dijemput', 'ORD-TEST-003');
+        $this->buatPesanan($customer, $layanan, 'dibatalkan', 'ORD-TEST-003');
         $this->buatPesanan($customer, $layanan, 'selesai', 'ORD-TEST-004');
 
-        $response = $this->actingAs($customer)->get(route('customer.orders', ['status' => 'done']));
+        $response = $this->actingAs($customer)->get(route('customer.orders', ['filter' => 'selesai']));
 
         $response->assertOk();
-        $response->assertSee('Selesai');
-        $response->assertDontSee('Dijemput');
+        $response->assertSee('ORD-TEST-004');
+        $response->assertDontSee('ORD-TEST-003');
     }
 
     public function test_store_order_menyimpan_customer_address_id_dari_alamat_tersimpan(): void
@@ -120,7 +120,9 @@ class OrderCustomerFlowTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseMissing('customer_addresses', [
+        // CustomerAddress pakai SoftDeletes — yang dihapus adalah row dengan
+        // deleted_at terisi, bukan hard delete.
+        $this->assertSoftDeleted('customer_addresses', [
             'id' => $alamatUtama->id,
         ]);
 
@@ -199,7 +201,7 @@ class OrderCustomerFlowTest extends TestCase
     {
         return Service::create([
             'name' => 'Cuci Test',
-            'slug' => 'cuci-test-' . uniqid(),
+            'slug' => 'cuci-test-'.uniqid(),
             'pricing_model' => 'per_kg',
             'unit_price' => 7000,
             'unit_type' => 'kg',
