@@ -195,4 +195,40 @@ class DashboardController extends Controller
             'unreadNotif'
         ));
     }
+
+    /**
+     * Endpoint polling ringan untuk driver dashboard. Dipanggil setiap
+     * 30 detik dari JS supaya driver gak harus refresh manual saat
+     * admin assign order baru. Format JSON minimal — payload <500 byte.
+     *
+     * Catatan: ini fallback shared-hosting friendly. Untuk
+     * pengalaman realtime sungguhan, switch ke broadcasting Reverb —
+     * lihat docs/realtime.md.
+     */
+    public function driverPoll()
+    {
+        $driver = Auth::user();
+        abort_if($driver->role !== 'driver', 403);
+
+        $aktif = Order::where('driver_id', $driver->id)
+            ->whereIn('status', ['dijemput', 'dikirim'])
+            ->count();
+
+        $unread = $driver->unreadNotifications()->count();
+
+        // signature_hash dipakai client untuk deteksi 'ada perubahan'.
+        // Hash dari id terakhir + status — kalau ada order baru di-assign
+        // atau status berubah, hash beda → client refresh.
+        $latest = Order::where('driver_id', $driver->id)
+            ->whereIn('status', ['menunggu', 'dijemput', 'dikirim'])
+            ->latest('updated_at')
+            ->first();
+
+        return response()->json([
+            'tugas_aktif' => $aktif,
+            'unread_notif' => $unread,
+            'signature' => $latest ? hash('crc32', $latest->id.'|'.$latest->status.'|'.$latest->updated_at) : null,
+            'polled_at' => now()->toIso8601String(),
+        ]);
+    }
 }
