@@ -16,6 +16,25 @@ class Order extends Model
 
     public const STATUS_SELESAI = 'selesai';
 
+    /**
+     * Peta transisi status yang sah. Pesanan hanya boleh maju lewat
+     * jalur yang sudah didefinisikan — bukan loncat sembarangan dari
+     * 'menunggu' langsung 'selesai'. Pembatalan boleh dari status awal
+     * saja (sebelum cucian masuk workshop) supaya finance & operasional
+     * gak ketipu.
+     *
+     * Catatan: status final ('selesai', 'dibatalkan') tidak punya entry
+     * di sini — order yang sudah final tidak boleh berubah lagi.
+     */
+    public const TRANSITIONS = [
+        'menunggu' => ['dijemput', 'dibatalkan'],
+        'dijemput' => ['dicuci', 'dibatalkan'],
+        'dicuci' => ['disetrika', 'siap'],
+        'disetrika' => ['siap'],
+        'siap' => ['dikirim', 'selesai'],
+        'dikirim' => ['selesai'],
+    ];
+
     public static function statusAktifSemua(): array
     {
         return self::STATUS_AKTIF;
@@ -24,6 +43,25 @@ class Order extends Model
     public static function statusSelesaiSemua(): array
     {
         return [self::STATUS_SELESAI];
+    }
+
+    /**
+     * Cek apakah pesanan boleh berpindah dari status sekarang ke
+     * $newStatus. Dipakai sebagai guard di controller sebelum update.
+     */
+    public function canTransitionTo(string $newStatus): bool
+    {
+        $allowed = self::TRANSITIONS[$this->status] ?? [];
+
+        return in_array($newStatus, $allowed, true);
+    }
+
+    /**
+     * Status final = pesanan sudah tidak bisa diubah lagi.
+     */
+    public function isFinal(): bool
+    {
+        return ! array_key_exists($this->status, self::TRANSITIONS);
     }
 
     protected $fillable = [
