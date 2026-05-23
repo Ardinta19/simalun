@@ -37,12 +37,22 @@ class DriverAssigner
     /**
      * Tandai driver sudah dapat tugas — update last_assigned_at supaya
      * round-robin di order berikutnya tidak nge-pick orang yang sama.
+     *
+     * Catatan: pakai raw DB query supaya format string ditulis dengan
+     * microsecond precision (Y-m-d H:i:s.u). Default Eloquent
+     * `$dateFormat` cuma 'Y-m-d H:i:s' — kalau dua mark terjadi di detik
+     * yang sama, round-robin jadi non-deterministik (tie-breaker fall
+     * back ke id terkecil → bias selalu ke driver pertama).
      */
     public static function markAssigned(User $driver): void
     {
-        // Pakai forceFill biar bypass mass-assignment check (kolom ini
-        // sengaja gak di-fillable karena bukan input form).
-        $driver->forceFill(['last_assigned_at' => now()])->saveQuietly();
+        DB::table('users')
+            ->where('id', $driver->id)
+            ->update(['last_assigned_at' => now()->format('Y-m-d H:i:s.u')]);
+
+        // Refresh in-memory model supaya caller yang punya reference
+        // dapet nilai terbaru tanpa harus ->fresh() manual.
+        $driver->forceFill(['last_assigned_at' => now()])->syncOriginal();
     }
 
     private static function pickByRoundRobin(): ?User
@@ -50,9 +60,13 @@ class DriverAssigner
         return User::where('role', 'driver')
             ->where('is_active', true)
             // null first — driver yang belum pernah dapet tugas duluan,
-            // baru yang last_assigned_at-nya paling lama.
+            // baru yang last_assigned_at-nya paling lama. Tie-breaker
+            // pakai id supaya distribusi deterministik (gak random
+            // saat dua driver punya last_assigned_at sama persis,
+            // mis. di test atau saat seed).
             ->orderByRaw('last_assigned_at IS NULL DESC')
             ->orderBy('last_assigned_at')
+            ->orderBy('id')
             ->first();
     }
 
@@ -71,6 +85,7 @@ class DriverAssigner
             ->groupBy('users.id')
             ->orderBy('active_load')
             ->orderBy('users.last_assigned_at')
+            ->orderBy('users.id')
             ->first();
     }
 }
