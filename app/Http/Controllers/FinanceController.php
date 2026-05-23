@@ -6,10 +6,10 @@ use App\Models\FinanceEntry;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\FinanceService;
 use App\Support\Audit;
 use App\Support\Laundry;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use OpenSpout\Common\Entity\Row;
@@ -93,47 +93,13 @@ class FinanceController extends Controller
 
     /**
      * Record income when order reaches 'selesai' status.
-     * Idempotent — won't create duplicate entries.
-     * Protected by both PHP-level check AND unique DB constraint.
+     *
+     * @deprecated Pakai App\Services\FinanceService::recordIncomeFromOrder() langsung.
+     * Method ini disimpan untuk backward-compat — delegate ke service.
      */
     public static function recordIncomeFromOrder(Order $order): void
     {
-        $exists = FinanceEntry::where('order_id', $order->id)
-            ->where('entry_type', 'income')
-            ->where('source_type', 'order')
-            ->exists();
-
-        if ($exists) {
-            return;
-        }
-
-        // Recalculate dari komponen agar tidak bergantung pada total_cost yang mungkin outdated
-        $serviceCost = (int) ($order->service_cost ?? 0);
-        $itemTotal = (int) $order->items()->where('service_id', '!=', $order->service_id)->sum('line_total');
-        $pickupCost = (int) ($order->pickup_cost ?? 0);
-        $discount = (int) ($order->discount ?? 0);
-        $calculatedTotal = $serviceCost + $itemTotal + $pickupCost - $discount;
-
-        try {
-            FinanceEntry::create([
-                'entry_date' => today(),
-                'period_key' => now()->format('Y-m'),
-                'entry_type' => 'income',
-                'category' => 'income',
-                'amount' => $calculatedTotal,
-                'source_type' => 'order',
-                'source_id' => $order->id,
-                'order_id' => $order->id,
-                'notes' => "Pesanan #{$order->order_code} selesai",
-                'created_by' => $order->customer_id,
-            ]);
-        } catch (QueryException $e) {
-            // Unique constraint violation (race condition) — safely ignore duplicate
-            if (str_contains($e->getMessage(), 'uniq_finance_order_type_source') || $e->getCode() === '23000') {
-                return;
-            }
-            throw $e;
-        }
+        FinanceService::recordIncomeFromOrder($order);
     }
 
     /**
