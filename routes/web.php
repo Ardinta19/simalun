@@ -17,6 +17,7 @@ use App\Http\Controllers\OrderRatingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceCategoryController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
@@ -144,6 +145,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/categories/{category}', [ServiceCategoryController::class, 'update'])->name('categories.update');
         Route::patch('/categories/{category}/toggle', [ServiceCategoryController::class, 'toggle'])->name('categories.toggle');
         Route::delete('/categories/{category}', [ServiceCategoryController::class, 'destroy'])->name('categories.destroy');
+
+        Route::post('/categories/{category}/services', [ServiceController::class, 'store'])->name('services.store');
+        Route::patch('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
+        Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggle'])->name('services.toggle');
+        Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
         Route::get('/reports', [ReportController::class, 'adminIndex'])->name('reports');
         Route::patch('/reports/{report}/status', [ReportController::class, 'updateStatus'])->name('reports.update-status');

@@ -15,7 +15,10 @@ class ServiceCategoryController extends Controller
      */
     public function index()
     {
+        // Eager load services biar admin bisa lihat (& kelola) layanan apa
+        // saja yang ada di tiap kategori, langsung dari satu halaman.
         $categories = ServiceCategory::withCount('services')
+            ->with(['services' => fn ($q) => $q->orderByDesc('is_active')->orderBy('name')])
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->get();

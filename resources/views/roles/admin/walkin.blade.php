@@ -275,11 +275,21 @@ body {
                     <label class="form-label">Layanan <span class="form-label__req">*</span></label>
                     <select name="service_id" id="walkin-service-main" required class="form-input">
                         <option value="">Pilih layanan</option>
-                        @foreach(($daftarLayanan ?? collect()) as $layanan)
-                            @if(($layanan->pricing_model ?? 'per_kg') === 'per_kg')
-                            <option value="{{ $layanan->id }}" data-category-id="{{ $layanan->service_category_id }}">{{ $layanan->name }}</option>
-                            @endif
-                        @endforeach
+                        @if(($kgCategories ?? collect())->count() > 0)
+                            @foreach($kgCategories as $cat)
+                                <optgroup label="{{ $cat->name }}">
+                                    @foreach($cat->services as $layanan)
+                                    <option value="{{ $layanan->id }}" data-category-id="{{ $layanan->service_category_id }}">{{ $layanan->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        @else
+                            @foreach(($daftarLayanan ?? collect()) as $layanan)
+                                @if(($layanan->pricing_model ?? 'per_kg') === 'per_kg')
+                                <option value="{{ $layanan->id }}" data-category-id="{{ $layanan->service_category_id }}">{{ $layanan->name }}</option>
+                                @endif
+                            @endforeach
+                        @endif
                     </select>
                 </div>
 
@@ -318,9 +328,19 @@ body {
                         <div class="item-row" data-item-row>
                             <select class="form-input" data-item-service>
                                 <option value="">Pilih item</option>
-                                @foreach(($daftarLayananItem ?? collect()) as $layananItem)
-                                <option value="{{ $layananItem->id }}" data-category-id="{{ $layananItem->service_category_id }}">{{ $layananItem->name }}</option>
-                                @endforeach
+                                @if(($itemCategories ?? collect())->count() > 0)
+                                    @foreach($itemCategories as $cat)
+                                        <optgroup label="{{ $cat->name }}">
+                                            @foreach($cat->services as $layananItem)
+                                            <option value="{{ $layananItem->id }}" data-category-id="{{ $layananItem->service_category_id }}">{{ $layananItem->name }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                @else
+                                    @foreach(($daftarLayananItem ?? collect()) as $layananItem)
+                                    <option value="{{ $layananItem->id }}" data-category-id="{{ $layananItem->service_category_id }}">{{ $layananItem->name }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                             <input type="number" min="1" max="999" placeholder="Qty" class="form-input" data-item-qty>
                             <button type="button" class="item-remove" data-item-remove>&times;</button>
