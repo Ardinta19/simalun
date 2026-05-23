@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
@@ -154,10 +155,13 @@ class OrderController extends Controller
 
         $totalCost = $serviceCost + $itemTotal + $pickupCost;
 
-        // Voucher: divalidasi & dihitung di luar transaksi (read-only). Pemakaian
-        // (increment used_count + insert ke voucher_usages) dilakukan di dalam
-        // transaksi supaya konsisten dengan order. Subtotal yang dihitung untuk
-        // diskon adalah service_cost + item_total + pickup_cost.
+        // Voucher: validasi awal (read-only) + hitung diskon di luar transaksi.
+        // Pemakaian aktual (re-check cap dengan lockForUpdate, increment
+        // used_count, insert ke voucher_usages) jalan di dalam transaksi
+        // supaya konsisten dengan order. Re-check di dalam lock CRITICAL
+        // karena read-check di luar gak bisa dipercaya: dua order yang
+        // submit bareng bisa lolos cek used_count < usage_limit walau
+        // di-increment masing-masing bakal nge-lewat batas.
         $voucher = null;
         $discount = 0;
         if (! empty($validated['voucher_code'])) {
@@ -206,17 +210,31 @@ class OrderController extends Controller
                 ]);
 
                 if ($voucher) {
+                    // Re-fetch dengan lockForUpdate — block transaksi lain yang
+                    // pakai voucher sama sampai kita commit. Cek ulang cap
+                    // & validitas dalam lock supaya gak bocor cap.
+                    $lockedVoucher = Voucher::lockForUpdate()->find($voucher->id);
+
+                    if (! $lockedVoucher || ! $lockedVoucher->isCurrentlyValid()) {
+                        // Voucher di-disable / kadaluarsa / cap penuh selama
+                        // jeda antara pre-check dan transaksi. Lempar
+                        // ValidationException supaya Laravel auto-convert
+                        // jadi field error tanpa rollback yang misterius.
+                        throw ValidationException::withMessages([
+                            'voucher_code' => 'Voucher sudah tidak berlaku saat ini (mungkin sudah penuh atau dinonaktifkan). Silakan coba kode lain.',
+                        ]);
+                    }
+
                     // Audit + idempotency: catat pemakaian per (voucher, order).
                     VoucherUsage::create([
-                        'voucher_id' => $voucher->id,
+                        'voucher_id' => $lockedVoucher->id,
                         'order_id' => $order->id,
                         'customer_id' => Auth::id(),
                         'discount_amount' => $discount,
                     ]);
-                    // Increment counter pemakaian. Pakai increment supaya
-                    // aman dari race kalau beberapa order pakai voucher
-                    // yang sama bersamaan.
-                    $voucher->increment('used_count');
+                    // Increment dijalankan langsung di row yang ke-lock,
+                    // jadi commit-nya atomic dengan validasinya.
+                    $lockedVoucher->increment('used_count');
                 }
 
                 OrderItem::create([
@@ -295,6 +313,11 @@ class OrderController extends Controller
 
                 return ['order' => $order, 'driver' => $driver];
             });
+        } catch (ValidationException $e) {
+            // Validation error dari dalam transaksi (mis. voucher cap
+            // ke-trigger di re-check lock) — biarin Laravel handle.
+            // Rollback otomatis terjadi karena exception bubble out.
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
 
