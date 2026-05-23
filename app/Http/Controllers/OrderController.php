@@ -13,6 +13,7 @@ use App\Models\Voucher;
 use App\Models\VoucherUsage;
 use App\Notifications\OrderStatusUpdated;
 use App\Support\Audit;
+use App\Support\DriverAssigner;
 use App\Support\Laundry;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -259,10 +260,10 @@ class OrderController extends Controller
                 // Income TIDAK dicatat di sini — dicatat saat order selesai (COD model).
                 // Lihat FinanceController::recordIncomeFromOrder()
 
-                // Auto-assign ke driver aktif (skala rumahan = 1 driver)
-                $driver = User::where('role', 'driver')
-                    ->where('is_active', true)
-                    ->first();
+                // Auto-assign ke driver aktif. DriverAssigner pilih driver
+                // pakai strategi yang diset di config (round_robin / load_based)
+                // — lebih adil daripada selalu ambil driver pertama.
+                $driver = DriverAssigner::pick();
 
                 if ($driver) {
                     // Driver tersedia — langsung assign
@@ -272,6 +273,8 @@ class OrderController extends Controller
                             'status' => 'dijemput',
                         ]);
                     });
+
+                    DriverAssigner::markAssigned($driver);
 
                     OrderStatusHistory::create([
                         'order_id' => $order->id,
@@ -539,6 +542,8 @@ class OrderController extends Controller
                 'driver_id' => $driver->id,
                 'status' => $newStatus,
             ]);
+
+            DriverAssigner::markAssigned($driver);
 
             OrderStatusHistory::create([
                 'order_id' => $order->id,
@@ -854,6 +859,7 @@ class OrderController extends Controller
             'status' => 'required|in:dicuci,dikirim,selesai',
             'weight_actual' => 'nullable|numeric|min:0.1',
             'proof_image' => 'nullable|image|max:5120',
+            'payment_channel' => 'nullable|in:cash,transfer,qris',
         ]);
 
         $updateData = ['status' => $request->status];
@@ -878,11 +884,13 @@ class OrderController extends Controller
             $updateData['proof_image'] = $request->file('proof_image')->store('proof', 'public');
             $updateData['is_paid'] = true;
             $updateData['paid_at'] = now();
-            $note = 'Pesanan berhasil diantar. Foto bukti diunggah.';
+            $updateData['payment_channel'] = $request->input('payment_channel', 'cash');
+            $note = 'Pesanan berhasil diantar. Foto bukti diunggah. Bayar via '.strtoupper($updateData['payment_channel']).'.';
         } elseif ($request->status === 'selesai') {
             $updateData['is_paid'] = true;
             $updateData['paid_at'] = now();
-            $note = $note ?: 'Pesanan selesai.';
+            $updateData['payment_channel'] = $request->input('payment_channel', 'cash');
+            $note = $note ?: 'Pesanan selesai. Bayar via '.strtoupper($updateData['payment_channel']).'.';
         }
 
         DB::transaction(function () use ($order, $updateData, $note, $request) {

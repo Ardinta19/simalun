@@ -53,4 +53,15 @@ return [
         'facebook' => env('LAUNDRY_FB', ''),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Operasional
+    |--------------------------------------------------------------------------
+    */
+
+    // Strategi auto-assign driver saat order baru masuk:
+    // - 'round_robin': driver yang last_assigned_at-nya paling lama
+    // - 'load_based':  driver dengan beban tugas aktif terkecil
+    'driver_assignment_strategy' => env('DRIVER_ASSIGNMENT_STRATEGY', 'round_robin'),
+
 ];
