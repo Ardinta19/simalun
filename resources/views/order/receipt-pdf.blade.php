@@ -349,7 +349,7 @@ body {
 {{-- PAYMENT STATUS --}}
 <div class="payment-badge {{ $order->is_paid ? 'payment-paid' : 'payment-unpaid' }}">
     @if($order->is_paid)
-        &#10003; Lunas {{ $order->paid_at ? '— ' . $order->paid_at->format('d/m/Y') : '' }}
+        &#10003; Lunas{{ $order->payment_channel ? ' via '.strtoupper($order->payment_channel) : '' }} {{ $order->paid_at ? '— ' . $order->paid_at->format('d/m/Y') : '' }}
     @else
         {{ strtoupper($order->payment_method ?? 'COD') }} — Bayar saat diterima
     @endif

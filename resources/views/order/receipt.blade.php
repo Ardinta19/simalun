@@ -607,7 +607,7 @@ body.print-thermal-58 .receipt { width: 100%; }
         <div class="r-payment {{ $order->is_paid ? 'r-payment--paid' : 'r-payment--unpaid' }}">
             @if($order->is_paid)
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Lunas {{ $order->paid_at ? '— ' . $order->paid_at->translatedFormat('d M Y') : '' }}
+                Lunas{{ $order->payment_channel ? ' via '.strtoupper($order->payment_channel) : '' }} {{ $order->paid_at ? '— ' . $order->paid_at->translatedFormat('d M Y') : '' }}
             @else
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 {{ strtoupper($order->payment_method ?? 'COD') }} — Bayar saat diterima

@@ -49,6 +49,7 @@ class Order extends Model
         'payment_method',
         'is_paid',
         'paid_at',
+        'payment_channel',
         'proof_image',
     ];
 

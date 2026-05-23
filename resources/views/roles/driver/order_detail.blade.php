@@ -484,6 +484,14 @@ body {
                 <input type="file" name="proof_image" id="proof_image" accept="image/*" capture="environment"
                        class="action-card__input" required>
             </div>
+            <div class="action-card__field">
+                <label class="action-card__label" for="payment_channel">Metode Pembayaran (COD)</label>
+                <select name="payment_channel" id="payment_channel" class="action-card__input" required>
+                    <option value="cash">Cash (Tunai)</option>
+                    <option value="transfer">Transfer Bank</option>
+                    <option value="qris">QRIS</option>
+                </select>
+            </div>
             <button type="button" class="action-card__submit action-card__submit--accent" id="btn-confirm-delivery">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 Selesaikan Pesanan
