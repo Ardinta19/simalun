@@ -4,6 +4,13 @@ Panduan deploy SIMALUN ke server produksi (VPS atau shared hosting yang
 support PHP-FPM + supervisor). Untuk deploy ke shared hosting murni
 (Hostinger basic, dll) lihat catatan di section [Shared Hosting](#shared-hosting-fallback).
 
+> **TL;DR untuk deploy pertama kali:** ikuti
+> [Deploy Checklist Pertama Kali](#deploy-checklist-pertama-kali) di
+> bawah, satu-satu jangan lompat.
+>
+> **Untuk deploy update (sudah pernah deploy):** ikuti
+> [Deploy Checklist Update](#deploy-checklist-update).
+
 ## Stack Yang Disarankan
 
 | Komponen | Versi minimum | Catatan |
@@ -30,35 +37,38 @@ composer install --no-dev --optimize-autoloader --prefer-dist
 
 ### 1.2 File `.env`
 
-Copy `.env.example` jadi `.env`, isi dengan kredensial production. Lihat
-juga `.env.production.example` (kalau sudah ada) untuk daftar variable
-yang relevan untuk produksi. Field penting:
+Copy `.env.production.example` jadi `.env`, isi placeholder bertanda
+`__ISI__`. Template ini sudah include opsi production yang aman by
+default (SESSION_ENCRYPT=true, APP_DEBUG=false, LOG_LEVEL=error, dll).
+
+```bash
+cp .env.production.example .env
+nano .env   # isi __DOMAIN_PRODUKSI__, __NAMA_DATABASE__, __SMTP_*, dll
+```
+
+Field penting yang **wajib** di-customize:
 
 ```env
-APP_ENV=production
-APP_DEBUG=false
 APP_URL=https://laundry.example.com
 APP_TIMEZONE=Asia/Jakarta
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
 DB_DATABASE=azka_laundry
-DB_USERNAME=azka
+DB_USERNAME=azka         # JANGAN root
 DB_PASSWORD=...
 
-QUEUE_CONNECTION=database
-SESSION_DRIVER=database
-CACHE_STORE=database
-
-# WAJIB di produksi (nonaktifkan kalau development pakai HTTP)
-SESSION_SECURE_COOKIE=true
-SESSION_ENCRYPT=true
-
-MAIL_MAILER=smtp
+MAIL_MAILER=smtp         # log driver gak ngirim ke user beneran
 MAIL_HOST=...
+MAIL_USERNAME=...
+MAIL_PASSWORD=...
 MAIL_FROM_ADDRESS=no-reply@laundry.example.com
-MAIL_FROM_NAME="${APP_NAME}"
+
+# Wajib di-aktifkan di production
+SESSION_ENCRYPT=true
+SESSION_SECURE_COOKIE=true
 ```
+
+> **Penting:** `.env.production.example` hanya **template**. JANGAN
+> commit `.env` produksi yang sudah berisi kredensial nyata.
 
 ### 1.3 Generate key & migrate
 
@@ -430,3 +440,187 @@ Worker hidup terlalu lama, koneksi DB di-drop server. Solusi:
    `Mail::raw('test', fn($m) => $m->to('test@example.com')->subject('test'))`)
 3. Cek queue worker hidup: `sudo supervisorctl status` atau
    `systemctl status simalun-queue`
+
+
+## Deploy Checklist Pertama Kali
+
+Centang satu-satu, urut dari atas. Jangan lompat — ada urutan yang
+penting (mis. migrate harus setelah .env diisi DB).
+
+### Pre-deploy (di server, sebelum pull)
+
+- [ ] **Server provisioning sudah selesai:**
+  - [ ] PHP 8.4 + extension umum (mbstring, xml, curl, gd, mysql, intl, zip)
+  - [ ] MySQL 8 / MariaDB 10.6 sudah running
+  - [ ] Nginx sudah install dengan SSL cert (Let's Encrypt OK)
+  - [ ] Composer 2.x global installed
+  - [ ] Supervisor (atau systemd) tersedia
+- [ ] **DNS sudah pointing** domain produksi ke IP server (cek `dig +short laundry.example.com`)
+- [ ] **Database & user sudah dibuat:**
+  ```sql
+  CREATE DATABASE azka_laundry CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE USER 'azka'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD_HERE';
+  GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES
+        ON azka_laundry.* TO 'azka'@'localhost';
+  FLUSH PRIVILEGES;
+  ```
+- [ ] **SMTP credentials sudah dapet** dari provider mail (Resend / SendGrid / Brevo / SMTP Hostinger)
+- [ ] **DNS authentication** untuk email sudah di-setup:
+  - [ ] SPF record include provider mail
+  - [ ] DKIM record sudah di-add (key dari provider mail)
+  - [ ] DMARC policy minimum `p=none`
+
+### Setup aplikasi
+
+- [ ] `git clone` atau `git pull` repo ke `/var/www/azka-laundry`
+- [ ] `composer install --no-dev --optimize-autoloader --prefer-dist`
+- [ ] `cp .env.production.example .env`
+- [ ] **Edit `.env` isi semua placeholder `__ISI__`:**
+  - [ ] `APP_URL=https://...`
+  - [ ] `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+  - [ ] `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`
+  - [ ] `MAIL_FROM_ADDRESS`
+- [ ] `php artisan key:generate --force`
+- [ ] **Verifikasi koneksi DB:** `php artisan migrate:status` (harus list migration tanpa error)
+- [ ] `php artisan migrate --force`
+- [ ] `php artisan db:seed --force --class=UserSeeder` (akun admin awal)
+- [ ] `php artisan db:seed --force --class=ServiceCategorySeeder`
+- [ ] `php artisan storage:link --force`
+- [ ] **Set permission:**
+  ```bash
+  sudo chown -R www-data:www-data storage bootstrap/cache
+  sudo chmod -R 775 storage bootstrap/cache
+  ```
+
+### Cache & optimization
+
+- [ ] `php artisan config:cache`
+- [ ] `php artisan route:cache`
+- [ ] `php artisan view:cache`
+- [ ] `php artisan event:cache`
+
+### Web server & queue
+
+- [ ] **Nginx vhost** sudah di-buat (lihat section [Web Server (Nginx)](#2-web-server-nginx))
+- [ ] `sudo nginx -t && sudo systemctl reload nginx`
+- [ ] **OPcache config** sudah di-set sesuai section [OPcache](#3-opcache) — restart php-fpm
+- [ ] **Supervisor / systemd** untuk queue worker sudah dibuat dan running:
+  - [ ] `sudo supervisorctl status simalun-queue:*` → state RUNNING
+  - [ ] (atau) `systemctl is-active simalun-queue` → active
+- [ ] **Cron `schedule:run`** sudah di-add ke crontab `www-data`
+
+### Smoke test post-deploy
+
+- [ ] **Buka URL produksi** di browser HTTPS — landing page render tanpa error
+- [ ] **HTTPS forced** — coba akses HTTP harus auto-redirect ke HTTPS
+- [ ] **Security headers ada** — `curl -I https://...` cek `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`
+- [ ] **Login admin awal** dengan akun seeded — harus berhasil sampai `/dashboard/admin`
+- [ ] **Dashboard admin** load tanpa error — section "Analitik 30 Hari" muncul (bisa kosong kalau belum ada order)
+- [ ] **Test register customer** lewat form — harus auto-login + masuk dashboard customer
+- [ ] **Test bikin order** customer flow — sampai halaman success
+- [ ] **Cek queue worker log** — gak ada job yang stuck:
+  ```bash
+  tail -f /var/log/simalun/queue.log
+  php artisan queue:failed   # harus kosong
+  ```
+- [ ] **Test reset password** — email beneran terkirim (cek inbox, bukan spam)
+- [ ] **Test upload gambar** (avatar customer / proof_image driver) — file tersimpan di `storage/app/public/`, accessible via URL
+- [ ] **Cek log Laravel** — `tail -100 storage/logs/laravel-$(date +%Y-%m-%d).log` — gak ada ERROR yang serius
+
+### Hardening tambahan (nice-to-have)
+
+- [ ] **Backup harian DB** di-setup (cron `mysqldump` ke S3 / local rotated)
+- [ ] **fail2ban** di-pasang untuk SSH + nginx auth bruteforce
+- [ ] **UFW / firewall** drop semua port kecuali 22 (SSH), 80, 443
+- [ ] **SSH:** disable password auth, key-only
+- [ ] **Monitoring uptime** (UptimeRobot / Better Stack) ping endpoint
+- [ ] **Tambah cron `php artisan auth:clear-resets`** harian (cleanup token reset password expired)
+
+## Deploy Checklist Update
+
+Untuk deploy berikutnya (kode berubah, sudah pernah deploy sebelumnya).
+Versi singkat — kalau ada migration baru atau perubahan dependency,
+lihat catatan tambahan di bawah.
+
+```bash
+cd /var/www/azka-laundry
+
+# 1. Pull kode terbaru
+git fetch origin main
+git reset --hard origin/main
+
+# 2. Update dependency (kalau composer.lock berubah)
+composer install --no-dev --optimize-autoloader --prefer-dist
+
+# 3. Migrate (kalau ada migration baru)
+php artisan migrate --force
+
+# 4. Refresh cache
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# 5. Restart queue worker (supaya code baru ke-load)
+sudo supervisorctl restart simalun-queue:*
+
+# 6. Reload PHP-FPM (flush OPcache)
+sudo systemctl reload php8.4-fpm
+```
+
+### Checklist sebelum git pull
+
+- [ ] **Backup DB** dulu (mysqldump quick — antisipasi migration salah):
+  ```bash
+  mysqldump -u azka -p azka_laundry > /var/backups/simalun-$(date +%Y%m%d-%H%M).sql
+  ```
+- [ ] **Cek changelog / PR description** — apakah ada migration baru? Apakah ada `.env` variable baru?
+- [ ] **Mode maintenance** kalau update besar:
+  ```bash
+  php artisan down --secret="bypass-token-disini"
+  ```
+  Lalu admin bisa akses lewat `https://...?secret=bypass-token-disini` saat user lain di-block.
+
+### Checklist setelah deploy
+
+- [ ] **Smoke test ringkas:**
+  - [ ] Login admin → dashboard
+  - [ ] Bikin order test → flow sampai detail
+  - [ ] Cek `php artisan queue:failed` kosong
+- [ ] **Cek log error** 5 menit pertama:
+  ```bash
+  tail -f storage/logs/laravel-$(date +%Y-%m-%d).log
+  ```
+- [ ] **Disable maintenance mode** kalau dipakai:
+  ```bash
+  php artisan up
+  ```
+
+### Rollback procedure (kalau deploy gagal)
+
+```bash
+# 1. Catat commit hash terakhir yang stabil sebelum deploy
+# (idealnya tag di git: git tag -a v1.0.0 -m "Stable rilis 23 Mei")
+
+# 2. Reset ke commit terakhir
+cd /var/www/azka-laundry
+git reset --hard <commit-hash-stabil>
+composer install --no-dev --optimize-autoloader --prefer-dist
+
+# 3. Kalau migration baru sudah jalan, rollback dulu (CAREFUL — bisa lose data):
+php artisan migrate:rollback --step=N --force
+
+# 4. Re-cache & restart
+php artisan optimize:clear
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+sudo supervisorctl restart simalun-queue:*
+sudo systemctl reload php8.4-fpm
+
+# 5. Restore DB dari backup pre-deploy kalau perlu:
+mysql -u azka -p azka_laundry < /var/backups/simalun-YYYYMMDD-HHMM.sql
+```
+
+> **Best practice:** sebelum deploy fitur besar, **tag commit** main
+> yang lagi running di produksi (`git tag -a v1.x -m "Production stable"`).
+> Rollback target jadi jelas, bukan harus baca ulang commit log.
