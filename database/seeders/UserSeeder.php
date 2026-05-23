@@ -10,38 +10,30 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Test Customer',
-            'email' => 'customer@test.com',
-            'phone' => '081234567890',
-            'password' => Hash::make('password123'),
-            'role' => 'customer',
-        ]);
-
-        User::create([
-            'name' => 'Test Admin',
-            'email' => 'admin@test.com',
-            'phone' => '081234567891',
-            'password' => Hash::make('password123'),
-            'role' => 'admin',
-        ]);
-
-        User::create([
-            'name' => 'Test Driver',
-            'email' => 'driver@test.com',
-            'phone' => '081234567892',
-            'password' => Hash::make('password123'),
-            'role' => 'driver',
-        ]);
+        // Catatan: $role di-set lewat property assignment, bukan mass-fill,
+        // karena `role` sudah dikeluarkan dari User::$fillable (anti
+        // privilege escalation). Pattern ini dipakai di seluruh codebase
+        // — RegisterController, walk-in flow, seeder ini.
+        $this->buatUser('Test Customer', 'customer@test.com', '081234567890', 'customer');
+        $this->buatUser('Test Admin', 'admin@test.com', '081234567891', 'admin');
+        $this->buatUser('Test Driver', 'driver@test.com', '081234567892', 'driver');
 
         // Driver kedua biar DriverAssigner kelihatan jalan menyebar tugas.
         // Round-robin / load-based gak ada gunanya kalau cuma satu driver.
-        User::create([
-            'name' => 'Test Driver 2',
-            'email' => 'driver2@test.com',
-            'phone' => '081234567893',
+        $this->buatUser('Test Driver 2', 'driver2@test.com', '081234567893', 'driver');
+    }
+
+    private function buatUser(string $name, string $email, string $phone, string $role): User
+    {
+        $user = new User([
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
             'password' => Hash::make('password123'),
-            'role' => 'driver',
         ]);
+        $user->role = $role;
+        $user->save();
+
+        return $user;
     }
 }
