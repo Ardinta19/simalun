@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Voucher;
+use App\Support\Audit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -58,7 +59,10 @@ class VoucherController extends Controller
             $data['max_discount'] = null;
         }
 
-        Voucher::create($data);
+        $voucher = Voucher::create($data);
+
+        Audit::log('voucher.create', $voucher, after: $voucher->only(['code', 'type', 'value', 'min_order', 'is_active']),
+            summary: "Membuat voucher {$voucher->code}");
 
         return redirect()->route('admin.vouchers.index')
             ->with('success', "Voucher {$data['code']} berhasil dibuat.");
@@ -66,9 +70,15 @@ class VoucherController extends Controller
 
     public function toggle(Voucher $voucher)
     {
+        $before = $voucher->is_active;
         $voucher->update(['is_active' => ! $voucher->is_active]);
 
         $statusLabel = $voucher->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        Audit::log('voucher.toggle', $voucher,
+            before: ['is_active' => $before],
+            after: ['is_active' => $voucher->is_active],
+            summary: "Voucher {$voucher->code} {$statusLabel}");
 
         return back()->with('success', "Voucher {$voucher->code} {$statusLabel}.");
     }
@@ -81,7 +91,12 @@ class VoucherController extends Controller
         }
 
         $code = $voucher->code;
+        $snapshot = $voucher->only(['code', 'type', 'value', 'min_order']);
         $voucher->delete();
+
+        Audit::log('voucher.delete', null,
+            before: $snapshot,
+            summary: "Menghapus voucher {$code}");
 
         return back()->with('success', "Voucher {$code} dihapus.");
     }

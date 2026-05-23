@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
 use App\Notifications\OrderStatusUpdated;
+use App\Support\Audit;
 use App\Support\Laundry;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -547,6 +548,10 @@ class OrderController extends Controller
             ]);
         });
 
+        Audit::log('order.assign-driver', $order,
+            after: ['driver_id' => $driver->id, 'status' => $newStatus, 'assignment_type' => $request->assignment_type],
+            summary: "Tugaskan {$driver->name} ke pesanan #{$order->order_code} ({$request->assignment_type})");
+
         // Notifikasi dikirim SETELAH transaksi commit — agar tidak rollback order jika notif gagal
         $order->customer->notify(new OrderStatusUpdated(
             $order,
@@ -583,6 +588,8 @@ class OrderController extends Controller
             'dibatalkan' => 'Dibatalkan',
         ];
 
+        $oldStatus = $order->status;
+
         DB::transaction(function () use ($order, $request, $statusLabel) {
             $order->update(['status' => $request->status]);
 
@@ -599,6 +606,11 @@ class OrderController extends Controller
                 FinanceController::recordIncomeFromOrder($order->fresh());
             }
         });
+
+        Audit::log('order.status', $order,
+            before: ['status' => $oldStatus],
+            after: ['status' => $request->status],
+            summary: "Update status #{$order->order_code}: {$oldStatus} → {$request->status}");
 
         // Notifikasi dikirim SETELAH transaksi commit
         $order->refresh();

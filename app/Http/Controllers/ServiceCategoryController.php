@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ServiceCategory;
+use App\Support\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -30,7 +31,10 @@ class ServiceCategoryController extends Controller
     {
         $data = $this->validatedData($request);
 
-        ServiceCategory::create($data);
+        $category = ServiceCategory::create($data);
+
+        Audit::log('service-category.create', $category, after: $data,
+            summary: "Membuat kategori \"{$data['name']}\"");
 
         return redirect()->route('admin.categories.index')
             ->with('success', "Kategori \"{$data['name']}\" berhasil dibuat.");
@@ -38,9 +42,14 @@ class ServiceCategoryController extends Controller
 
     public function update(Request $request, ServiceCategory $category)
     {
+        $before = $category->only(['name', 'pricing_model', 'description', 'is_active']);
         $data = $this->validatedData($request, $category->id);
 
         $category->update($data);
+
+        Audit::log('service-category.update', $category,
+            before: $before, after: $category->only(array_keys($before)),
+            summary: "Mengubah kategori {$category->name}");
 
         return redirect()->route('admin.categories.index')
             ->with('success', "Kategori \"{$category->name}\" diperbarui.");
@@ -48,9 +57,15 @@ class ServiceCategoryController extends Controller
 
     public function toggle(ServiceCategory $category)
     {
+        $before = $category->is_active;
         $category->update(['is_active' => ! $category->is_active]);
 
         $statusLabel = $category->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        Audit::log('service-category.toggle', $category,
+            before: ['is_active' => $before],
+            after: ['is_active' => $category->is_active],
+            summary: "Kategori {$category->name} {$statusLabel}");
 
         return back()->with('success', "Kategori {$category->name} {$statusLabel}.");
     }
@@ -64,7 +79,11 @@ class ServiceCategoryController extends Controller
         }
 
         $name = $category->name;
+        $snapshot = $category->only(['name', 'pricing_model', 'description']);
         $category->delete();
+
+        Audit::log('service-category.delete', null, before: $snapshot,
+            summary: "Menghapus kategori \"{$name}\"");
 
         return back()->with('success', "Kategori \"{$name}\" dihapus.");
     }
