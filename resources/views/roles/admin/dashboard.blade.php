@@ -429,6 +429,10 @@ body {
                 <div class="quick-item__icon" style="background:var(--blue-lt); color:var(--blue);">📂</div>
                 <span class="quick-item__label">Kategori Layanan</span>
             </a>
+            <a href="{{ route('admin.audit.index') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:#f3f4f6; color:#475569;">📋</div>
+                <span class="quick-item__label">Audit Trail</span>
+            </a>
         </div>
     </section>
 

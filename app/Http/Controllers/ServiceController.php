@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Support\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -29,12 +30,17 @@ class ServiceController extends Controller
         $service->is_active = $request->boolean('is_active', true);
         $service->save();
 
+        Audit::log('service.create', $service,
+            after: $service->only(['name', 'unit_price', 'pricing_model', 'service_category_id']),
+            summary: "Membuat layanan \"{$service->name}\" di kategori {$category->name}");
+
         return redirect()->route('admin.categories.index')
             ->with('success', "Layanan \"{$service->name}\" ditambahkan ke kategori {$category->name}.");
     }
 
     public function update(Request $request, Service $service)
     {
+        $before = $service->only(['name', 'unit_price', 'estimated_hours', 'description', 'is_active']);
         $data = $this->validatedData($request, $service->id);
 
         // Slug ikut nama kalau nama berubah, biar URL/identifier tetap rapi.
@@ -50,15 +56,25 @@ class ServiceController extends Controller
         $service->is_active = $request->boolean('is_active', $service->is_active);
         $service->save();
 
+        Audit::log('service.update', $service,
+            before: $before, after: $service->only(array_keys($before)),
+            summary: "Mengubah layanan \"{$service->name}\"");
+
         return redirect()->route('admin.categories.index')
             ->with('success', "Layanan \"{$service->name}\" diperbarui.");
     }
 
     public function toggle(Service $service)
     {
+        $before = $service->is_active;
         $service->update(['is_active' => ! $service->is_active]);
 
         $statusLabel = $service->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        Audit::log('service.toggle', $service,
+            before: ['is_active' => $before],
+            after: ['is_active' => $service->is_active],
+            summary: "Layanan {$service->name} {$statusLabel}");
 
         return back()->with('success', "Layanan {$service->name} {$statusLabel}.");
     }
@@ -72,7 +88,11 @@ class ServiceController extends Controller
         }
 
         $name = $service->name;
+        $snapshot = $service->only(['name', 'unit_price', 'pricing_model', 'service_category_id']);
         $service->delete();
+
+        Audit::log('service.delete', null, before: $snapshot,
+            summary: "Menghapus layanan \"{$name}\"");
 
         return back()->with('success', "Layanan \"{$name}\" dihapus.");
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -153,6 +154,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/reports', [ReportController::class, 'adminIndex'])->name('reports');
         Route::patch('/reports/{report}/status', [ReportController::class, 'updateStatus'])->name('reports.update-status');
+
+        Route::get('/audit', [AuditLogController::class, 'index'])->name('audit.index');
 
         Route::get('/notifications', [NotificationController::class, 'adminIndex'])->name('notifications');
 
