@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Dashboard Kurir – Azka Laundry</title>
 @include('layouts.component.customer._head_meta')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{{-- Mode realtime: 'polling' (default, hemat) atau 'broadcasting' (Reverb,
+     butuh VPS — lihat docs/realtime.md). Ganti via env DRIVER_REALTIME_MODE. --}}
+<meta name="realtime-mode" content="{{ env('DRIVER_REALTIME_MODE', 'polling') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root {
@@ -403,6 +407,83 @@ document.addEventListener('DOMContentLoaded', function() {
     gsap.from('.kpi-card', { opacity: 0, scale: 0.92, duration: 0.4, stagger: 0.08, ease: 'back.out(1.4)', delay: 0.2 });
     gsap.from('.js-card', { opacity: 0, y: 16, duration: 0.4, stagger: 0.06, ease: 'power2.out', delay: 0.15 });
 });
+
+/* ───────────────── Realtime Driver Dashboard ────────────────────
+ * Mode dibaca dari <meta name="realtime-mode">.
+ *  - polling (default): cek endpoint setiap 30 detik. Hemat & jalan
+ *    di shared hosting.
+ *  - broadcasting: pakai Echo + Reverb. Belum diaktifkan di repo —
+ *    lihat docs/realtime.md untuk panduan switch.
+ *
+ * Untuk hindari nge-spam server kalau tab gak aktif, polling auto-pause
+ * saat document.hidden = true.
+ */
+(function () {
+    const mode = document.querySelector('meta[name="realtime-mode"]')?.content || 'polling';
+
+    if (mode !== 'polling') {
+        // ── BROADCASTING MODE (template, tidak aktif) ─────────────
+        // Saat pindah ke VPS, ikuti docs/realtime.md sampai langkah
+        // bikin echo.js, lalu uncomment block di bawah & hapus
+        // polling-init di bawah.
+        //
+        // import './echo.js';
+        // window.Echo.private(`App.Models.User.${currentUserId}`)
+        //     .notification((notification) => {
+        //         if (notification.type === 'App\\Notifications\\OrderStatusUpdated') {
+        //             window.location.reload();
+        //         }
+        //     });
+        return;
+    }
+
+    let lastSignature = null;
+    const POLL_INTERVAL_MS = 30000;
+
+    async function poll() {
+        if (document.hidden) return; // hemat resource saat tab background
+
+        try {
+            const res = await fetch('{{ route('driver.dashboard.poll') }}', {
+                headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
+            });
+            if (! res.ok) return;
+            const data = await res.json();
+
+            if (lastSignature === null) {
+                lastSignature = data.signature;
+                return;
+            }
+
+            // Signature berubah = ada update di backend (order baru
+            // di-assign / status berubah). Reload halaman supaya kartu
+            // sinkron tanpa kompleksitas patch DOM manual.
+            if (data.signature !== lastSignature) {
+                lastSignature = data.signature;
+                showNewTaskBanner();
+            }
+        } catch (e) {
+            // Diam — bisa jadi user offline sebentar. Polling berikutnya
+            // akan retry otomatis.
+        }
+    }
+
+    function showNewTaskBanner() {
+        if (document.getElementById('rt-banner')) return; // udah ada
+
+        const banner = document.createElement('div');
+        banner.id = 'rt-banner';
+        banner.style.cssText = 'position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#0077b6;color:#fff;padding:10px 18px;border-radius:99px;font-weight:800;font-size:.78rem;z-index:1000;box-shadow:0 4px 16px rgba(0,47,92,.3);cursor:pointer;font-family:inherit;';
+        banner.textContent = '🔔 Ada update tugas — tap untuk muat ulang';
+        banner.addEventListener('click', () => window.location.reload());
+        document.body.appendChild(banner);
+    }
+
+    // First poll cepat, biar sig awal di-cache. Setelah itu interval normal.
+    setTimeout(poll, 1500);
+    setInterval(poll, POLL_INTERVAL_MS);
+})();
 </script>
 </body>
 </html>

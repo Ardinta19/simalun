@@ -1,0 +1,47 @@
+/**
+ * TEMPLATE — File ini sengaja dinamai *.example supaya tidak ikut di-bundle
+ * oleh Vite. Saat Mas/Mbak pindah ke broadcasting mode (lihat
+ * docs/realtime.md), copy file ini jadi `echo.js` lalu import-nya
+ * di `app.js`.
+ *
+ * Yang dilakukan:
+ *  1. Inisialisasi Echo dengan driver Reverb.
+ *  2. Subscribe ke channel privat user yang lagi login.
+ *  3. Listen notifikasi `App\Notifications\OrderStatusUpdated`.
+ *  4. Saat notif masuk, reload halaman (versi paling sederhana —
+ *     bisa di-tweak jadi patch DOM kalau perlu).
+ *
+ * Prerequisite: sudah `npm install laravel-echo pusher-js`,
+ * `composer require laravel/reverb`, dan `php artisan reverb:install`.
+ */
+
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Pusher = Pusher;
+
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+});
+
+// Ambil ID user yang login dari meta tag yang di-render server.
+// Di blade: <meta name="user-id" content="{{ auth()->id() }}">
+const userId = document.querySelector('meta[name="user-id"]')?.content;
+
+if (userId) {
+    window.Echo.private(`App.Models.User.${userId}`)
+        .notification((notification) => {
+            if (notification.type === 'App\\Notifications\\OrderStatusUpdated') {
+                // Versi sederhana: full reload. Versi lebih halus: render
+                // banner "ada update", biar user yang scroll halaman gak
+                // kehilangan posisinya.
+                window.location.reload();
+            }
+        });
+}

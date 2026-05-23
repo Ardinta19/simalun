@@ -163,6 +163,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:driver')->prefix('driver')->name('driver.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'driver'])->name('dashboard');
+        Route::get('/dashboard/poll', [DashboardController::class, 'driverPoll'])->name('dashboard.poll');
 
         Route::get('/orders', [OrderController::class, 'driverIndex'])->name('orders');
         Route::get('/orders/{order}', [OrderController::class, 'driverDetail'])->name('orders.show');
