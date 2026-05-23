@@ -124,17 +124,14 @@ class Order extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            'menunggu' => 'Menunggu',
-            'dijemput' => 'Dijemput',
-            'dicuci' => 'Sedang Dicuci',
-            'disetrika' => 'Disetrika',
-            'siap' => 'Siap Dikirim',
-            'dikirim' => 'Dalam Pengiriman',
-            'selesai' => 'Selesai',
-            'dibatalkan' => 'Dibatalkan',
-            default => ucfirst($this->status),
-        };
+        // Pakai trans(['orders.status...']) supaya kalau Azka mau ganti
+        // istilah cukup edit lang/id/orders.php — bukan grep ke semua view.
+        $key = 'orders.status.'.$this->status;
+        $translated = trans($key);
+
+        // trans() return key kalau gak nemu — fallback ke ucfirst supaya
+        // status custom (kalau ada) tetap kebaca enak.
+        return $translated === $key ? ucfirst($this->status) : $translated;
     }
 
     public function getStatusColorAttribute(): string

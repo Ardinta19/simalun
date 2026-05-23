@@ -157,7 +157,7 @@ body {
 <div class="page-header">
     <x-back-button fallback="admin.dashboard" style="hero" />
     <div class="page-header__title">Voucher Promo</div>
-    <a href="{{ route('admin.vouchers.create') }}" class="page-header__action">+ Buat</a>
+    <a href="{{ route('admin.vouchers.create') }}" class="page-header__action">+ {{ __('ui.buttons.create') }}</a>
 </div>
 
 <div class="container">
@@ -173,7 +173,7 @@ body {
         <div class="voucher-card__head">
             <div class="voucher-code">{{ $v->code }}</div>
             <span class="voucher-status {{ $v->is_active ? 'voucher-status--on' : 'voucher-status--off' }}">
-                {{ $v->is_active ? 'Aktif' : 'Nonaktif' }}
+                {{ $v->is_active ? __('ui.states.active') : __('ui.states.inactive') }}
             </span>
         </div>
 
@@ -209,7 +209,7 @@ body {
                 <form method="POST" action="{{ route('admin.vouchers.destroy', $v) }}" style="flex: 1;"
                       onsubmit="return confirm('Hapus voucher {{ $v->code }}?');">
                     @csrf @method('DELETE')
-                    <button type="submit" class="voucher-btn voucher-btn--danger">Hapus</button>
+                    <button type="submit" class="voucher-btn voucher-btn--danger">{{ __('ui.buttons.delete') }}</button>
                 </form>
             @endif
         </div>
