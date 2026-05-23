@@ -35,7 +35,6 @@ class User extends Authenticatable
         'password',
         'phone',
         'gender',
-        'alamat',
         'avatar',
     ];
 

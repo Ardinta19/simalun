@@ -71,7 +71,6 @@ class RegisterController extends Controller
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
                 'gender' => $validated['gender'],
-                'alamat' => $validated['address'],
                 'password' => Hash::make($validated['password']),
             ]);
             // Role di-set lewat property assignment, bukan mass-fill —
