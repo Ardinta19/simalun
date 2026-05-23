@@ -539,6 +539,44 @@ body.print-thermal-58 .receipt { width: 100%; }
         </div>
         @endif
 
+        {{-- Riwayat kurir per leg. Kalau pickup & delivery ditangani driver
+             berbeda, dua-duanya muncul. Kalau salah satunya belum, baris
+             yang relevan saja yang tampil. --}}
+        @php
+            $pickupAssignment = $order->pickupAssignment();
+            $deliveryAssignment = $order->deliveryAssignment();
+        @endphp
+        @if($pickupAssignment || $deliveryAssignment)
+        <div class="r-grid">
+            @if($pickupAssignment)
+            <div class="r-box">
+                <div class="r-box__label">Dijemput oleh</div>
+                <div class="r-box__value">
+                    {{ $pickupAssignment->driver->name ?? '-' }}
+                    @if($pickupAssignment->actual_time)
+                        <br><span style="font-weight:500;color:var(--ink-mid);font-size:0.7rem;">
+                            {{ $pickupAssignment->actual_time->translatedFormat('d M, H:i') }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+            @endif
+            @if($deliveryAssignment)
+            <div class="r-box">
+                <div class="r-box__label">Diantar oleh</div>
+                <div class="r-box__value">
+                    {{ $deliveryAssignment->driver->name ?? '-' }}
+                    @if($deliveryAssignment->actual_time)
+                        <br><span style="font-weight:500;color:var(--ink-mid);font-size:0.7rem;">
+                            {{ $deliveryAssignment->actual_time->translatedFormat('d M, H:i') }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+            @endif
+        </div>
+        @endif
+
         {{-- Items Table --}}
         <table class="r-table">
             <thead>
