@@ -427,9 +427,10 @@ class OrderController extends Controller
     {
         abort_if($order->customer_id !== Auth::id(), 403);
 
-        $allowedCancel = ['menunggu', 'dijemput'];
-
-        if (! in_array($order->status, $allowedCancel, true)) {
+        // Pakai canTransitionTo supaya aturan transisi terpusat di model.
+        // Dibatalkan hanya boleh dari 'menunggu' & 'dijemput' (sebelum cucian
+        // masuk workshop) — definisinya ada di Order::TRANSITIONS.
+        if (! $order->canTransitionTo('dibatalkan')) {
             return back()->with('error', 'Pesanan tidak bisa dibatalkan karena sudah dalam proses pencucian.');
         }
 
@@ -580,9 +581,20 @@ class OrderController extends Controller
             'status' => ['required', 'in:dicuci,disetrika,siap,selesai,dibatalkan'],
         ]);
 
-        // Block updates on final orders
-        if (in_array($order->status, ['selesai', 'dibatalkan'], true)) {
+        // Order final tidak bisa diubah lagi
+        if ($order->isFinal()) {
             return back()->with('error', 'Pesanan sudah final, tidak bisa diubah lagi.');
+        }
+
+        // Guard transisi: cegah lompat status. Mis. dari 'menunggu' loncat
+        // ke 'selesai' bakal nge-trigger income recording padahal cucian
+        // bahkan belum dijemput.
+        if (! $order->canTransitionTo($request->status)) {
+            return back()->with(
+                'error',
+                "Tidak bisa ubah status dari '{$order->status_label}' ke '{$request->status}'. "
+                .'Ikuti alur: dijemput → dicuci → disetrika → siap → dikirim → selesai.'
+            );
         }
 
         $statusLabel = [
@@ -861,6 +873,30 @@ class OrderController extends Controller
             'proof_image' => 'nullable|image|max:5120',
             'payment_channel' => 'nullable|in:cash,transfer,qris',
         ]);
+
+        // Guard transisi sama seperti updateStatus admin. Driver punya 3
+        // titik aksi: dijemput→dicuci, siap→dikirim, dikirim→selesai.
+        // Selain itu ditolak — termasuk loncat dari dijemput langsung
+        // selesai (yang akan nge-trigger income recording prematur).
+        if ($order->isFinal()) {
+            return back()->with('error', 'Pesanan sudah final, tidak bisa diubah lagi.');
+        }
+
+        if (! $order->canTransitionTo($request->status)) {
+            return back()->with(
+                'error',
+                "Tidak bisa ubah status dari '{$order->status_label}' ke '{$request->status}'."
+            );
+        }
+
+        // Aturan tambahan khusus driver: driver hanya boleh aksi pada
+        // pesanan yang sedang di tangannya (status 'dijemput' atau 'dikirim').
+        // Status 'dicuci'/'disetrika'/'siap' adalah domain workshop & admin
+        // — driver tidak boleh ambil alih.
+        $allowedDriverStartStatuses = ['dijemput', 'dikirim'];
+        if (! in_array($order->status, $allowedDriverStartStatuses, true)) {
+            return back()->with('error', 'Status pesanan saat ini di luar kendali driver.');
+        }
 
         $updateData = ['status' => $request->status];
         $note = '';
