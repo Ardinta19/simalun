@@ -16,6 +16,7 @@ use App\Support\Audit;
 use App\Support\DriverAssigner;
 use App\Support\Laundry;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -754,16 +755,14 @@ class OrderController extends Controller
             }
         }
 
-        $customer = User::firstOrCreate(
-            ['phone' => $request->customer_phone ?: null],
-            [
-                'name' => $request->customer_name,
-                'email' => null,
-                'password' => bcrypt(Str::random(12)),
-                'role' => 'customer',
-                'phone' => $request->customer_phone,
-            ]
-        );
+        // Resolve customer dengan guard collision. Kalau nomor HP yang
+        // diketik admin ternyata dipakai akun staff, balikin pakai
+        // validation error — bukan biarkan order nempel ke staff.
+        $customerOrError = $this->resolveWalkinCustomer($request->customer_name, $request->customer_phone);
+        if ($customerOrError instanceof RedirectResponse) {
+            return $customerOrError;
+        }
+        $customer = $customerOrError;
 
         $service = Service::findOrFail($request->service_id);
         $weight = (float) $request->weight_estimate;
@@ -838,6 +837,68 @@ class OrderController extends Controller
         });
 
         return back()->with('status', "Pesanan walk-in untuk {$request->customer_name} berhasil dibuat.");
+    }
+
+    /**
+     * Cari atau buat user customer untuk walk-in. Logikanya beda dengan
+     * firstOrCreate biasa karena ada 3 trap yang dulu kejadian / berpotensi:
+     *
+     * 1. Walk-in tanpa nomor HP — kalau pakai `firstOrCreate(['phone' => null])`
+     *    semua walk-in tanpa nomor bakal merge ke user pertama yang
+     *    phone-nya null (mungkin akun admin/seed). Solusi: kalau no
+     *    HP kosong, selalu bikin user baru — gak ada cara identifikasi
+     *    customer balik.
+     *
+     * 2. Nomor HP yang dimasukin ternyata milik akun staff (admin/driver) —
+     *    sebelumnya order walk-in nempel ke akun staff (data finance &
+     *    audit jadi kebocoran). Solusi: lookup difilter `role=customer`,
+     *    kalau ternyata nomor itu ada tapi role-nya staff, tolak input
+     *    dengan validation error supaya admin di counter sadar.
+     *
+     * 3. Customer existing yang sebelumnya pernah daftar online datang
+     *    walk-in — order baru harus nempel ke akun customer yang sudah
+     *    ada (bukan bikin user baru dengan unique-phone collision di DB).
+     *
+     * Return:
+     *  - User instance kalau resolve sukses
+     *  - RedirectResponse dengan validation error kalau collision staff
+     */
+    private function resolveWalkinCustomer(string $name, ?string $phone): User|RedirectResponse
+    {
+        $cleanPhone = $phone !== null && $phone !== '' ? $phone : null;
+
+        if ($cleanPhone !== null) {
+            // Cek dulu siapapun yang pakai nomor ini — terlepas role
+            // (kolom `phone` di-unique secara global di tabel users).
+            $anyone = User::where('phone', $cleanPhone)->first();
+
+            if ($anyone) {
+                if ($anyone->role !== 'customer') {
+                    // Nomor ini milik admin/driver — REFUSE bikin order
+                    // walk-in di akunnya. Admin counter dapat error jelas.
+                    return back()->withInput()->withErrors([
+                        'customer_phone' => 'Nomor HP ini terdaftar sebagai akun staff. Pakai nomor lain atau kosongkan.',
+                    ]);
+                }
+
+                // Nomor milik customer existing — pakai akun yang sudah ada
+                return $anyone;
+            }
+        }
+
+        $user = new User([
+            'name' => $name,
+            'email' => null,
+            'password' => bcrypt(Str::random(12)),
+            'phone' => $cleanPhone,
+        ]);
+        // Set role lewat property assignment, bukan mass-fill — biar
+        // konsisten dengan pengetatan $fillable (lihat PR mass-assignment
+        // hardening). Walk-in selalu bikin user role 'customer'.
+        $user->role = 'customer';
+        $user->save();
+
+        return $user;
     }
 
     public function driverIndex()
