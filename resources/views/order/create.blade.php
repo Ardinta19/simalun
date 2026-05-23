@@ -192,6 +192,12 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
 
 /* ── SERVICE CARDS ── */
 .service-list { display:flex; flex-direction:column; gap:9px; }
+.cat-heading {
+  font-size:.7rem; font-weight:800;
+  color:var(--blue-mid); letter-spacing:.5px; text-transform:uppercase;
+  margin-top:6px; padding:0 4px;
+}
+.cat-heading:first-child { margin-top:0; }
 .service-card {
   border:2px solid var(--border); border-radius:var(--radius-sm);
   padding:12px 14px; cursor:pointer;
@@ -516,26 +522,56 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
       <div class="section-body">
 
         <div class="service-list">
-          @foreach(($kgServices ?? $services->where('pricing_model', 'per_kg')) as $svc)
-          @php
-            $icons = ['reguler'=>'🧺','express'=>'⚡','prioritas'=>'💎'];
-            $iconClasses = ['reguler'=>'icon-reguler','express'=>'icon-express','prioritas'=>'icon-prioritas'];
-            $icon = $icons[$svc->slug] ?? '🫧';
-            $iconCls = $iconClasses[$svc->slug] ?? 'icon-reguler';
-          @endphp
-          <label class="service-card">
-            <input type="radio" name="service_id" value="{{ $svc->id }}"
-              {{ old('service_id', $kgServices->first()?->id ?? $services->first()?->id) == $svc->id ? 'checked' : '' }}
-              data-price="{{ $svc->effective_unit_price ?? $svc->price_per_kg }}"
-              data-pricing-model="{{ $svc->pricing_model ?? 'per_kg' }}">
-            <div class="service-icon {{ $iconCls }}">{{ $icon }}</div>
-            <div class="service-info">
-              <div class="service-name">{{ $svc->name }}</div>
-              <div class="service-eta">{{ $svc->estimated_label }}</div>
-            </div>
-            <div class="service-price">Rp {{ number_format(($svc->effective_unit_price ?? $svc->price_per_kg)/1000,0) }}k/{{ ($svc->unit_type ?? 'kg') }}</div>
-          </label>
-          @endforeach
+          @php $kiloanCats = $kgCategories ?? collect(); $allKgServices = $kgServices ?? collect(); @endphp
+          @if($kiloanCats->count() > 0)
+            @foreach($kiloanCats as $cat)
+              @if($kiloanCats->count() > 1)
+              <div class="cat-heading">{{ $cat->name }}</div>
+              @endif
+              @foreach($cat->services as $svc)
+              @php
+                $icons = ['reguler'=>'🧺','express'=>'⚡','prioritas'=>'💎'];
+                $iconClasses = ['reguler'=>'icon-reguler','express'=>'icon-express','prioritas'=>'icon-prioritas'];
+                $icon = $icons[$svc->slug] ?? '🫧';
+                $iconCls = $iconClasses[$svc->slug] ?? 'icon-reguler';
+              @endphp
+              <label class="service-card">
+                <input type="radio" name="service_id" value="{{ $svc->id }}"
+                  {{ old('service_id', $allKgServices->first()?->id ?? $services->first()?->id) == $svc->id ? 'checked' : '' }}
+                  data-price="{{ $svc->effective_unit_price ?? $svc->price_per_kg }}"
+                  data-pricing-model="{{ $svc->pricing_model ?? 'per_kg' }}">
+                <div class="service-icon {{ $iconCls }}">{{ $icon }}</div>
+                <div class="service-info">
+                  <div class="service-name">{{ $svc->name }}</div>
+                  <div class="service-eta">{{ $svc->estimated_label }}</div>
+                </div>
+                <div class="service-price">Rp {{ number_format(($svc->effective_unit_price ?? $svc->price_per_kg)/1000,0) }}k/{{ ($svc->unit_type ?? 'kg') }}</div>
+              </label>
+              @endforeach
+            @endforeach
+          @else
+            {{-- Fallback: kategori belum dibuat / kosong, render flat seperti versi lama. --}}
+            @foreach(($allKgServices->count() ? $allKgServices : $services->where('pricing_model', 'per_kg')) as $svc)
+            @php
+              $icons = ['reguler'=>'🧺','express'=>'⚡','prioritas'=>'💎'];
+              $iconClasses = ['reguler'=>'icon-reguler','express'=>'icon-express','prioritas'=>'icon-prioritas'];
+              $icon = $icons[$svc->slug] ?? '🫧';
+              $iconCls = $iconClasses[$svc->slug] ?? 'icon-reguler';
+            @endphp
+            <label class="service-card">
+              <input type="radio" name="service_id" value="{{ $svc->id }}"
+                {{ old('service_id', $allKgServices->first()?->id ?? $services->first()?->id) == $svc->id ? 'checked' : '' }}
+                data-price="{{ $svc->effective_unit_price ?? $svc->price_per_kg }}"
+                data-pricing-model="{{ $svc->pricing_model ?? 'per_kg' }}">
+              <div class="service-icon {{ $iconCls }}">{{ $icon }}</div>
+              <div class="service-info">
+                <div class="service-name">{{ $svc->name }}</div>
+                <div class="service-eta">{{ $svc->estimated_label }}</div>
+              </div>
+              <div class="service-price">Rp {{ number_format(($svc->effective_unit_price ?? $svc->price_per_kg)/1000,0) }}k/{{ ($svc->unit_type ?? 'kg') }}</div>
+            </label>
+            @endforeach
+          @endif
         </div>
 
         @error('service_id') <div class="err">{{ $message }}</div> @enderror
@@ -556,9 +592,61 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
         </div>
 
         @if(isset($itemServices) && $itemServices->count() > 0)
+        @php
+          $itemCats = $itemCategories ?? collect();
+          // Loop counter manual karena nested foreach: tiap item punya index unik
+          // di payload form (item_lines[N][...]), gak bisa pakai $loop->index nested.
+          $itemIdx = 0;
+        @endphp
         <div>
           <div class="field-label">Item Satuan (Opsional)</div>
           <div class="service-list">
+          @if($itemCats->count() > 0)
+            @foreach($itemCats as $cat)
+              @if($itemCats->count() > 1)
+              <div class="cat-heading">{{ $cat->name }}</div>
+              @endif
+              @foreach($cat->services as $itemSvc)
+              <div class="service-card" style="cursor:default; flex-direction:column; align-items:stretch; gap:10px;">
+                <input type="hidden" name="item_lines[{{ $itemIdx }}][service_id]" value="{{ $itemSvc->id }}">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div class="service-icon icon-prioritas">🧾</div>
+                  <div class="service-info">
+                    <div class="service-name">{{ $itemSvc->name }}</div>
+                    <div class="service-eta">Harga satuan</div>
+                  </div>
+                  <div class="service-price">Rp {{ number_format(($itemSvc->effective_unit_price ?? $itemSvc->price_per_kg)/1000,0) }}k/item</div>
+                </div>
+                <div class="item-row" style="margin-top:0; border-style:dashed;">
+                  <div class="item-row-head">
+                    <div class="item-stepper">
+                      <button type="button" class="item-stepper-btn item-minus" data-target="item-qty-{{ $itemIdx }}">−</button>
+                      <div class="item-stepper-value" id="item-view-{{ $itemIdx }}">{{ old('item_lines.'.$itemIdx.'.qty', 0) }}</div>
+                      <button type="button" class="item-stepper-btn item-plus" data-target="item-qty-{{ $itemIdx }}">+</button>
+                    </div>
+                    <button type="button" class="item-note-toggle" data-note="item-note-{{ $itemIdx }}">Tambah catatan</button>
+                  </div>
+                  <input type="hidden" min="0" max="999" value="{{ old('item_lines.'.$itemIdx.'.qty', 0) }}"
+                    id="item-qty-{{ $itemIdx }}"
+                    name="item_lines[{{ $itemIdx }}][qty]" class="item-qty"
+                    data-item-price="{{ $itemSvc->effective_unit_price ?? $itemSvc->price_per_kg }}"
+                    data-view="item-view-{{ $itemIdx }}">
+                  <div class="item-note-wrap" id="item-note-{{ $itemIdx }}">
+                    <input type="text" name="item_lines[{{ $itemIdx }}][notes]" class="field-input"
+                      value="{{ old('item_lines.'.$itemIdx.'.notes') }}"
+                      placeholder="Catatan item (opsional)">
+                  </div>
+                </div>
+              </div>
+
+              @error('item_lines.'.$itemIdx.'.qty') <div class="err">{{ $message }}</div> @enderror
+              @error('item_lines.'.$itemIdx.'.notes') <div class="err">{{ $message }}</div> @enderror
+
+              @php $itemIdx++; @endphp
+              @endforeach
+            @endforeach
+          @else
+            {{-- Fallback flat tanpa kategori. --}}
             @foreach($itemServices as $itemSvc)
             <div class="service-card" style="cursor:default; flex-direction:column; align-items:stretch; gap:10px;">
               <input type="hidden" name="item_lines[{{ $loop->index }}][service_id]" value="{{ $itemSvc->id }}">
@@ -596,6 +684,7 @@ textarea.field-input { resize:none; min-height:80px; line-height:1.5; }
             @error('item_lines.'.$loop->index.'.notes') <div class="err">{{ $message }}</div> @enderror
 
             @endforeach
+          @endif
           </div>
         </div>
         @endif

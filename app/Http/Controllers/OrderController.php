@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
@@ -26,12 +27,35 @@ class OrderController extends Controller
         $kgServices = $services->where('pricing_model', 'per_kg')->values();
         $itemServices = $services->where('pricing_model', 'per_item')->values();
 
+        // Group per kategori biar form pemesanan bisa nampilin section dinamis
+        // (mis. admin nambah kategori "Karpet" otomatis muncul di section item).
+        // Kategori dengan service kosong di-skip — gak ada gunanya tampil.
+        $kgCategories = ServiceCategory::where('is_active', true)
+            ->where('pricing_model', 'per_kg')
+            ->with(['services' => fn ($q) => $q->where('is_active', true)->orderBy('id')])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($cat) => $cat->services->isNotEmpty())
+            ->values();
+
+        $itemCategories = ServiceCategory::where('is_active', true)
+            ->where('pricing_model', 'per_item')
+            ->with(['services' => fn ($q) => $q->where('is_active', true)->orderBy('id')])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($cat) => $cat->services->isNotEmpty())
+            ->values();
+
         $alamatTersimpan = Auth::user()->customerAddresses()
             ->orderByDesc('is_primary')
             ->orderByDesc('last_used_at')
             ->get();
 
-        return view('order.create', compact('services', 'kgServices', 'itemServices', 'alamatTersimpan'));
+        return view('order.create', compact(
+            'services', 'kgServices', 'itemServices',
+            'kgCategories', 'itemCategories',
+            'alamatTersimpan'
+        ));
     }
 
     public function store(Request $request)
@@ -654,7 +678,28 @@ class OrderController extends Controller
         $daftarLayanan = Service::where('is_active', true)->where('pricing_model', 'per_kg')->get();
         $daftarLayananItem = Service::where('is_active', true)->where('pricing_model', 'per_item')->get();
 
-        return view('roles.admin.walkin', compact('daftarLayanan', 'daftarLayananItem'));
+        // Kategori dipakai di view sebagai optgroup di select layanan, biar
+        // admin gampang lihat layanan dikelompokkan per kategori.
+        $kgCategories = ServiceCategory::where('is_active', true)
+            ->where('pricing_model', 'per_kg')
+            ->with(['services' => fn ($q) => $q->where('is_active', true)->orderBy('id')])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($cat) => $cat->services->isNotEmpty())
+            ->values();
+
+        $itemCategories = ServiceCategory::where('is_active', true)
+            ->where('pricing_model', 'per_item')
+            ->with(['services' => fn ($q) => $q->where('is_active', true)->orderBy('id')])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($cat) => $cat->services->isNotEmpty())
+            ->values();
+
+        return view('roles.admin.walkin', compact(
+            'daftarLayanan', 'daftarLayananItem',
+            'kgCategories', 'itemCategories'
+        ));
     }
 
     public function walkinStore(Request $request)
