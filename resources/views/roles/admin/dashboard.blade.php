@@ -425,6 +425,10 @@ body {
                 <div class="quick-item__icon" style="background:#fff7ed; color:#c2410c;">🎟️</div>
                 <span class="quick-item__label">Voucher Promo</span>
             </a>
+            <a href="{{ route('admin.categories.index') }}" class="quick-item">
+                <div class="quick-item__icon" style="background:var(--blue-lt); color:var(--blue);">📂</div>
+                <span class="quick-item__label">Kategori Layanan</span>
+            </a>
         </div>
     </section>
 
