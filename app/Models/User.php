@@ -18,19 +18,25 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
+     * Sensitive privilege columns (`role`, `is_active`, `email_verified_at`)
+     * sengaja TIDAK di-fillable. Set lewat property assignment supaya
+     * gak ada cara `User::create($request->all())` accidentally bikin
+     * customer dengan role=admin. Caller yang sah harus eksplisit:
+     *
+     *     $user = new User([...mass-fields]);
+     *     $user->role = 'customer';
+     *     $user->save();
+     *
      * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
-        'email_verified_at',
         'password',
-        'role',
         'phone',
         'gender',
         'alamat',
         'avatar',
-        'is_active',
     ];
 
     /**

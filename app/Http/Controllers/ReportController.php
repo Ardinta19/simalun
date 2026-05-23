@@ -27,12 +27,12 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'category'    => ['required', 'in:bug,saran,komplain'],
+            'category' => ['required', 'in:bug,saran,komplain'],
             'description' => ['required', 'string', 'min:10', 'max:1000'],
-            'screenshot'  => ['nullable', 'image', 'max:5120'],
+            'screenshot' => ['nullable', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:5120'],
         ], [
             'description.min' => 'Deskripsi minimal 10 karakter agar kami bisa memahami kendala kamu.',
-            'screenshot.max'  => 'Ukuran gambar maksimal 5 MB.',
+            'screenshot.max' => 'Ukuran gambar maksimal 5 MB.',
         ]);
 
         $screenshotPath = null;
@@ -41,11 +41,11 @@ class ReportController extends Controller
         }
 
         Report::create([
-            'user_id'         => Auth::id(),
-            'category'        => $request->category,
-            'description'     => $request->description,
+            'user_id' => Auth::id(),
+            'category' => $request->category,
+            'description' => $request->description,
             'screenshot_path' => $screenshotPath,
-            'status'          => 'open',
+            'status' => 'open',
         ]);
 
         return back()->with('success', 'Laporan berhasil dikirim. Terima kasih atas masukannya!');
@@ -56,7 +56,7 @@ class ReportController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        $status   = $request->get('status');
+        $status = $request->get('status');
         $category = $request->get('category');
 
         $query = Report::with('user')->latest();
@@ -71,9 +71,9 @@ class ReportController extends Controller
 
         $reports = $query->paginate(15)->withQueryString();
 
-        $countOpen       = Report::where('status', 'open')->count();
+        $countOpen = Report::where('status', 'open')->count();
         $countInProgress = Report::where('status', 'in_progress')->count();
-        $countResolved   = Report::whereIn('status', ['resolved', 'closed'])->count();
+        $countResolved = Report::whereIn('status', ['resolved', 'closed'])->count();
 
         return view('roles.admin.reports', compact(
             'reports', 'countOpen', 'countInProgress', 'countResolved', 'status', 'category'
@@ -86,7 +86,7 @@ class ReportController extends Controller
     public function updateStatus(Request $request, Report $report)
     {
         $request->validate([
-            'status'      => ['required', 'in:open,in_progress,resolved,closed'],
+            'status' => ['required', 'in:open,in_progress,resolved,closed'],
             'admin_notes' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -96,7 +96,7 @@ class ReportController extends Controller
             $data['admin_notes'] = $request->admin_notes;
         }
 
-        if (in_array($request->status, ['resolved', 'closed']) && !$report->resolved_at) {
+        if (in_array($request->status, ['resolved', 'closed']) && ! $report->resolved_at) {
             $data['resolved_at'] = now();
         }
 

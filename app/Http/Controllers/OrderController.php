@@ -954,7 +954,7 @@ class OrderController extends Controller
         $request->validate([
             'status' => 'required|in:dicuci,dikirim,selesai',
             'weight_actual' => 'nullable|numeric|min:0.1',
-            'proof_image' => 'nullable|image|max:5120',
+            'proof_image' => 'nullable|image|mimetypes:image/jpeg,image/png,image/webp|max:5120',
             'payment_channel' => 'nullable|in:cash,transfer,qris',
         ]);
 

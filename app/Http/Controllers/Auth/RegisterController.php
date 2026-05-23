@@ -39,52 +39,55 @@ class RegisterController extends Controller
         $request->merge(['email' => $email !== '' ? strtolower($email) : null]);
 
         $validated = $request->validate([
-            'name'         => ['required', 'string', 'min:3', 'max:255'],
-            'gender'       => ['required', 'in:L,P'],
-            'phone'        => [
+            'name' => ['required', 'string', 'min:3', 'max:255'],
+            'gender' => ['required', 'in:L,P'],
+            'phone' => [
                 'required',
                 'string',
                 'regex:/^8[0-9]{8,12}$/',
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
             ],
-            'email'        => [
+            'email' => [
                 'nullable',
                 'email:rfc',
                 'max:150',
                 Rule::unique('users', 'email')->whereNull('deleted_at'),
             ],
-            'password'     => ['required', 'confirmed', Password::min(8)],
-            'address'      => ['required', 'string', 'min:10', 'max:300'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'address' => ['required', 'string', 'min:10', 'max:300'],
             'address_note' => ['nullable', 'string', 'max:200'],
-            'terms'        => ['accepted'],
+            'terms' => ['accepted'],
         ], [
             'phone.required' => 'Nomor HP wajib diisi.',
-            'phone.regex'    => 'Format nomor HP tidak valid (contoh: 81234567890).',
-            'phone.unique'   => 'Nomor HP sudah terdaftar. Silakan login.',
-            'email.unique'   => 'Email sudah terdaftar. Silakan pakai email lain atau kosongkan.',
+            'phone.regex' => 'Format nomor HP tidak valid (contoh: 81234567890).',
+            'phone.unique' => 'Nomor HP sudah terdaftar. Silakan login.',
+            'email.unique' => 'Email sudah terdaftar. Silakan pakai email lain atau kosongkan.',
             'terms.accepted' => 'Kamu harus menyetujui syarat & ketentuan.',
         ]);
 
         $user = DB::transaction(function () use ($validated) {
-            $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
-                'phone'    => $validated['phone'],
-                'gender'   => $validated['gender'],
-                'alamat'   => $validated['address'],
+            $user = new User([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'gender' => $validated['gender'],
+                'alamat' => $validated['address'],
                 'password' => Hash::make($validated['password']),
-                'role'     => 'customer',
             ]);
+            // Role di-set lewat property assignment, bukan mass-fill —
+            // gak ada cara $request->all() bocor ke role.
+            $user->role = 'customer';
+            $user->save();
 
             CustomerAddress::create([
-                'customer_id'    => $user->id,
-                'label'          => 'Alamat Utama',
+                'customer_id' => $user->id,
+                'label' => 'Alamat Utama',
                 'recipient_name' => $user->name,
-                'phone'          => $user->phone,
-                'full_address'   => $validated['address'],
-                'notes'          => $validated['address_note'] ?? null,
-                'zone'           => 'A',
-                'is_primary'     => true,
+                'phone' => $user->phone,
+                'full_address' => $validated['address'],
+                'notes' => $validated['address_note'] ?? null,
+                'zone' => 'A',
+                'is_primary' => true,
             ]);
 
             return $user;

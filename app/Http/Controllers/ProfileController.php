@@ -22,17 +22,17 @@ class ProfileController extends Controller
         }
 
         $view = match ($user->role) {
-            'admin'  => 'roles.admin.profile_edit',
+            'admin' => 'roles.admin.profile_edit',
             'driver' => 'roles.driver.profile-edit',
-            default  => 'roles.customer.profile.edit',
+            default => 'roles.customer.profile.edit',
         };
 
-        if (!view()->exists($view)) {
+        if (! view()->exists($view)) {
             $view = 'roles.customer.profile.edit';
         }
 
         return view($view, [
-            'user'           => $user,
+            'user' => $user,
             'primaryAddress' => $primaryAddress,
         ]);
     }
@@ -42,23 +42,23 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name'   => ['required', 'string', 'max:255'],
-            'email'  => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone'  => [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => [
                 'required',
                 'string',
                 'regex:/^(?:\+?62|0)?8[0-9]{8,12}$/',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'phone.required' => 'Nomor HP wajib diisi.',
-            'phone.regex'    => 'Format nomor HP tidak valid (contoh: 081234567890).',
-            'phone.unique'   => 'Nomor HP sudah dipakai akun lain.',
+            'phone.regex' => 'Format nomor HP tidak valid (contoh: 081234567890).',
+            'phone.unique' => 'Nomor HP sudah dipakai akun lain.',
         ]);
 
         // Normalisasi nomor HP ke kanonik 8xxxxxxxxxx
-        if (!empty($validated['phone'])) {
+        if (! empty($validated['phone'])) {
             $normalized = preg_replace('/[\s\-\.]/', '', $validated['phone']);
             $validated['phone'] = preg_replace('/^(\+?62|0)/', '', $normalized);
         }
@@ -75,11 +75,17 @@ class ProfileController extends Controller
             $validated['email'] = null;
         }
 
-        if (($validated['email'] ?? null) !== $user->email) {
-            $validated['email_verified_at'] = null;
-        }
+        $emailChanged = ($validated['email'] ?? null) !== $user->email;
 
         $user->fill($validated)->save();
+
+        // email_verified_at tidak di-fillable (sensitive). Reset lewat
+        // property assignment kalau email berubah — supaya user wajib
+        // verifikasi ulang alamat baru.
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+            $user->save();
+        }
 
         return back()->with('status', 'profile-updated');
     }
@@ -138,12 +144,12 @@ class ProfileController extends Controller
         abort_unless($user->role === 'customer', 403);
 
         $validated = $request->validate([
-            'label'          => ['required', 'string', 'max:80'],
+            'label' => ['required', 'string', 'max:80'],
             'recipient_name' => ['required', 'string', 'max:120'],
-            'phone'          => ['nullable', 'string', 'max:30'],
-            'full_address'   => ['required', 'string', 'min:10'],
-            'distance_km'    => ['nullable', 'numeric', 'min:0', 'max:50'],
-            'notes'          => ['nullable', 'string', 'max:300'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'full_address' => ['required', 'string', 'min:10'],
+            'distance_km' => ['nullable', 'numeric', 'min:0', 'max:50'],
+            'notes' => ['nullable', 'string', 'max:300'],
         ]);
 
         $km = (float) ($validated['distance_km'] ?? 0);
