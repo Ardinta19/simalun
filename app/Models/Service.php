@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
@@ -18,7 +18,7 @@ class Service extends Model
 
     public function getEffectiveUnitPriceAttribute(): int
     {
-        if (!is_null($this->unit_price)) {
+        if (! is_null($this->unit_price)) {
             return (int) $this->unit_price;
         }
 
@@ -40,7 +40,7 @@ class Service extends Model
      */
     public function getPriceFormattedAttribute(): string
     {
-        return 'Rp ' . number_format($this->price_per_kg / 1000, 0) . 'k';
+        return 'Rp '.number_format($this->price_per_kg / 1000, 0).'k';
     }
 
     /**
@@ -49,7 +49,10 @@ class Service extends Model
     public function getEstimatedLabelAttribute(): string
     {
         $h = $this->estimated_hours;
-        if ($h >= 48) return 'Estimasi ' . round($h / 24) . '-' . (round($h / 24) + 1) . ' Hari';
-        return 'Estimasi ' . $h . ' Jam';
+        if ($h >= 48) {
+            return 'Estimasi '.round($h / 24).'-'.(round($h / 24) + 1).' Hari';
+        }
+
+        return 'Estimasi '.$h.' Jam';
     }
 }

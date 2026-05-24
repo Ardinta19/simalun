@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'gender')) {
+            if (! Schema::hasColumn('users', 'gender')) {
                 $table->enum('gender', ['L', 'P'])->nullable()->after('phone');
             }
 
@@ -17,7 +17,7 @@ return new class extends Migration
             if (Schema::hasColumn('users', 'phone')) {
                 try {
                     $table->unique('phone');
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     // Index sudah ada, abaikan.
                 }
             }
@@ -33,7 +33,7 @@ return new class extends Migration
 
             try {
                 $table->dropUnique(['phone']);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Abaikan jika index tidak ada.
             }
         });

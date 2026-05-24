@@ -34,7 +34,7 @@ class BackUrl
 
         // 2. HTTP Referer (same-host, bukan current URL)
         $referer = $request->headers->get('referer');
-        if ($referer && static::isSafeUrl($referer) && !static::isSameAs($referer, $request->fullUrl())) {
+        if ($referer && static::isSafeUrl($referer) && ! static::isSameAs($referer, $request->fullUrl())) {
             return $referer;
         }
 
@@ -52,7 +52,7 @@ class BackUrl
      */
     public static function param(): string
     {
-        return 'back=' . urlencode(url()->current());
+        return 'back='.urlencode(url()->current());
     }
 
     /**
@@ -62,7 +62,7 @@ class BackUrl
     {
         $parsed = parse_url($url);
 
-        if (!isset($parsed['host'])) {
+        if (! isset($parsed['host'])) {
             // Relative URL — aman
             return str_starts_with($url, '/');
         }
