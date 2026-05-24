@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Edit Profil</title>
 <style>
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -60,7 +60,7 @@
             </div>
             <div class="field">
                 <label>Nomor HP</label>
-                <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
+                <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" pattern="[0-9]{9,15}" title="Masukkan nomor HP valid (9-15 angka)" inputmode="tel">
             </div>
             <div class="field">
                 <label>Foto Profil</label>
