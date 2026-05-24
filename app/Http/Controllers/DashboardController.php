@@ -8,6 +8,7 @@ use App\Models\OrderRating;
 use App\Models\User;
 use App\Models\Voucher;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -99,51 +100,74 @@ class DashboardController extends Controller
         // ── Analitik 30 hari terakhir ─────────────────────────────────
         // Sengaja pakai window 30 hari supaya tetap relevan saat usaha tumbuh.
         // Window lifetime cenderung condong ke layanan/customer lama saja.
+        //
+        // Cache 60 detik per segment supaya dashboard admin tetap snappy
+        // walau aggregate query berat. Trade-off: data bisa basi maksimal
+        // 1 menit — acceptable untuk analitik 30-hari (top services /
+        // customer / rating distribusi gak berubah signifikan dalam
+        // window 60 detik). Operasional counter (jumlahDiproses,
+        // pemasukanHari, dll) di atas SENGAJA gak di-cache karena admin
+        // butuh data live untuk dispatching.
         $sejak = now()->subDays(30)->startOfDay();
+        $cacheTtl = 60; // detik
 
-        $topServices = Order::query()
-            ->selectRaw('service_id, COUNT(*) as total_order')
-            ->whereNotNull('service_id')
-            ->where('created_at', '>=', $sejak)
-            ->groupBy('service_id')
-            ->orderByDesc('total_order')
-            ->take(5)
-            ->with('service:id,name')
-            ->get();
+        $topServices = Cache::remember('dashboard.admin.top-services', $cacheTtl, function () use ($sejak) {
+            return Order::query()
+                ->selectRaw('service_id, COUNT(*) as total_order')
+                ->whereNotNull('service_id')
+                ->where('created_at', '>=', $sejak)
+                ->groupBy('service_id')
+                ->orderByDesc('total_order')
+                ->take(5)
+                ->with('service:id,name')
+                ->get();
+        });
 
         // Distribusi jam pickup (pagi/siang/sore) — bantu admin atur jadwal kurir.
-        $pickupBuckets = Order::query()
-            ->selectRaw('pickup_time, COUNT(*) as total')
-            ->whereNotNull('pickup_time')
-            ->where('created_at', '>=', $sejak)
-            ->groupBy('pickup_time')
-            ->pluck('total', 'pickup_time');
+        $pickupBuckets = Cache::remember('dashboard.admin.pickup-buckets', $cacheTtl, function () use ($sejak) {
+            $raw = Order::query()
+                ->selectRaw('pickup_time, COUNT(*) as total')
+                ->whereNotNull('pickup_time')
+                ->where('created_at', '>=', $sejak)
+                ->groupBy('pickup_time')
+                ->pluck('total', 'pickup_time');
 
-        $pickupBuckets = collect(['pagi', 'siang', 'sore'])
-            ->mapWithKeys(fn ($slot) => [$slot => (int) ($pickupBuckets[$slot] ?? 0)])
-            ->toArray();
+            // Normalisasi: pastikan 3 slot selalu ada walau count = 0,
+            // supaya view gak butuh fallback `?? 0` di tiap render.
+            return collect(['pagi', 'siang', 'sore'])
+                ->mapWithKeys(fn ($slot) => [$slot => (int) ($raw[$slot] ?? 0)])
+                ->toArray();
+        });
 
-        $topCustomers = Order::query()
-            ->selectRaw('customer_id, COUNT(*) as total_order, SUM(total_cost) as total_spent')
-            ->whereNotNull('customer_id')
-            ->where('created_at', '>=', $sejak)
-            ->groupBy('customer_id')
-            ->orderByDesc('total_order')
-            ->take(5)
-            ->with('customer:id,name,phone')
-            ->get();
+        $topCustomers = Cache::remember('dashboard.admin.top-customers', $cacheTtl, function () use ($sejak) {
+            return Order::query()
+                ->selectRaw('customer_id, COUNT(*) as total_order, SUM(total_cost) as total_spent')
+                ->whereNotNull('customer_id')
+                ->where('created_at', '>=', $sejak)
+                ->groupBy('customer_id')
+                ->orderByDesc('total_order')
+                ->take(5)
+                ->with('customer:id,name,phone')
+                ->get();
+        });
 
-        $ratingStats = OrderRating::query()
-            ->where('created_at', '>=', $sejak)
-            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_rating')
-            ->first();
+        $ratingStats = Cache::remember('dashboard.admin.rating-stats', $cacheTtl, function () use ($sejak) {
+            return OrderRating::query()
+                ->where('created_at', '>=', $sejak)
+                ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_rating')
+                ->first();
+        });
 
-        $ulasanTerbaru = OrderRating::with(['customer:id,name', 'order:id,order_code'])
-            ->latest()
-            ->take(3)
-            ->get();
+        $ulasanTerbaru = Cache::remember('dashboard.admin.latest-reviews', $cacheTtl, function () {
+            return OrderRating::with(['customer:id,name', 'order:id,order_code'])
+                ->latest()
+                ->take(3)
+                ->get();
+        });
 
-        $voucherAktif = Voucher::where('is_active', true)->count();
+        $voucherAktif = Cache::remember('dashboard.admin.voucher-aktif-count', $cacheTtl, function () {
+            return Voucher::where('is_active', true)->count();
+        });
 
         return view('roles.admin.dashboard', compact(
             'jumlahDiproses',
