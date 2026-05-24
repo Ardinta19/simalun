@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerAddress;
+use App\Models\DriverAssignment;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
@@ -302,6 +303,19 @@ class OrderController extends Controller
                         'status_note' => "Kurir {$driver->name} otomatis ditugaskan untuk penjemputan.",
                         'updated_by' => $order->customer_id,
                     ]);
+
+                    // History assignment per leg (pickup/delivery). Sengaja
+                    // bukan cuma update orders.driver_id — supaya kalau
+                    // pickup & delivery ditangani 2 driver berbeda, kita
+                    // punya rekam siapa ngerjain leg yang mana untuk
+                    // tampil di nota & audit.
+                    DriverAssignment::create([
+                        'order_id' => $order->id,
+                        'driver_id' => $driver->id,
+                        'assignment_type' => 'pickup',
+                        'assignment_status' => 'assigned',
+                        'assigned_by' => $order->customer_id,
+                    ]);
                 } else {
                     // Tidak ada driver aktif — order tetap 'menunggu', notif admin untuk assign manual
                     OrderStatusHistory::create([
@@ -576,6 +590,20 @@ class OrderController extends Controller
                 'status_code' => $newStatus,
                 'status_note' => "Driver {$driver->name} ditugaskan untuk {$request->assignment_type}.",
                 'updated_by' => Auth::id(),
+            ]);
+
+            // Catat history assignment per leg. Beda dengan
+            // orders.driver_id yang cuma nyimpan "siapa kurir terakhir",
+            // tabel ini menyimpan rekam jejak pickup vs delivery —
+            // berguna saat 2 leg ditangani driver berbeda (mis. driver
+            // pickup off saat siap-dikirim, admin reassign ke driver
+            // lain untuk delivery).
+            DriverAssignment::create([
+                'order_id' => $order->id,
+                'driver_id' => $driver->id,
+                'assignment_type' => $request->assignment_type,
+                'assignment_status' => 'assigned',
+                'assigned_by' => Auth::id(),
             ]);
         });
 
@@ -1023,6 +1051,34 @@ class OrderController extends Controller
                 'status_note' => $note ?: 'Status diperbarui oleh driver.',
                 'updated_by' => Auth::id(),
             ]);
+
+            // Tutup assignment yang lagi 'assigned' kalau driver
+            // selesaikan leg-nya. Mapping status driver → leg:
+            //   dijemput→dicuci  = pickup selesai (cucian sampai workshop)
+            //   dikirim→selesai  = delivery selesai (pesanan sampai customer)
+            // Status lain (siap, disetrika, dll) gak ngena ke leg
+            // driver — workshop yang ngerjain.
+            $completedLeg = match ($request->status) {
+                'dicuci' => 'pickup',
+                'selesai' => 'delivery',
+                default => null,
+            };
+
+            if ($completedLeg !== null) {
+                $assignment = DriverAssignment::where('order_id', $order->id)
+                    ->where('driver_id', Auth::id())
+                    ->where('assignment_type', $completedLeg)
+                    ->where('assignment_status', 'assigned')
+                    ->latest('id')
+                    ->first();
+
+                if ($assignment) {
+                    $assignment->update([
+                        'assignment_status' => 'completed',
+                        'actual_time' => now(),
+                    ]);
+                }
+            }
 
             // Record income saat order selesai (COD — bayar di tempat)
             if ($request->status === 'selesai') {

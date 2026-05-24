@@ -129,6 +129,34 @@ class Order extends Model
         return $this->hasMany(DriverAssignment::class);
     }
 
+    /**
+     * Assignment terakhir untuk leg pickup. Dipakai di nota & detail
+     * order untuk nampilin "Dijemput oleh: X" — bukan via $order->driver
+     * yang cuma simpan kurir terakhir (mungkin sudah berganti ke
+     * delivery driver).
+     */
+    public function pickupAssignment()
+    {
+        return $this->assignments()
+            ->where('assignment_type', 'pickup')
+            ->with('driver')
+            ->latest('id')
+            ->first();
+    }
+
+    /**
+     * Assignment terakhir untuk leg delivery. Lihat dokumentasi
+     * pickupAssignment().
+     */
+    public function deliveryAssignment()
+    {
+        return $this->assignments()
+            ->where('assignment_type', 'delivery')
+            ->with('driver')
+            ->latest('id')
+            ->first();
+    }
+
     public function statusHistories(): HasMany
     {
         return $this->hasMany(OrderStatusHistory::class);

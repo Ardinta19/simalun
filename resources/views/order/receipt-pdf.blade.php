@@ -282,6 +282,44 @@ body {
 </div>
 @endif
 
+{{-- RIWAYAT KURIR PER LEG (pickup vs delivery) --}}
+@php
+    $pickupAssignment = $order->pickupAssignment();
+    $deliveryAssignment = $order->deliveryAssignment();
+@endphp
+@if($pickupAssignment || $deliveryAssignment)
+<table class="info-table">
+    <tr>
+        @if($pickupAssignment)
+        <td>
+            <div class="info-box">
+                <div class="info-label">Dijemput oleh</div>
+                <div class="info-value">
+                    {{ $pickupAssignment->driver->name ?? '-' }}
+                    @if($pickupAssignment->actual_time)
+                        &mdash; {{ $pickupAssignment->actual_time->format('d/m H:i') }}
+                    @endif
+                </div>
+            </div>
+        </td>
+        @endif
+        @if($deliveryAssignment)
+        <td>
+            <div class="info-box">
+                <div class="info-label">Diantar oleh</div>
+                <div class="info-value">
+                    {{ $deliveryAssignment->driver->name ?? '-' }}
+                    @if($deliveryAssignment->actual_time)
+                        &mdash; {{ $deliveryAssignment->actual_time->format('d/m H:i') }}
+                    @endif
+                </div>
+            </div>
+        </td>
+        @endif
+    </tr>
+</table>
+@endif
+
 {{-- ITEMS --}}
 <table class="items-table">
     <thead>
