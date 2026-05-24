@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
 use App\Notifications\OrderStatusUpdated;
+use App\Services\FinanceService;
 use App\Support\Audit;
 use App\Support\DriverAssigner;
 use App\Support\Laundry;
@@ -277,7 +278,7 @@ class OrderController extends Controller
                 }
 
                 // Income TIDAK dicatat di sini — dicatat saat order selesai (COD model).
-                // Lihat FinanceController::recordIncomeFromOrder()
+                // Lihat FinanceService::recordIncomeFromOrder()
 
                 // Auto-assign ke driver aktif. DriverAssigner pilih driver
                 // pakai strategi yang diset di config (round_robin / load_based)
@@ -644,7 +645,7 @@ class OrderController extends Controller
             // Record income saat order selesai (COD)
             if ($request->status === 'selesai') {
                 $order->update(['is_paid' => true, 'paid_at' => now()]);
-                FinanceController::recordIncomeFromOrder($order->fresh());
+                FinanceService::recordIncomeFromOrder($order->fresh());
             }
         });
 
@@ -1025,7 +1026,7 @@ class OrderController extends Controller
 
             // Record income saat order selesai (COD — bayar di tempat)
             if ($request->status === 'selesai') {
-                FinanceController::recordIncomeFromOrder($order->fresh());
+                FinanceService::recordIncomeFromOrder($order->fresh());
             }
         });
 
