@@ -411,7 +411,8 @@ html, body {
               <input class="form-input @error('phone') error @enderror"
                 type="tel" id="phone" name="phone"
                 placeholder="8xxxxxxxxxx"
-                value="{{ old('phone') }}" inputmode="tel" autocomplete="tel">
+                value="{{ old('phone') }}" inputmode="tel" autocomplete="tel"
+                pattern="[0-9]{9,15}" title="Masukkan nomor HP valid (9-15 angka)">
             </div>
           </div>
           @error('phone')<div class="form-error show">{{ $message }}</div>@enderror
