@@ -29,32 +29,32 @@ class Report extends Model
     public function getCategoryLabelAttribute(): string
     {
         return match ($this->category) {
-            'bug'      => 'Bug / Error',
-            'saran'    => 'Saran & Masukan',
+            'bug' => 'Bug / Error',
+            'saran' => 'Saran & Masukan',
             'komplain' => 'Komplain Layanan',
-            default    => ucfirst($this->category),
+            default => ucfirst($this->category),
         };
     }
 
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'open'        => 'Menunggu',
+            'open' => 'Menunggu',
             'in_progress' => 'Ditangani',
-            'resolved'    => 'Selesai',
-            'closed'      => 'Ditutup',
-            default       => ucfirst($this->status),
+            'resolved' => 'Selesai',
+            'closed' => 'Ditutup',
+            default => ucfirst($this->status),
         };
     }
 
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            'open'        => '#f59e0b',
+            'open' => '#f59e0b',
             'in_progress' => '#0077b6',
-            'resolved'    => '#059669',
-            'closed'      => '#6b7280',
-            default       => '#6b7280',
+            'resolved' => '#059669',
+            'closed' => '#6b7280',
+            default => '#6b7280',
         };
     }
 }

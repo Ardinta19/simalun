@@ -54,7 +54,7 @@ class Laundry
         $url = "https://wa.me/{$number}";
 
         if ($message) {
-            $url .= '?text=' . urlencode($message);
+            $url .= '?text='.urlencode($message);
         }
 
         return $url;

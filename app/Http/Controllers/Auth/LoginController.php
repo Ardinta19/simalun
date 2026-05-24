@@ -20,16 +20,16 @@ class LoginController extends Controller
     {
         $credentials = $request->validate([
             'identifier' => ['nullable', 'string'],
-            'email'      => ['nullable', 'string'],
-            'password'   => ['required', 'string'],
+            'email' => ['nullable', 'string'],
+            'password' => ['required', 'string'],
         ], [
             'password.required' => 'Password wajib diisi',
         ]);
 
         $identifier = trim($credentials['identifier'] ?? $credentials['email'] ?? '');
-        $password   = $credentials['password'];
+        $password = $credentials['password'];
 
-        if (!$identifier) {
+        if (! $identifier) {
             return back()->withErrors([
                 'identifier' => 'Email atau No. HP wajib diisi',
             ])->onlyInput('identifier');
@@ -65,7 +65,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect('/'); // Redirect ke splash/home
     }
 

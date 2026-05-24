@@ -24,7 +24,7 @@ class PasswordResetTest extends TestCase
 
         $response = $this->post('/forgot-password', ['email' => $user->email]);
 
-        $response->assertSessionHas('status', __ ('passwords.sent'));
+        $response->assertSessionHas('status', __('passwords.sent'));
     }
 
     public function test_reset_password_screen_can_be_rendered(): void

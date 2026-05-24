@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomerAddress extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'customer_id',
         'label',

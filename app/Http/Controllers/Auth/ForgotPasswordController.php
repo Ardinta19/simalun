@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -24,7 +25,7 @@ class ForgotPasswordController extends Controller
         $credentials = ['email' => $request->email];
         $user = Password::broker()->getUser($credentials);
 
-        if (!$user) {
+        if (! $user) {
             $user = User::query()->where('email', $request->email)->first();
         }
 

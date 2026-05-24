@@ -11,7 +11,7 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login')->with('error', 'Silakan masuk terlebih dahulu.');
         }
 
@@ -22,9 +22,9 @@ class RoleMiddleware
         }
 
         return match ($userRole) {
-            'admin'  => redirect()->route('dashboard.admin'),
+            'admin' => redirect()->route('dashboard.admin'),
             'driver' => redirect()->route('dashboard.driver'),
-            default  => redirect()->route('customer.dashboard'),
+            default => redirect()->route('customer.dashboard'),
         };
     }
 }

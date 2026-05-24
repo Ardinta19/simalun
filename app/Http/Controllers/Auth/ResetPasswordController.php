@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -22,8 +23,8 @@ class ResetPasswordController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'token'    => ['required'],
-            'email'    => ['required', 'email'],
+            'token' => ['required'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -31,7 +32,7 @@ class ResetPasswordController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password'       => Hash::make($password),
+                    'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
                 event(new PasswordReset($user));
